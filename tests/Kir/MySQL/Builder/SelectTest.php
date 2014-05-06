@@ -66,6 +66,24 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals('SELECT a FROM test t HAVING a+1<2 ;', $str);
 	}
 
+	public function testOrder() {
+		$str = TestSelect::create()
+		->field('a')
+		->from('t', 'test')
+		->orderBy('a', 'desc')
+		->asString();
+		$this->assertEquals('SELECT a FROM test t ORDER BY a DESC ;', $str);
+	}
+
+	public function testGroup() {
+		$str = TestSelect::create()
+		->field('a')
+		->from('t', 'test')
+		->groupBy('a', 'b', 'c')
+		->asString();
+		$this->assertEquals('SELECT a FROM test t GROUP BY a, b, c ;', $str);
+	}
+
 	public function testLimit() {
 		$str = TestSelect::create()
 		->field('a')

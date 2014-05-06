@@ -137,7 +137,7 @@ class Select extends Statement {
 	 */
 	public function orderBy($expression, $direction = 'asc') {
 		if(strtolower($direction) != 'desc') {
-			$direction = 'asc';
+			$direction = 'ASC';
 		}
 		if(is_array($expression)) {
 			if(!count($expression)) {
@@ -317,7 +317,7 @@ class Select extends Statement {
 		$arr = array();
 		foreach($this->orderBy as $order) {
 			list($expression, $direction) = $order;
-			$arr[] = "\t{$expression} {$direction}";
+			$arr[] = sprintf("\t%s %s", $expression, strtoupper($direction));
 		}
 		return $query . join(",\n", $arr) . "\n";
 	}
@@ -327,7 +327,7 @@ class Select extends Statement {
 	 * @return string
 	 */
 	private function buildGroups($query) {
-		if(!count($this->orderBy)) {
+		if(!count($this->groupBy)) {
 			return $query;
 		}
 		$query .= "GROUP BY\n";
