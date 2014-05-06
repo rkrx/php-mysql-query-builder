@@ -1,0 +1,24 @@
+{
+	"name": "rkr/php-mysql-query-builder",
+	"description": "Easy to use query builder for PDO",
+	"license": "MIT",
+	"minimum-stability": "dev",
+	"prefer-stable": true,
+	"authors": [{
+		"name": "ron",
+		"email": "ron.kirschler@gmail.com"
+	}],
+	"require-dev": {
+		"phpunit/phpunit": "~4.0"
+	},
+	"autoload": {
+		"psr-0": {
+			"Kir\\MySQL\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-0": {
+			"Kir\\MySQL\\": ["src/", "tests/"]
+		}
+	}
+}
