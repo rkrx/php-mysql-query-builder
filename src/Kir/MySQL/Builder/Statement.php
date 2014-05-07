@@ -17,13 +17,6 @@ abstract class Statement {
 	}
 
 	/**
-	 * @return Database
-	 */
-	protected function db() {
-		return $this->db;
-	}
-
-	/**
 	 * @param bool $stop
 	 * @return $this
 	 */
@@ -37,5 +30,19 @@ abstract class Statement {
 			exit;
 		}
 		return $this;
+	}
+
+	/**
+	 * @return Statement
+	 */
+	public function cloneStatement() {
+		return clone $this;
+	}
+
+	/**
+	 * @return Database
+	 */
+	protected function db() {
+		return $this->db;
 	}
 }
