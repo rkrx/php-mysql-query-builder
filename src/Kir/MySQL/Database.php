@@ -1,7 +1,6 @@
 <?php
 namespace Kir\MySQL;
 
-use Kir\MySQL\Builder\RunnableSelect;
 use PDOStatement;
 
 interface Database {
@@ -49,7 +48,7 @@ interface Database {
 
 	/**
 	 * @param array $fields
-	 * @return RunnableSelect
+	 * @return Builder\RunnableSelect
 	 */
 	public function select(array $fields = array());
 
