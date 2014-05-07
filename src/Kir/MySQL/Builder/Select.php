@@ -147,7 +147,7 @@ class Select extends Statement {
 				$expression[0],
 				array_slice($expression, 1)
 			);
-			$expression = call_user_func_array(array($this->mysql(), 'quoteExpression'), $arguments);
+			$expression = call_user_func_array(array($this->db(), 'quoteExpression'), $arguments);
 		}
 		$this->orderBy[] = array($expression, $direction);
 		return $this;
@@ -167,7 +167,7 @@ class Select extends Statement {
 					$expression[0],
 					array_slice($expression, 1)
 				);
-				$expression = call_user_func_array(array($this->mysql(), 'quoteExpression'), $arguments);
+				$expression = call_user_func_array(array($this->db(), 'quoteExpression'), $arguments);
 			}
 			$this->groupBy[] = $expression;
 		}
@@ -298,7 +298,7 @@ class Select extends Statement {
 		$arr = array();
 		foreach($conditions as $condition) {
 			list($expression, $arguments) = $condition;
-			$expr = $this->mysql()->quoteExpression($expression, $arguments);
+			$expr = $this->db()->quoteExpression($expression, $arguments);
 			$arr[] = "\t{$expr}";
 		}
 		$query .= join("\n\tAND\n", $arr);
@@ -368,6 +368,6 @@ class Select extends Statement {
 	 * @return string
 	 */
 	private function buildExpression($expression, array $arguments) {
-		return $this->mysql()->quoteExpression($expression, $arguments);
+		return $this->db()->quoteExpression($expression, $arguments);
 	}
 }

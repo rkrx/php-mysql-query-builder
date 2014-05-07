@@ -1,12 +1,19 @@
 <?php
-namespace Kir\MySQL;
+namespace Kir\MySQL\Databases;
 
+use Kir\MySQL\Builder;
+use Kir\MySQL\Database;
 use PDO;
 use PDOStatement;
 use Kir\MySQL\Builder\RunnableSelect;
 use UnexpectedValueException;
 
-class MySQL {
+class MySQL implements Database {
+	/**
+	 * @var array
+	 */
+	private static $tableFields = array();
+
 	/**
 	 * @var PDO
 	 */
@@ -45,6 +52,22 @@ class MySQL {
 	}
 
 	/**
+	 * @param string $table
+	 * @return array
+	 */
+	public function getTableFields($table) {
+		if(array_key_exists($table, self::$tableFields)) {
+			return self::$tableFields[$table];
+		}
+		$stmt = $this->pdo->query("DESCRIBE {$table}");
+		$stmt->execute();
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		self::$tableFields[$table] = array_map(function ($row) { return $row['Field']; }, $rows);
+		$stmt->closeCursor();
+		return self::$tableFields[$table];
+	}
+
+	/**
 	 * @param mixed $expression
 	 * @param array $arguments
 	 * @return string
@@ -79,8 +102,8 @@ class MySQL {
 			$result = 'NULL';
 		} elseif(is_array($value)) {
 			$result = join(', ', array_map(function ($value) { return $this->quote($value); }, $value));
-		} elseif(is_numeric($value)) {
-			$result = $value;
+		/*} elseif(is_int(trim($value)) && strpos('123456789', substr(0, 1, trim($value))) !== null) {
+			$result = $value;*/
 		} else {
 			$result = $this->pdo->quote($value);
 		}

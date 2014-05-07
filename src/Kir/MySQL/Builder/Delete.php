@@ -32,7 +32,7 @@ class Delete extends Statement {
 	 */
 	public function where($expr) {
 		$arguments = array_slice(func_get_args(), 1);
-		$expr = $this->mysql()->quoteExpression($expr, $arguments);
+		$expr = $this->db()->quoteExpression($expr, $arguments);
 		$this->where[] = "({$expr})";
 		return $this;
 	}

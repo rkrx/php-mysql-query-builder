@@ -7,6 +7,6 @@ class RunnableDelete extends Delete {
 	 */
 	public function run() {
 		$query = (string)$this;
-		return $this->mysql()->exec($query);
+		return $this->db()->exec($query);
 	}
 }

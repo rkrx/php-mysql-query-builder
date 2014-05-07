@@ -1,26 +1,26 @@
 <?php
 namespace Kir\MySQL\Builder;
 
-use Kir\MySQL\MySQL;
+use Kir\MySQL\Database;
 
 abstract class Statement {
 	/**
 	 * @var
 	 */
-	private $mysql;
+	private $db;
 
 	/**
-	 * @param MySQL $mysql
+	 * @param Database $db
 	 */
-	public function __construct(MySQL $mysql) {
-		$this->mysql = $mysql;
+	public function __construct(Database $db) {
+		$this->db = $db;
 	}
 
 	/**
-	 * @return MySQL
+	 * @return Database
 	 */
-	protected function mysql() {
-		return $this->mysql;
+	protected function db() {
+		return $this->db;
 	}
 
 	/**

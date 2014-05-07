@@ -1,10 +1,10 @@
 <?php
-namespace Kir\MySQL\Builder\SelectTest;
+namespace Kir\MySQL\Builder\UpdateTest;
 
-use Kir\MySQL\Builder\Select;
+use Kir\MySQL\Builder\Update;
 use Kir\MySQL\Databases\Mock;
 
-class TestSelect extends Select {
+class TestUpdate extends Update {
 	/**
 	 * @return $this
 	 */

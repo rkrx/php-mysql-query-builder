@@ -62,6 +62,6 @@ class RunnableSelect extends Select {
 	 * @return PDOStatement
 	 */
 	private function createStatement() {
-		return $this->mysql()->query($this->__toString());
+		return $this->db()->query($this->__toString());
 	}
 }

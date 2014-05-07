@@ -33,19 +33,19 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	private function _testJoin($method, $type) {
-		$str = TestSelect::create()
+		$sql = TestSelect::create()
 		->field('a')
 		->from('t1', 'test1')
 		->{$method}('t2', 'test2', 't2.id=t1.id')
 		->asString();
-		$this->assertEquals("SELECT a FROM test1 t1 {$type} JOIN test2 t2 ON t2.id=t1.id ;", $str);
+		$this->assertEquals("SELECT a FROM test1 t1 {$type} JOIN test2 t2 ON t2.id=t1.id ;", $sql);
 
-		$str = TestSelect::create()
+		$sql = TestSelect::create()
 		->field('a')
 		->from('t1', 'test1')
 		->{$method}('t2', 'test2', 't2.id=t1.id AND t2.id < ?', 1000)
 		->asString();
-		$this->assertEquals("SELECT a FROM test1 t1 {$type} JOIN test2 t2 ON t2.id=t1.id AND t2.id < 1000 ;", $str);
+		$this->assertEquals("SELECT a FROM test1 t1 {$type} JOIN test2 t2 ON t2.id=t1.id AND t2.id < '1000' ;", $sql);
 	}
 
 	public function testWhere() {
@@ -61,14 +61,14 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->from('t', 'test')
 		->where('a < ?', 1000)
 		->asString();
-		$this->assertEquals('SELECT a FROM test t WHERE a < 1000 ;', $str);
+		$this->assertEquals("SELECT a FROM test t WHERE a < '1000' ;", $str);
 
 		$str = TestSelect::create()
 		->field('a')
 		->from('t', 'test')
 		->where('a < :0', 1000)
 		->asString();
-		$this->assertEquals('SELECT a FROM test t WHERE a < 1000 ;', $str);
+		$this->assertEquals("SELECT a FROM test t WHERE a < '1000' ;", $str);
 	}
 
 	public function testHaving() {

@@ -74,7 +74,7 @@ class Insert extends InsertUpdateStatement {
 			throw new UnexpectedValueException('Field name is invalid');
 		}
 		$sqlField = $field;
-		$sqlValue = $this->mysql()->quote($value);
+		$sqlValue = $this->db()->quote($value);
 		$this->fields[$sqlField] = $sqlValue;
 		return $this;
 	}
@@ -90,7 +90,7 @@ class Insert extends InsertUpdateStatement {
 			throw new UnexpectedValueException('Field name is invalid');
 		}
 		$sqlField = $field;
-		$sqlValue = $this->mysql()->quote($value);
+		$sqlValue = $this->db()->quote($value);
 		$this->update[$sqlField] = $sqlValue;
 		return $this;
 	}
@@ -184,7 +184,7 @@ class Insert extends InsertUpdateStatement {
 		}
 
 		$fields = $this->fields;
-		$tableFields = $this->getTableFields($this->table);
+		$tableFields = $this->db()->getTableFields($this->table);
 
 		$insertData = $this->buildFieldList($fields, $tableFields);
 		$updateData = $this->buildUpdate();
@@ -212,7 +212,7 @@ class Insert extends InsertUpdateStatement {
 	 */
 	private function buildUpdate() {
 		$queryArr = array();
-		$tableFields = $this->getTableFields($this->table);
+		$tableFields = $this->db()->getTableFields($this->table);
 		if(!empty($this->update)) {
 			$queryArr[] = "ON DUPLICATE KEY UPDATE\n";
 			$updateArr = array();

@@ -7,6 +7,6 @@ class RunnableUpdate extends Update {
 	 */
 	public function run() {
 		$query = $this->__toString();
-		return $this->mysql()->exec($query);
+		return $this->db()->exec($query);
 	}
 }

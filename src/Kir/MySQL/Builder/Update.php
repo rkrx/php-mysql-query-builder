@@ -42,7 +42,7 @@ class Update extends InsertUpdateStatement {
 	 */
 	public function set($field, $value) {
 		$sqlField = $field;
-		$sqlValue = $this->mysql()->quote($value);
+		$sqlValue = $this->db()->quote($value);
 		$this->fields[$sqlField] = $sqlValue;
 		return $this;
 	}
@@ -72,7 +72,7 @@ class Update extends InsertUpdateStatement {
 	 * @return $this
 	 */
 	public function where($expr) {
-		$expr = $this->mysql()->quoteExpression($expr, array_slice(func_get_args(), 1));
+		$expr = $this->db()->quoteExpression($expr, array_slice(func_get_args(), 1));
 		$this->where[] = "({$expr})";
 		return $this;
 	}
@@ -95,7 +95,7 @@ class Update extends InsertUpdateStatement {
 			throw new Exception('Specify a table-name');
 		}
 
-		$tableFields = $this->getTableFields($this->table);
+		$tableFields = $this->db()->getTableFields($this->table);
 		$sqlFields = $this->buildFieldList($this->fields, $tableFields);
 
 		if (empty($sqlFields)) {
