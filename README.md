@@ -1,4 +1,4 @@
-mysql query builder (php 5.3+)
+mysql query builder (php 5.4+)
 ==============================
 Simple mysql query builder to build select, insert, update and delete queries with conditional parts.
 This library was initially not intended to build prepared statements, but this is also possible.
