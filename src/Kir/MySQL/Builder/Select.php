@@ -234,12 +234,16 @@ class Select extends Statement {
 	 */
 	private function buildFields($query) {
 		$fields = array();
-		foreach($this->fields as $alias => $expression) {
-			if(is_numeric($alias)) {
-				$fields[] = "\t{$expression}";
-			} else {
-				$fields[] = "\t{$expression} AS `{$alias}`";
+		if(count($this->fields)) {
+			foreach($this->fields as $alias => $expression) {
+				if(is_numeric($alias)) {
+					$fields[] = "\t{$expression}";
+				} else {
+					$fields[] = "\t{$expression} AS `{$alias}`";
+				}
 			}
+		} else {
+			$fields[] = "\t*";
 		}
 		return $query . join(",\n", $fields) . "\n";
 	}
