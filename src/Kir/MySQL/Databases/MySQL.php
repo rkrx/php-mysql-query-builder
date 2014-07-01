@@ -1,12 +1,13 @@
 <?php
 namespace Kir\MySQL\Databases;
 
+use PDO;
+use Exception;
+use PDOStatement;
 use Kir\MySQL\Builder;
 use Kir\MySQL\Database;
-use PDO;
-use PDOStatement;
-use Kir\MySQL\Builder\RunnableSelect;
 use UnexpectedValueException;
+use Kir\MySQL\Builder\RunnableSelect;
 
 class MySQL implements Database {
 	/**
@@ -28,10 +29,14 @@ class MySQL implements Database {
 
 	/**
 	 * @param string $query
+	 * @throws Exception
 	 * @return PDOStatement
 	 */
 	public function query($query) {
 		$stmt = $this->pdo->query($query);
+		if(!$stmt) {
+			throw new Exception("Could not execute statement:\n{$query}");
+		}
 		$stmt->execute();
 		return $stmt;
 	}
