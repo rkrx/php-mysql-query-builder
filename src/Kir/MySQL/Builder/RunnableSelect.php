@@ -65,15 +65,13 @@ class RunnableSelect extends Select {
 		if($callback !== null) {
 			$data = array_map($callback, $data);
 		}
-		$statement->closeCursor();
-
 		if($this->preserveTypes) {
 			$columnDefinitions = $this->getFieldTypes($statement);
 			foreach($data as &$row) {
 				$row = $this->convertValues($row, $columnDefinitions);
 			}
 		}
-
+		$statement->closeCursor();
 		return $data;
 	}
 
@@ -91,9 +89,7 @@ class RunnableSelect extends Select {
 			$columnDefinitions = $this->getFieldTypes($statement);
 			$row = $this->convertValues($row, $columnDefinitions);
 		}
-
 		$statement->closeCursor();
-
 		return $row;
 	}
 
@@ -121,6 +117,7 @@ class RunnableSelect extends Select {
 		if(!count($row)) {
 			return null;
 		}
+		$statement->closeCursor();
 		return array_shift($row);
 	}
 
