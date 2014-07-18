@@ -43,6 +43,19 @@ class MySQL implements Database {
 
 	/**
 	 * @param string $query
+	 * @throws Exception
+	 * @return PDOStatement
+	 */
+	public function prepare($query) {
+		$stmt = $this->pdo->prepare($query);
+		if(!$stmt) {
+			throw new Exception("Could not execute statement:\n{$query}");
+		}
+		return $stmt;
+	}
+
+	/**
+	 * @param string $query
 	 * @return int
 	 */
 	public function exec($query) {

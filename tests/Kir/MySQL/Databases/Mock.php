@@ -29,6 +29,14 @@ class Mock implements Database {
 
 	/**
 	 * @param string $query
+	 * @return PDOStatement
+	 */
+	public function prepare($query) {
+		return null;
+	}
+
+	/**
+	 * @param string $query
 	 * @return int
 	 */
 	public function exec($query) {

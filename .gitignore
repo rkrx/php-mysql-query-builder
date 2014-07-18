@@ -2,3 +2,4 @@
 /vendor
 /composer.lock
 /atlassian-ide-plugin.xml
+/test.php

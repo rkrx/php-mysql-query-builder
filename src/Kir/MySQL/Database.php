@@ -12,6 +12,12 @@ interface Database {
 
 	/**
 	 * @param string $query
+	 * @return PDOStatement
+	 */
+	public function prepare($query);
+
+	/**
+	 * @param string $query
 	 * @return int
 	 */
 	public function exec($query);
@@ -66,4 +72,5 @@ interface Database {
 	 * @return Builder\RunnableDelete
 	 */
 	public function delete();
+
 }
