@@ -189,16 +189,16 @@ class Insert extends InsertUpdateStatement {
 		$insertData = $this->buildFieldList($fields, $tableFields);
 		$updateData = $this->buildUpdate();
 
-		if (empty($insertData)) {
+		if (!count($insertData)) {
 			throw new Exception('No field-data found');
 		}
 
 		$queryArr = array();
 		$ignoreStr = $this->ignore ? ' IGNORE' : '';
 		$queryArr[] = "INSERT{$ignoreStr} INTO\n\t{$this->table}\n";
-		$queryArr[] = "SET\n{$insertData}\n";
+		$queryArr[] = "SET\n" . join(",\n", $insertData) . "\n";
 		if($updateData) {
-			$queryArr[] = "{$updateData}\n";
+			$queryArr[] = join('', $updateData) . "\n";
 		}
 		$queryArr[] = ";\n";
 
@@ -223,7 +223,7 @@ class Insert extends InsertUpdateStatement {
 
 			$queryArr[] = $this->buildFieldList($this->update, $tableFields, $updateArr);
 		}
-		return join('', $queryArr);
+		return $queryArr;
 	}
 
 	/**
