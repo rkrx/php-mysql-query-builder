@@ -8,6 +8,13 @@ abstract class InsertUpdateStatement extends Statement {
 	private $mask = null;
 
 	/**
+	 * @return array|null
+	 */
+	public function getMask() {
+		return $this->mask;
+	}
+
+	/**
 	 * @param array $mask
 	 * @return $this
 	 */
@@ -24,6 +31,9 @@ abstract class InsertUpdateStatement extends Statement {
 	 */
 	protected function buildFieldList(array $fields, array $tableFields, array $result = array()) {
 		foreach ($fields as $fieldName => $fieldValue) {
+			if(is_array($this->mask) && !in_array($fieldName, $this->mask)) {
+				continue;
+			}
 			if (is_int($fieldName)) {
 				$result[] = $fieldValue;
 			} elseif ($this->isFieldAccessible($fieldName, $tableFields)) {
