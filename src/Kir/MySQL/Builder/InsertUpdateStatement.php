@@ -41,7 +41,7 @@ abstract class InsertUpdateStatement extends Statement {
 				$result[] = "\t{$fieldName} = {$fieldValue}";
 			}
 		}
-		return $result;
+		return join(",\n", $result);
 	}
 
 	/**
