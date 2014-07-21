@@ -56,6 +56,6 @@ abstract class InsertUpdateStatement extends Statement {
 		if(!is_array($this->mask)) {
 			return true;
 		}
-		return !in_array($fieldName, $this->mask);
+		return in_array($fieldName, $this->mask);
 	}
 } 
