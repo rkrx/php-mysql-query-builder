@@ -43,6 +43,11 @@ class Select extends Statement {
 	private $offset = null;
 
 	/**
+	 * @var bool
+	 */
+	private $calcFoundRows;
+
+	/**
 	 * @param string $expression
 	 * @param string $alias
 	 * @return $this
@@ -193,10 +198,22 @@ class Select extends Statement {
 	}
 
 	/**
+	 * @return $this
+	 */
+	public function sqlCalcFoundRows() {
+		$this->calcFoundRows = true;
+		return $this;
+	}
+
+	/**
 	 * @return string
 	 */
 	public function __toString() {
-		$query = "SELECT\n";
+		$query = "SELECT";
+		if($this->calcFoundRows) {
+			$query .= " SQL_CALC_ROUND_ROWS";
+		}
+		$query .= "\n";
 		$query = $this->buildFields($query);
 		$query = $this->buildFrom($query);
 		$query = $this->buildJoins($query);
