@@ -219,7 +219,7 @@ class Select extends Statement {
 	public function __toString() {
 		$query = "SELECT";
 		if($this->calcFoundRows) {
-			$query .= " SQL_CALC_ROUND_ROWS";
+			$query .= " SQL_CALC_FOUND_ROWS";
 		}
 		$query .= "\n";
 		$query = $this->buildFields($query);
