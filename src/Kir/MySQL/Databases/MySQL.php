@@ -37,7 +37,6 @@ class MySQL implements Database {
 		if(!$stmt) {
 			throw new Exception("Could not execute statement:\n{$query}");
 		}
-		$stmt->execute();
 		return $stmt;
 	}
 

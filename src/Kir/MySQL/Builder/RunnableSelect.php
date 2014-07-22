@@ -134,23 +134,13 @@ class RunnableSelect extends Select {
 	 * @return PDOStatement
 	 */
 	private function createStatement() {
-		$statement = $this->db()->prepare($this->__toString());
+		$db = $this->db();
+		$statement = $db->query($this->__toString());
 		$statement->execute($this->values);
 		if($this->getCalcFoundRows()) {
-			$this->foundRows = $this->fetchFoundRows();
+			$this->foundRows = $db->query('SELECT FOUND_ROWS()')->fetchColumn(0);
 		}
 		return $statement;
-	}
-
-	/**
-	 * @return int
-	 */
-	private function fetchFoundRows() {
-		$statement = $this->db()->query('SELECT FOUND_ROWS()');
-		$statement->execute();
-		$result = $statement->fetchColumn(0);
-		$statement->closeCursor();
-		return $result;
 	}
 
 	/**
@@ -195,7 +185,9 @@ class RunnableSelect extends Select {
 	 */
 	private function convertValues(array $row, array $columnDefinitions) {
 		foreach($row as $key => &$value) {
-			$value = $this->convertValue($value, $columnDefinitions[$key]);
+			if($value !== null) {
+				$value = $this->convertValue($value, $columnDefinitions[$key]);
+			}
 		}
 		return $row;
 	}
