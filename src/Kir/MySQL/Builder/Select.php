@@ -45,7 +45,7 @@ class Select extends Statement {
 	/**
 	 * @var bool
 	 */
-	private $calcFoundRows;
+	private $calcFoundRows = false;
 
 	/**
 	 * @param string $expression
@@ -198,10 +198,18 @@ class Select extends Statement {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function getCalcFoundRows() {
+		return $this->calcFoundRows;
+	}
+
+	/**
+	 * @param bool $calcFoundRows
 	 * @return $this
 	 */
-	public function sqlCalcFoundRows() {
-		$this->calcFoundRows = true;
+	public function setCalcFoundRows($calcFoundRows = true) {
+		$this->calcFoundRows = $calcFoundRows;
 		return $this;
 	}
 

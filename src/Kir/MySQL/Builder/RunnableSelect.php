@@ -19,6 +19,11 @@ class RunnableSelect extends Select {
 	private $preserveTypes;
 
 	/**
+	 * @var bool
+	 */
+	private $foundRows = 0;
+
+	/**
 	 * @param array $values
 	 * @return $this
 	 */
@@ -60,7 +65,6 @@ class RunnableSelect extends Select {
 	 */
 	public function fetchRows(Closure $callback = null) {
 		$statement = $this->createStatement();
-		$statement->execute($this->values);
 		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
 		if($callback !== null) {
 			$data = array_map($callback, $data);
@@ -80,7 +84,6 @@ class RunnableSelect extends Select {
 	 */
 	public function fetchRow() {
 		$statement = $this->createStatement();
-		$statement->execute($this->values);
 		$row = $statement->fetch(PDO::FETCH_ASSOC);
 		if(!is_array($row)) {
 			return array();
@@ -109,7 +112,6 @@ class RunnableSelect extends Select {
 	 */
 	public function fetchValue($default = null) {
 		$statement = $this->createStatement();
-		$statement->execute($this->values);
 		$row = $statement->fetch(PDO::FETCH_ASSOC);
 		if(!is_array($row)) {
 			return $default;
@@ -122,10 +124,33 @@ class RunnableSelect extends Select {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function getFoundRows() {
+		return $this->foundRows;
+	}
+
+	/**
 	 * @return PDOStatement
 	 */
 	private function createStatement() {
-		return $this->db()->prepare($this->__toString());
+		$statement = $this->db()->prepare($this->__toString());
+		$statement->execute($this->values);
+		if($this->getCalcFoundRows()) {
+			$this->foundRows = $this->fetchFoundRows();
+		}
+		return $statement;
+	}
+
+	/**
+	 * @return int
+	 */
+	private function fetchFoundRows() {
+		$statement = $this->db()->query('SELECT FOUND_ROWS()');
+		$statement->execute();
+		$result = $statement->fetchColumn(0);
+		$statement->closeCursor();
+		return $result;
 	}
 
 	/**
