@@ -2,8 +2,6 @@
 	"name": "rkr/mysql-query-builder",
 	"description": "Easy to use query builder for PHP5.3+/PDO",
 	"license": "MIT",
-	"minimum-stability": "dev",
-	"prefer-stable": true,
 	"authors": [{
 		"name": "ron",
 		"email": "ron.kirschler@gmail.com"
