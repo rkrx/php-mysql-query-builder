@@ -142,9 +142,7 @@ class Insert extends InsertUpdateStatement {
 	 */
 	public function addAll(array $data) {
 		foreach ($data as $field => $value) {
-			if ($field != $this->keyField) {
-				$this->add($field, $value);
-			}
+			$this->add($field, $value);
 		}
 		return $this;
 	}
