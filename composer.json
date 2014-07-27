@@ -1,5 +1,5 @@
 {
-	"name": "rkr/php-mysql-query-builder",
+	"name": "rkr/mysql-query-builder",
 	"description": "Easy to use query builder for PHP5.3+/PDO",
 	"license": "MIT",
 	"minimum-stability": "dev",
