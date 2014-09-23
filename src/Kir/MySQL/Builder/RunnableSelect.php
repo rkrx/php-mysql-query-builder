@@ -97,6 +97,19 @@ class RunnableSelect extends Select {
 	}
 
 	/**
+	 * @return mixed[]
+	 */
+	public function fetchKeyValue() {
+		$rows = $this->fetchRows();
+		$result = array();
+		foreach($rows as $row) {
+			list($key, $value) = array_values($row);
+			$result[$key] = $value;
+		}
+		return $result;
+	}
+
+	/**
 	 * @return string[]
 	 */
 	public function fetchArray() {

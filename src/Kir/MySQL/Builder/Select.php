@@ -206,9 +206,13 @@ class Select extends Statement {
 
 	/**
 	 * @param bool $calcFoundRows
+	 * @throws \Exception
 	 * @return $this
 	 */
 	public function setCalcFoundRows($calcFoundRows = true) {
+		if(ini_get("mysql.trace_mode")) {
+			throw new \Exception('This function cant operate with mysql.trace_mode is set.');
+		}
 		$this->calcFoundRows = $calcFoundRows;
 		return $this;
 	}
