@@ -119,8 +119,9 @@ class RunnableSelect extends Select {
 		foreach($rows as $row) {
 			$tmp = &$result;
 			foreach($fields as $field) {
-				$tmp[$field] = [];
-				$tmp = &$tmp[$field];
+				$value = $row[$field];
+				$tmp[$value] = [];
+				$tmp = &$tmp[$value];
 			}
 			$tmp = $row;
 		}
