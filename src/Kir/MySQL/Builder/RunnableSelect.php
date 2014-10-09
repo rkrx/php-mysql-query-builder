@@ -110,6 +110,24 @@ class RunnableSelect extends Select {
 	}
 
 	/**
+	 * @param array $fields
+	 * @return array
+	 */
+	public function fetchGroups(array $fields) {
+		$rows = $this->fetchRows();
+		$result = array();
+		foreach($rows as $row) {
+			$tmp = &$result;
+			foreach($fields as $field) {
+				$tmp[$field] = [];
+				$tmp = &$tmp[$field];
+			}
+			$tmp = $row;
+		}
+		return $result;
+	}
+
+	/**
 	 * @return string[]
 	 */
 	public function fetchArray() {
