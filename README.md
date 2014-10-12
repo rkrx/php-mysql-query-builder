@@ -6,6 +6,6 @@ The main motive for this library is an environment where a lot of things are aut
 
 Here a few things to keep in mind:
 
-* The charset is up to you. No special binding to UTF8 although UTF8 is the foundation of my initiating project.
+* The charset is up to you. No special binding to UTF8, although UTF8 is the standard.
 * The order of method-calls of each statement-builder is irrelevant. The resulting query will always render the right order.
 * No animals were harmed due to the production of this library.
