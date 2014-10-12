@@ -173,20 +173,23 @@ class MySQL implements Database {
 	 * @return $this
 	 */
 	public function transactionStart() {
-		$this->exec('BEGIN;');
+		$this->pdo->beginTransaction();
+		return $this;
 	}
 
 	/**
 	 * @return $this
 	 */
 	public function transactionCommit() {
-		$this->exec('COMMIT;');
+		$this->pdo->commit();
+		return $this;
 	}
 
 	/**
 	 * @return $this
 	 */
 	public function transactionRollback() {
-		$this->exec('ROLLBACK;');
+		$this->pdo->rollBack();
+		return $this;
 	}
 }
