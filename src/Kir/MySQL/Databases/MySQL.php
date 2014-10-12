@@ -168,4 +168,25 @@ class MySQL implements Database {
 	public function delete() {
 		return new Builder\RunnableDelete($this);
 	}
+
+	/**
+	 * @return $this
+	 */
+	public function transactionStart() {
+		$this->exec('BEGIN;');
+	}
+
+	/**
+	 * @return $this
+	 */
+	public function transactionCommit() {
+		$this->exec('COMMIT;');
+	}
+
+	/**
+	 * @return $this
+	 */
+	public function transactionRollback() {
+		$this->exec('ROLLBACK;');
+	}
 }
