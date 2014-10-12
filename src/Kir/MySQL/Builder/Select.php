@@ -48,13 +48,18 @@ class Select extends Statement {
 	private $calcFoundRows = false;
 
 	/**
+	 * @var bool
+	 */
+	private $forUpdate = false;
+
+	/**
 	 * @param string $expression
 	 * @param string $alias
 	 * @return $this
 	 */
 	public function field($expression, $alias = null) {
 		if(is_object($expression)) {
-			$expression = (string) $expression;
+			$expression = (string)$expression;
 		}
 		if($alias === null) {
 			$this->fields[] = $expression;
@@ -198,6 +203,15 @@ class Select extends Statement {
 	}
 
 	/**
+	 * @param bool $enabled
+	 * @return $this
+	 */
+	public function forUpdate($enabled = true) {
+		$this->forUpdate = $enabled;
+		return $this;
+	}
+
+	/**
 	 * @return bool
 	 */
 	public function getCalcFoundRows() {
@@ -234,6 +248,7 @@ class Select extends Statement {
 		$query = $this->buildConditions('HAVING', $this->having, $query);
 		$query = $this->buildOrder($query);
 		$query = $this->buildLimit($query);
+		$query = $this->buildForUpdate($query);
 		$query .= ";\n";
 		return $query;
 	}
@@ -274,7 +289,7 @@ class Select extends Statement {
 		} else {
 			$fields[] = "\t*";
 		}
-		return $query . join(",\n", $fields) . "\n";
+		return $query.join(",\n", $fields)."\n";
 	}
 
 	/**
@@ -285,12 +300,12 @@ class Select extends Statement {
 		$arr = array();
 		foreach($this->tables as $table) {
 			if($table['type'] == 'FROM') {
-				$arr[] = "\t" . $this->buildTableName($table['alias'], $table['name']);
+				$arr[] = "\t".$this->buildTableName($table['alias'], $table['name']);
 			}
 		}
 		if(count($arr)) {
 			$query .= "FROM\n";
-			$query .= join(",\n", $arr) . "\n";
+			$query .= join(",\n", $arr)."\n";
 		}
 		return $query;
 	}
@@ -303,16 +318,16 @@ class Select extends Statement {
 		$arr = array();
 		foreach($this->tables as $table) {
 			if($table['type'] != 'FROM') {
-				$join = $table['type'] . " JOIN\n";
-				$join .= "\t" . $this->buildTableName($table['alias'], $table['name']);
+				$join = $table['type']." JOIN\n";
+				$join .= "\t".$this->buildTableName($table['alias'], $table['name']);
 				if($table['expression']) {
-					$join .= " ON " . $this->buildExpression($table['expression'], $table['arguments']);
+					$join .= " ON ".$this->buildExpression($table['expression'], $table['arguments']);
 				}
 				$arr[] = $join;
 			}
 		}
 		if(count($arr)) {
-			$query .= join("\n", $arr) . "\n";
+			$query .= join("\n", $arr)."\n";
 		}
 		return $query;
 	}
@@ -335,7 +350,7 @@ class Select extends Statement {
 			$arr[] = "\t{$expr}";
 		}
 		$query .= join("\n\tAND\n", $arr);
-		return $query . "\n";
+		return $query."\n";
 	}
 
 	/**
@@ -352,7 +367,7 @@ class Select extends Statement {
 			list($expression, $direction) = $order;
 			$arr[] = sprintf("\t%s %s", $expression, strtoupper($direction));
 		}
-		return $query . join(",\n", $arr) . "\n";
+		return $query.join(",\n", $arr)."\n";
 	}
 
 	/**
@@ -368,7 +383,7 @@ class Select extends Statement {
 		foreach($this->groupBy as $expression) {
 			$arr[] = "\t{$expression}";
 		}
-		return $query . join(",\n", $arr) . "\n";
+		return $query.join(",\n", $arr)."\n";
 	}
 
 	/**
@@ -382,6 +397,17 @@ class Select extends Statement {
 		$query .= "LIMIT\n\t{$this->limit}\n";
 		if($this->offset !== null) {
 			$query .= "OFFSET\n\t{$this->offset}\n";
+		}
+		return $query;
+	}
+
+	/**
+	 * @param string $query
+	 * @return string
+	 */
+	private function buildForUpdate($query) {
+		if($this->forUpdate) {
+			$query .= "FOR UPDATE\n";
 		}
 		return $query;
 	}

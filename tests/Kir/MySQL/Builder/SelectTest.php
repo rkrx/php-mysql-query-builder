@@ -123,4 +123,13 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->asString();
 		$this->assertEquals('SELECT a FROM test t ;', $str);
 	}
+
+	public function testForUpdate() {
+		$str = TestSelect::create()
+		->field('a')
+		->from('t', 'test')
+		->forUpdate()
+		->asString();
+		$this->assertEquals('SELECT a FROM test t FOR UPDATE ;', $str);
+	}
 }
