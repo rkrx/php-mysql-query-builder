@@ -201,7 +201,7 @@ class MySQL implements Database {
 	public function transaction($callback) {
 		try {
 			$this->pdo->beginTransaction();
-			call_user_func($callback);
+			call_user_func($callback, $this);
 			$this->pdo->commit();
 		} catch (\Exception $e) {
 			$this->pdo->rollBack();
