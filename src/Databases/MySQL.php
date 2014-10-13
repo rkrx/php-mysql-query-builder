@@ -192,4 +192,21 @@ class MySQL implements Database {
 		$this->pdo->rollBack();
 		return $this;
 	}
+
+	/**
+	 * @param callable $callback
+	 * @throws \Exception
+	 * @return $this
+	 */
+	public function transaction($callback) {
+		try {
+			$this->pdo->beginTransaction();
+			call_user_func($callback);
+			$this->pdo->commit();
+		} catch (\Exception $e) {
+			$this->pdo->rollBack();
+			throw $e;
+		}
+		return $this;
+	}
 }
