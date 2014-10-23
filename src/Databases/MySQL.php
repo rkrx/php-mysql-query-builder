@@ -57,7 +57,7 @@ class MySQL implements Database {
 	 * @return int
 	 */
 	public function exec($query, array $params = array()) {
-		$stmt = $this->pdo->query($query);
+		$stmt = $this->pdo->prepare($query);
 		$stmt->execute($params);
 		$result = $stmt->rowCount();
 		$stmt->closeCursor();
