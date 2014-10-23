@@ -1,10 +1,6 @@
 <?php
 namespace Kir\MySQL\Builder;
 
-use Closure;
-use PDO;
-use PDOStatement;
-
 /**
  */
 class RunnableSelect extends Select {
@@ -60,12 +56,12 @@ class RunnableSelect extends Select {
 	}
 
 	/**
-	 * @param Closure $callback
+	 * @param \Closure $callback
 	 * @return array[]
 	 */
-	public function fetchRows(Closure $callback = null) {
+	public function fetchRows(\Closure $callback = null) {
 		$statement = $this->createStatement();
-		$data = $statement->fetchAll(PDO::FETCH_ASSOC);
+		$data = $statement->fetchAll(\PDO::FETCH_ASSOC);
 		if($callback !== null) {
 			$data = array_map($callback, $data);
 		}
@@ -84,7 +80,7 @@ class RunnableSelect extends Select {
 	 */
 	public function fetchRow() {
 		$statement = $this->createStatement();
-		$row = $statement->fetch(PDO::FETCH_ASSOC);
+		$row = $statement->fetch(\PDO::FETCH_ASSOC);
 		if(!is_array($row)) {
 			return array();
 		}
@@ -144,7 +140,7 @@ class RunnableSelect extends Select {
 	 */
 	public function fetchValue($default = null) {
 		$statement = $this->createStatement();
-		$row = $statement->fetch(PDO::FETCH_ASSOC);
+		$row = $statement->fetch(\PDO::FETCH_ASSOC);
 		if(!is_array($row)) {
 			return $default;
 		}
@@ -163,7 +159,7 @@ class RunnableSelect extends Select {
 	}
 
 	/**
-	 * @return PDOStatement
+	 * @return \PDOStatement
 	 */
 	private function createStatement() {
 		$db = $this->db();
@@ -176,7 +172,7 @@ class RunnableSelect extends Select {
 	}
 
 	/**
-	 * @param PDOStatement $statement
+	 * @param \PDOStatement $statement
 	 * @return array
 	 */
 	private function getFieldTypes($statement) {

@@ -1,7 +1,6 @@
 <?php
 namespace Kir\MySQL\Builder;
 
-use Exception;
 use UnexpectedValueException;
 
 class Insert extends InsertUpdateStatement {

@@ -1,8 +1,6 @@
 <?php
 namespace Kir\MySQL\Builder;
 
-use Exception;
-
 class Delete extends Statement {
 	/**
 	 * @var string

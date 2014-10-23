@@ -9,7 +9,7 @@ use Kir\MySQL\Database;
 use UnexpectedValueException;
 use Kir\MySQL\Builder\RunnableSelect;
 
-class MySQL implements Database {
+class MySQL implements Database, Database {
 	/**
 	 * @var array
 	 */

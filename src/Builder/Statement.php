@@ -45,4 +45,9 @@ abstract class Statement {
 	protected function db() {
 		return $this->db;
 	}
+
+	/**
+	 * @return string
+	 */
+	abstract public function __toString();
 }

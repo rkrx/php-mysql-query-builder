@@ -1,18 +1,21 @@
 <?php
 namespace Kir\MySQL;
 
-use PDOStatement;
+use Kir\MySQL\Builder\Exception;
+use Kir\MySQL\Builder\RunnableSelect;
 
 interface Database {
 	/**
 	 * @param string $query
-	 * @return PDOStatement
+	 * @throws Exception
+	 * @return \PDOStatement
 	 */
 	public function query($query);
 
 	/**
 	 * @param string $query
-	 * @return PDOStatement
+	 * @throws Exception
+	 * @return \PDOStatement
 	 */
 	public function prepare($query);
 
@@ -54,7 +57,7 @@ interface Database {
 
 	/**
 	 * @param array $fields
-	 * @return Builder\RunnableSelect
+	 * @return RunnableSelect
 	 */
 	public function select(array $fields = array());
 
@@ -73,4 +76,25 @@ interface Database {
 	 */
 	public function delete();
 
+	/**
+	 * @return $this
+	 */
+	public function transactionStart();
+
+	/**
+	 * @return $this
+	 */
+	public function transactionCommit();
+
+	/**
+	 * @return $this
+	 */
+	public function transactionRollback();
+
+	/**
+	 * @param callable $callback
+	 * @throws \Exception
+	 * @return $this
+	 */
+	public function transaction($callback);
 }
