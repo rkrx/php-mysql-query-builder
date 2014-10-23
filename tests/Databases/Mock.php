@@ -4,8 +4,6 @@ namespace Kir\MySQL\Databases;
 use Kir\MySQL\Builder;
 use Kir\MySQL\Builder\RunnableSelect;
 use Kir\MySQL\Database;
-use PDO;
-use PDOStatement;
 
 class Mock implements Database {
 	/**
@@ -16,12 +14,12 @@ class Mock implements Database {
 	/**
 	 */
 	function __construct() {
-		$this->db = new MySQL(new PDO('sqlite::memory:'));
+		$this->db = new MySQL(new \PDO('sqlite::memory:'));
 	}
 
 	/**
 	 * @param string $query
-	 * @return PDOStatement
+	 * @return \PDOStatement
 	 */
 	public function query($query) {
 		return null;
@@ -29,7 +27,7 @@ class Mock implements Database {
 
 	/**
 	 * @param string $query
-	 * @return PDOStatement
+	 * @return \PDOStatement
 	 */
 	public function prepare($query) {
 		return null;
@@ -112,5 +110,31 @@ class Mock implements Database {
 	 */
 	public function delete() {
 		return null;
+	}
+
+	/**
+	 * @return $this
+	 */
+	public function transactionStart() {
+	}
+
+	/**
+	 * @return $this
+	 */
+	public function transactionCommit() {
+	}
+
+	/**
+	 * @return $this
+	 */
+	public function transactionRollback() {
+	}
+
+	/**
+	 * @param callable $callback
+	 * @throws \Exception
+	 * @return $this
+	 */
+	public function transaction($callback) {
 	}
 }

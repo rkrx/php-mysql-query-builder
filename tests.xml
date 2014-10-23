@@ -6,8 +6,8 @@
 		 timeoutForSmallTests="5">
 	<testsuites>
 		<testsuite name="Streams">
-			<file>tests/Kir/MySQL/Builder/SelectTest.php</file>
-			<file>tests/Kir/MySQL/Builder/UpdateTest.php</file>
+			<file>tests/Builder/SelectTest.php</file>
+			<file>tests/Builder/UpdateTest.php</file>
 		</testsuite>
 	</testsuites>
 </phpunit>

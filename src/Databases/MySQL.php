@@ -1,36 +1,34 @@
 <?php
 namespace Kir\MySQL\Databases;
 
-use PDO;
-use Exception;
-use PDOStatement;
 use Kir\MySQL\Builder;
+use Kir\MySQL\Builder\Exception;
 use Kir\MySQL\Database;
 use UnexpectedValueException;
 use Kir\MySQL\Builder\RunnableSelect;
 
-class MySQL implements Database, Database {
+class MySQL implements Database {
 	/**
 	 * @var array
 	 */
 	private static $tableFields = array();
 
 	/**
-	 * @var PDO
+	 * @var \PDO
 	 */
 	private $pdo;
 
 	/**
-	 * @param PDO $pdo
+	 * @param \PDO $pdo
 	 */
-	public function __construct(PDO $pdo) {
+	public function __construct(\PDO $pdo) {
 		$this->pdo = $pdo;
 	}
 
 	/**
 	 * @param string $query
 	 * @throws Exception
-	 * @return PDOStatement
+	 * @return \PDOStatement
 	 */
 	public function query($query) {
 		$stmt = $this->pdo->query($query);
@@ -43,7 +41,7 @@ class MySQL implements Database, Database {
 	/**
 	 * @param string $query
 	 * @throws Exception
-	 * @return PDOStatement
+	 * @return \PDOStatement
 	 */
 	public function prepare($query) {
 		$stmt = $this->pdo->prepare($query);
@@ -78,7 +76,7 @@ class MySQL implements Database, Database {
 		}
 		$stmt = $this->pdo->query("DESCRIBE {$table}");
 		$stmt->execute();
-		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 		self::$tableFields[$table] = array_map(function ($row) { return $row['Field']; }, $rows);
 		$stmt->closeCursor();
 		return self::$tableFields[$table];
