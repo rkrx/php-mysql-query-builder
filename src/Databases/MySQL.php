@@ -53,10 +53,15 @@ class MySQL implements Database {
 
 	/**
 	 * @param string $query
+	 * @param array $params
 	 * @return int
 	 */
-	public function exec($query) {
-		return $this->pdo->exec($query);
+	public function exec($query, array $params = array()) {
+		$stmt = $this->pdo->query($query);
+		$stmt->execute($params);
+		$result = $stmt->rowCount();
+		$stmt->closeCursor();
+		return $result;
 	}
 
 	/**
