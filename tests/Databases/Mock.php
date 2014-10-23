@@ -35,9 +35,10 @@ class Mock implements Database {
 
 	/**
 	 * @param string $query
+	 * @param array $params
 	 * @return int
 	 */
-	public function exec($query) {
+	public function exec($query, array $params = array()) {
 		return 1;
 	}
 
