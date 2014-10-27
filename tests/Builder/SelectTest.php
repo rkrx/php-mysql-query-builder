@@ -54,21 +54,21 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->from('t', 'test')
 		->where('a+1<2')
 		->asString();
-		$this->assertEquals('SELECT a FROM test t WHERE a+1<2 ;', $str);
+		$this->assertEquals('SELECT a FROM test t WHERE (a+1<2) ;', $str);
 
 		$str = TestSelect::create()
 		->field('a')
 		->from('t', 'test')
 		->where('a < ?', 1000)
 		->asString();
-		$this->assertEquals("SELECT a FROM test t WHERE a < '1000' ;", $str);
+		$this->assertEquals("SELECT a FROM test t WHERE (a < '1000') ;", $str);
 
 		$str = TestSelect::create()
 		->field('a')
 		->from('t', 'test')
 		->where('a < :0', 1000)
 		->asString();
-		$this->assertEquals("SELECT a FROM test t WHERE a < '1000' ;", $str);
+		$this->assertEquals("SELECT a FROM test t WHERE (a < '1000') ;", $str);
 	}
 
 	public function testHaving() {
@@ -77,7 +77,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->from('t', 'test')
 		->having('a+1<2')
 		->asString();
-		$this->assertEquals('SELECT a FROM test t HAVING a+1<2 ;', $str);
+		$this->assertEquals('SELECT a FROM test t HAVING (a+1<2) ;', $str);
 	}
 
 	public function testOrder() {
@@ -142,6 +142,6 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->from('t', $select)
 		->asString();
 
-		$this->assertEquals('SELECT * FROM (SELECT * FROM table a WHERE a.id=1) t ;', $str);
+		$this->assertEquals('SELECT * FROM (SELECT * FROM table a WHERE (a.id=1)) t ;', $str);
 	}
 }
