@@ -418,7 +418,8 @@ class Select extends Statement {
 	 * @return string
 	 */
 	private function buildTableName($alias, $name) {
-		return "{$name} {$alias}";
+		$name = rtrim($name, '; ');
+		return sprintf("(%s) %s", $name, $alias);
 	}
 
 	/**
