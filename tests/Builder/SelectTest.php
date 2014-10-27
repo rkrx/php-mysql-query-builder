@@ -132,4 +132,16 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->asString();
 		$this->assertEquals('SELECT a FROM test t FOR UPDATE ;', $str);
 	}
+
+	public function testInnerSelect() {
+		$select = TestSelect::create()
+		->from('a', 'table')
+		->where('a.id=1');
+
+		$str = (string) TestSelect::create()
+		->from('t', $select)
+		->asString();
+
+		$this->assertEquals('SELECT * FROM (SELECT * FROM table a WHERE a.id=1) t ;', $str);
+	}
 }

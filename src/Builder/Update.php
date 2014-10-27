@@ -1,9 +1,6 @@
 <?php
 namespace Kir\MySQL\Builder;
 
-use Exception;
-use UnexpectedValueException;
-
 class Update extends InsertUpdateStatement {
 	/**
 	 * @var array
@@ -37,7 +34,7 @@ class Update extends InsertUpdateStatement {
 	/**
 	 * @param string $field
 	 * @param string $value
-	 * @throws UnexpectedValueException
+	 * @throws \UnexpectedValueException
 	 * @return $this
 	 */
 	public function set($field, $value) {

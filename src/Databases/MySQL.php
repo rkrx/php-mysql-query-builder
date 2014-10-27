@@ -1,10 +1,8 @@
 <?php
 namespace Kir\MySQL\Databases;
 
-use PDO;
-use Exception;
-use PDOStatement;
 use Kir\MySQL\Builder;
+use Kir\MySQL\Builder\Exception;
 use Kir\MySQL\Database;
 use UnexpectedValueException;
 use Kir\MySQL\Builder\RunnableSelect;
@@ -16,21 +14,21 @@ class MySQL implements Database {
 	private static $tableFields = array();
 
 	/**
-	 * @var PDO
+	 * @var \PDO
 	 */
 	private $pdo;
 
 	/**
-	 * @param PDO $pdo
+	 * @param \PDO $pdo
 	 */
-	public function __construct(PDO $pdo) {
+	public function __construct(\PDO $pdo) {
 		$this->pdo = $pdo;
 	}
 
 	/**
 	 * @param string $query
 	 * @throws Exception
-	 * @return PDOStatement
+	 * @return \PDOStatement
 	 */
 	public function query($query) {
 		$stmt = $this->pdo->query($query);
@@ -43,7 +41,7 @@ class MySQL implements Database {
 	/**
 	 * @param string $query
 	 * @throws Exception
-	 * @return PDOStatement
+	 * @return \PDOStatement
 	 */
 	public function prepare($query) {
 		$stmt = $this->pdo->prepare($query);
@@ -55,10 +53,15 @@ class MySQL implements Database {
 
 	/**
 	 * @param string $query
+	 * @param array $params
 	 * @return int
 	 */
-	public function exec($query) {
-		return $this->pdo->exec($query);
+	public function exec($query, array $params = array()) {
+		$stmt = $this->pdo->prepare($query);
+		$stmt->execute($params);
+		$result = $stmt->rowCount();
+		$stmt->closeCursor();
+		return $result;
 	}
 
 	/**
@@ -78,7 +81,7 @@ class MySQL implements Database {
 		}
 		$stmt = $this->pdo->query("DESCRIBE {$table}");
 		$stmt->execute();
-		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 		self::$tableFields[$table] = array_map(function ($row) { return $row['Field']; }, $rows);
 		$stmt->closeCursor();
 		return self::$tableFields[$table];
@@ -190,6 +193,23 @@ class MySQL implements Database {
 	 */
 	public function transactionRollback() {
 		$this->pdo->rollBack();
+		return $this;
+	}
+
+	/**
+	 * @param callable $callback
+	 * @throws \Exception
+	 * @return $this
+	 */
+	public function transaction($callback) {
+		try {
+			$this->pdo->beginTransaction();
+			call_user_func($callback, $this);
+			$this->pdo->commit();
+		} catch (\Exception $e) {
+			$this->pdo->rollBack();
+			throw $e;
+		}
 		return $this;
 	}
 }

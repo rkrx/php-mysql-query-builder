@@ -15,7 +15,7 @@
 		}
 	},
 	"autoload-dev": {
-		"psr-0": {
+		"psr-4": {
 			"Kir\\MySQL\\": ["src/", "tests/"]
 		}
 	}

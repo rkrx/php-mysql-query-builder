@@ -418,7 +418,16 @@ class Select extends Statement {
 	 * @return string
 	 */
 	private function buildTableName($alias, $name) {
-		return "{$name} {$alias}";
+		if(is_object($name)) {
+			$name = (string) $name;
+			$lines = explode("\n", $name);
+			foreach($lines as &$line) {
+				$line = "\t{$line}";
+			}
+			$name = join("\n", $lines);
+			$name = '(' . trim(rtrim(trim($name), ';')) . ')';
+		}
+		return sprintf("%s %s", $name, $alias);
 	}
 
 	/**
