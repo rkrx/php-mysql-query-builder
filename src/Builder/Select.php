@@ -347,7 +347,7 @@ class Select extends Statement {
 		foreach($conditions as $condition) {
 			list($expression, $arguments) = $condition;
 			$expr = $this->db()->quoteExpression($expression, $arguments);
-			$arr[] = "\t{$expr}";
+			$arr[] = "\t({$expr})";
 		}
 		$query .= join("\n\tAND\n", $arr);
 		return $query."\n";
