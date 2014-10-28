@@ -136,7 +136,7 @@ class RunnableSelect extends Select {
 
 	/**
 	 * @param mixed $default
-	 * @return string[]
+	 * @return null|bool|string|int|float
 	 */
 	public function fetchValue($default = null) {
 		$statement = $this->createStatement();
