@@ -212,7 +212,8 @@ class Insert extends InsertUpdateStatement {
 	 */
 	private function buildUpdate() {
 		$queryArr = array();
-		$tableFields = $this->db()->getTableFields($this->table);
+		$tableName = $this->aliasReplacer()->replace($this->table);
+		$tableFields = $this->db()->getTableFields($tableName);
 		if(!empty($this->update)) {
 			$queryArr[] = "ON DUPLICATE KEY UPDATE\n";
 			$updateArr = array();
