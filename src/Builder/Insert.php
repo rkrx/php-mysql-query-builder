@@ -181,8 +181,10 @@ class Insert extends InsertUpdateStatement {
 			throw new Exception('Specify a table-name');
 		}
 
+		$tableName = $this->aliasReplacer()->replace($this->table);
+
 		$fields = $this->fields;
-		$tableFields = $this->db()->getTableFields($this->table);
+		$tableFields = $this->db()->getTableFields($tableName);
 
 		$insertData = $this->buildFieldList($fields, $tableFields);
 		$updateData = $this->buildUpdate();
@@ -190,8 +192,6 @@ class Insert extends InsertUpdateStatement {
 		if (empty($insertData)) {
 			throw new Exception('No field-data found');
 		}
-
-		$tableName = (new AliasReplacer($this->db()->getAliasRegistry()))->replace($this->table);
 
 		$queryArr = array();
 		$ignoreStr = $this->ignore ? ' IGNORE' : '';
