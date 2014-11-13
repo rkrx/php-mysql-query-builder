@@ -116,10 +116,12 @@ class RunnableSelect extends Select {
 			$tmp = &$result;
 			foreach($fields as $field) {
 				$value = $row[$field];
-				$tmp[$value] = [];
+				if(!array_key_exists($value, $tmp)) {
+					$tmp[$value] = [];
+				}
 				$tmp = &$tmp[$value];
 			}
-			$tmp = $row;
+			$tmp[] = $row;
 		}
 		return $result;
 	}
@@ -136,7 +138,7 @@ class RunnableSelect extends Select {
 
 	/**
 	 * @param mixed $default
-	 * @return string[]
+	 * @return null|bool|string|int|float
 	 */
 	public function fetchValue($default = null) {
 		$statement = $this->createStatement();
