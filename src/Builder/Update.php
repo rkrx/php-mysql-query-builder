@@ -1,6 +1,8 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Kir\MySQL\Tools\AliasReplacer;
+
 class Update extends InsertUpdateStatement {
 	/**
 	 * @var array
@@ -99,8 +101,10 @@ class Update extends InsertUpdateStatement {
 			throw new Exception('No field-data found');
 		}
 
+		$tableName = (new AliasReplacer($this->db()->getAliasRegistry()))->replace($this->table);
+
 		$queryArr = array();
-		$queryArr[] = "UPDATE\n\t{$this->table}\nSET\n{$sqlFields}\n";
+		$queryArr[] = "UPDATE\n\t{$tableName}\nSET\n{$sqlFields}\n";
 
 		if (!empty($this->where)) {
 			$sqlWhere = join("\n\tAND\n\t", $this->where);

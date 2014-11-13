@@ -1,6 +1,8 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Kir\MySQL\Tools\AliasReplacer;
+
 class Select extends Statement {
 	/**
 	 * @var string[]
@@ -427,6 +429,7 @@ class Select extends Statement {
 			$name = join("\n", $lines);
 			$name = '(' . trim(rtrim(trim($name), ';')) . ')';
 		}
+		$name = (new AliasReplacer($this->db()->getAliasRegistry()))->replace($name);
 		return sprintf("%s %s", $name, $alias);
 	}
 

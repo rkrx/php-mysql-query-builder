@@ -4,25 +4,39 @@ namespace Kir\MySQL\Databases;
 use Kir\MySQL\Builder;
 use Kir\MySQL\Builder\Exception;
 use Kir\MySQL\Database;
+use Kir\MySQL\Tools\AliasRegistry;
 use UnexpectedValueException;
 use Kir\MySQL\Builder\RunnableSelect;
 
+/**
+ */
 class MySQL implements Database {
 	/**
 	 * @var array
 	 */
 	private static $tableFields = array();
-
 	/**
 	 * @var \PDO
 	 */
 	private $pdo;
+	/**
+	 * @var AliasRegistry
+	 */
+	private $aliasRegistry;
 
 	/**
 	 * @param \PDO $pdo
 	 */
 	public function __construct(\PDO $pdo) {
 		$this->pdo = $pdo;
+		$this->aliasRegistry = new AliasRegistry();
+	}
+
+	/**
+	 * @return AliasRegistry
+	 */
+	public function getAliasRegistry() {
+		return $this->aliasRegistry;
 	}
 
 	/**

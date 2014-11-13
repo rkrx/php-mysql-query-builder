@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Kir\MySQL\Tools\AliasReplacer;
 use UnexpectedValueException;
 
 class Insert extends InsertUpdateStatement {
@@ -190,9 +191,11 @@ class Insert extends InsertUpdateStatement {
 			throw new Exception('No field-data found');
 		}
 
+		$tableName = (new AliasReplacer($this->db()->getAliasRegistry()))->replace($this->table);
+
 		$queryArr = array();
 		$ignoreStr = $this->ignore ? ' IGNORE' : '';
-		$queryArr[] = "INSERT{$ignoreStr} INTO\n\t{$this->table}\n";
+		$queryArr[] = "INSERT{$ignoreStr} INTO\n\t{$tableName}\n";
 		$queryArr[] = "SET\n{$insertData}\n";
 		if($updateData) {
 			$queryArr[] = "{$updateData}\n";

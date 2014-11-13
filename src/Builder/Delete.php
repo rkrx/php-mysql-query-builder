@@ -1,6 +1,8 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Kir\MySQL\Tools\AliasReplacer;
+
 class Delete extends Statement {
 	/**
 	 * @var string
@@ -44,7 +46,7 @@ class Delete extends Statement {
 			throw new Exception('Specify a table-name');
 		}
 
-		$sqlTable = $this->table;
+		$sqlTable = (new AliasReplacer($this->db()->getAliasRegistry()))->replace($this->table);
 		$queryArr = array();
 		$queryArr[] = "DELETE "."FROM\n\t{$sqlTable}\n";
 

@@ -144,4 +144,12 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 
 		$this->assertEquals('SELECT * FROM (SELECT * FROM table a WHERE (a.id=1)) t ;', $str);
 	}
+
+	public function testAlias() {
+		$query = TestSelect::create()
+		->from('t', 'orders#orders')
+		->asString();
+
+		$this->assertEquals('SELECT * FROM shop.orders_orders t ;', $query);
+	}
 }

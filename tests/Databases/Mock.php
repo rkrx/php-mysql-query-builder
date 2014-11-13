@@ -4,17 +4,25 @@ namespace Kir\MySQL\Databases;
 use Kir\MySQL\Builder;
 use Kir\MySQL\Builder\RunnableSelect;
 use Kir\MySQL\Database;
+use Kir\MySQL\Tools\AliasRegistry;
 
 class Mock implements Database {
 	/**
 	 * @var Database
 	 */
 	private $db = null;
+	/**
+	 * @var AliasRegistry
+	 */
+	private $aliasRegistry;
 
 	/**
 	 */
 	function __construct() {
 		$this->db = new MySQL(new \PDO('sqlite::memory:'));
+		$this->aliasRegistry = new AliasRegistry();
+		$this->getAliasRegistry()->add('orders', 'shop.orders_');
+		$this->getAliasRegistry()->add('products', 'shop.products_');
 	}
 
 	/**
@@ -137,5 +145,12 @@ class Mock implements Database {
 	 * @return $this
 	 */
 	public function transaction($callback) {
+	}
+
+	/**
+	 * @return AliasRegistry
+	 */
+	public function getAliasRegistry() {
+		return $this->aliasRegistry;
 	}
 }
