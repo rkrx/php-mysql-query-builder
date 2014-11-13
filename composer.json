@@ -7,7 +7,7 @@
 		"email": "ron.kirschler@gmail.com"
 	}],
 	"require-dev": {
-		"php": ">= 5.4"
+		"php": ">= 5.4",
 		"phpunit/phpunit": "~4.0"
 	},
 	"autoload": {
