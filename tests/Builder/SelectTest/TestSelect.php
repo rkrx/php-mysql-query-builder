@@ -1,21 +1,15 @@
 <?php
 namespace Kir\MySQL\Builder\SelectTest;
 
-use Kir\MySQL\Builder\Select;
-use Kir\MySQL\Databases\Mock;
+use Kir\MySQL\Builder\RunnableSelect;
+use Kir\MySQL\Databases\TestDB;
 
-class TestSelect extends Select {
+class TestSelect extends RunnableSelect {
 	/**
 	 * @return $this
 	 */
 	public static function create() {
-		$functions = array(
-			'getTableFields' => function ($tableName) {
-				return array();
-			}
-		);
-
-		$db = new Mock($functions);
+		$db = new TestDB();
 		return new static($db);
 	}
 

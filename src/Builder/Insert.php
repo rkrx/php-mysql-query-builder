@@ -103,7 +103,7 @@ class Insert extends InsertUpdateStatement {
 	 */
 	public function addOrUpdate($field, $value) {
 		$this->add($field, $value);
-		$this->update($field, $value);
+		$this->updateExpr("{$field}=VALUES({$field})");
 		return $this;
 	}
 
