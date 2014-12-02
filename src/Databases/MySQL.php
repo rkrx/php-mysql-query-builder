@@ -239,12 +239,12 @@ class MySQL implements Database {
 	public function transaction($callback) {
 		try {
 			$this->transactionStart();
-			call_user_func($callback, $this);
+			$result = call_user_func($callback, $this);
 			$this->transactionCommit();
+			return $result;
 		} catch (\Exception $e) {
 			$this->transactionRollback();
 			throw $e;
 		}
-		return $this;
 	}
 }

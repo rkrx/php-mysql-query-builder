@@ -101,7 +101,7 @@ interface Database {
 	/**
 	 * @param callable $callback
 	 * @throws \Exception
-	 * @return $this
+	 * @return mixed
 	 */
 	public function transaction($callback);
 }
