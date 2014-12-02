@@ -194,7 +194,9 @@ class MySQL implements Database {
 	 * @return $this
 	 */
 	public function transactionStart() {
-		$this->pdo->beginTransaction();
+		if((int) $this->transactionLevel === 0) {
+			$this->pdo->beginTransaction();
+		}
 		$this->transactionLevel++;
 		return $this;
 	}
