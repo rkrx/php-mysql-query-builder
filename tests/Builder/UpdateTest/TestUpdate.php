@@ -2,7 +2,7 @@
 namespace Kir\MySQL\Builder\UpdateTest;
 
 use Kir\MySQL\Builder\Update;
-use Kir\MySQL\Databases\Mock;
+use Kir\MySQL\Databases\TestDB;
 
 class TestUpdate extends Update {
 	/**
@@ -15,7 +15,7 @@ class TestUpdate extends Update {
 			}
 		);
 
-		$db = new Mock($functions);
+		$db = new TestDB($functions);
 		return new static($db);
 	}
 

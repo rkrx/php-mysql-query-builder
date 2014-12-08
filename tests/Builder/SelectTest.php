@@ -2,8 +2,17 @@
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\SelectTest\TestSelect;
+use Kir\MySQL\Databases\TestDB;
 
 class SelectTest extends \PHPUnit_Framework_TestCase {
+	protected function setUp() {
+		TestDB::create()->install();
+	}
+
+	protected function tearDown() {
+		TestDB::create()->uninstall();
+	}
+
 	public function testAddition() {
 		$str = TestSelect::create()->field('1+2')->asString();
 		$this->assertEquals('SELECT 1+2 ;', $str);
@@ -147,9 +156,20 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 
 	public function testAlias() {
 		$query = TestSelect::create()
-		->from('t', 'orders#orders')
+		->from('t', 'travis#test1')
 		->asString();
 
-		$this->assertEquals('SELECT * FROM shop.orders_orders t ;', $query);
+		$this->assertEquals('SELECT * FROM travis_test.test1 t ;', $query);
+	}
+
+	public function testCount() {
+		$count = TestSelect::create()
+		->field('COUNT(*)')
+		->from('t1', 'test1')
+		->joinInner('t2', 'test2', 't1.id=t2.id')
+		->where('t1.id > 10')
+		->fetchValue();
+
+		$this->assertEquals(90, $count);
 	}
 }

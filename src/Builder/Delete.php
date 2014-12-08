@@ -46,7 +46,7 @@ class Delete extends Statement {
 			throw new Exception('Specify a table-name');
 		}
 
-		$sqlTable = (new AliasReplacer($this->db()->getAliasRegistry()))->replace($this->table);
+		$sqlTable = $this->aliasReplacer()->replace($this->table);
 		$queryArr = array();
 		$queryArr[] = "DELETE "."FROM\n\t{$sqlTable}\n";
 

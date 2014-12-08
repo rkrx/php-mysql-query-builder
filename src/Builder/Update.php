@@ -94,14 +94,14 @@ class Update extends InsertUpdateStatement {
 			throw new Exception('Specify a table-name');
 		}
 
-		$tableFields = $this->db()->getTableFields($this->table);
+		$tableName = $this->aliasReplacer()->replace($this->table);
+
+		$tableFields = $this->db()->getTableFields($tableName);
 		$sqlFields = $this->buildFieldList($this->fields, $tableFields);
 
 		if (empty($sqlFields)) {
 			throw new Exception('No field-data found');
 		}
-
-		$tableName = (new AliasReplacer($this->db()->getAliasRegistry()))->replace($this->table);
 
 		$queryArr = array();
 		$queryArr[] = "UPDATE\n\t{$tableName}\nSET\n{$sqlFields}\n";

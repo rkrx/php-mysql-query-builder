@@ -2,7 +2,7 @@
 namespace Kir\MySQL\Builder\DeleteTest;
 
 use Kir\MySQL\Builder\Delete;
-use Kir\MySQL\Databases\Mock;
+use Kir\MySQL\Databases\TestDB;
 
 class TestDelete extends Delete {
 	/**
@@ -18,7 +18,7 @@ class TestDelete extends Delete {
 				);
 			}
 		);
-		$db = new Mock($functions);
+		$db = new TestDB($functions);
 		return new static($db);
 	}
 

@@ -9,26 +9,26 @@ class Insert extends InsertUpdateStatement {
 	 * @var array
 	 */
 	private $fields = array();
+
 	/**
 	 * @var array
 	 */
 	private $update = array();
+
 	/**
 	 * @var string
 	 */
 	private $table = null;
+
 	/**
 	 * @var string
 	 */
 	private $keyField = null;
+
 	/**
 	 * @var bool
 	 */
 	private $ignore = false;
-	/**
-	 * @var Select
-	 */
-	private $from = null;
 
 	/**
 	 * @param string $table
@@ -173,21 +173,22 @@ class Insert extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @param Select $select
-	 * @return $this
-	 */
-	public function from(Select $select) {
-		$this->from = $select;
-		return $this;
-	}
-
-	/**
 	 * @throws Exception
 	 * @return string
 	 */
 	public function __toString() {
 		if ($this->table === null) {
 			throw new Exception('Specify a table-name');
+		}
+
+		$fields = $this->fields;
+		$tableFields = $this->db()->getTableFields($this->table);
+
+		$insertData = $this->buildFieldList($fields, $tableFields);
+		$updateData = $this->buildUpdate();
+
+		if (empty($insertData)) {
+			throw new Exception('No field-data found');
 		}
 
 		$tableName = (new AliasReplacer($this->db()->getAliasRegistry()))->replace($this->table);
@@ -231,7 +232,8 @@ class Insert extends InsertUpdateStatement {
 	 */
 	private function buildUpdate() {
 		$queryArr = array();
-		$tableFields = $this->db()->getTableFields($this->table);
+		$tableName = $this->aliasReplacer()->replace($this->table);
+		$tableFields = $this->db()->getTableFields($tableName);
 		if(!empty($this->update)) {
 			$queryArr[] = "ON DUPLICATE KEY UPDATE\n";
 			$updateArr = array();

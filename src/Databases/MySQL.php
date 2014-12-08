@@ -23,6 +23,10 @@ class MySQL implements Database {
 	 * @var AliasRegistry
 	 */
 	private $aliasRegistry;
+	/**
+	 * @var int
+	 */
+	private $transactionLevel = 0;
 
 	/**
 	 * @param \PDO $pdo
@@ -190,23 +194,40 @@ class MySQL implements Database {
 	 * @return $this
 	 */
 	public function transactionStart() {
-		$this->pdo->beginTransaction();
+		if((int) $this->transactionLevel === 0) {
+			$this->pdo->beginTransaction();
+		}
+		$this->transactionLevel++;
 		return $this;
 	}
 
 	/**
 	 * @return $this
+	 * @throws Exception
 	 */
 	public function transactionCommit() {
-		$this->pdo->commit();
+		$this->transactionLevel--;
+		if($this->transactionLevel < 0) {
+			throw new Exception("Transaction-Nesting-Problem: Trying to invoke commit on a already closed transaction");
+		}
+		if((int) $this->transactionLevel === 0) {
+			$this->pdo->commit();
+		}
 		return $this;
 	}
 
 	/**
 	 * @return $this
+	 * @throws Exception
 	 */
 	public function transactionRollback() {
-		$this->pdo->rollBack();
+		$this->transactionLevel--;
+		if($this->transactionLevel < 0) {
+			throw new Exception("Transaction-Nesting-Problem: Trying to invoke rollback on a already closed transaction");
+		}
+		if((int) $this->transactionLevel === 0) {
+			$this->pdo->rollBack();
+		}
 		return $this;
 	}
 
@@ -217,13 +238,13 @@ class MySQL implements Database {
 	 */
 	public function transaction($callback) {
 		try {
-			$this->pdo->beginTransaction();
-			call_user_func($callback, $this);
-			$this->pdo->commit();
+			$this->transactionStart();
+			$result = call_user_func($callback, $this);
+			$this->transactionCommit();
+			return $result;
 		} catch (\Exception $e) {
-			$this->pdo->rollBack();
+			$this->transactionRollback();
 			throw $e;
 		}
-		return $this;
 	}
 }

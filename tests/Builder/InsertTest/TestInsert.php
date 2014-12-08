@@ -2,7 +2,7 @@
 namespace Kir\MySQL\Builder\InsertTest;
 
 use Kir\MySQL\Builder\Insert;
-use Kir\MySQL\Databases\Mock;
+use Kir\MySQL\Databases\TestDB;
 
 class TestInsert extends Insert {
 	/**
@@ -18,7 +18,7 @@ class TestInsert extends Insert {
 				);
 			}
 		);
-		$db = new Mock($functions);
+		$db = new TestDB($functions);
 		return new static($db);
 	}
 
