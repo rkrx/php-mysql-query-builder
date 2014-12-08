@@ -202,7 +202,7 @@ class Insert extends InsertUpdateStatement {
 			$queryArr[] = trim(trim($this->from), ';');
 		} else {
 			$fields = $this->fields;
-			$tableFields = $this->db()->getTableFields($this->table);
+			$tableFields = $this->db()->getTableFields($tableName);
 
 			$insertData = $this->buildFieldList($fields, $tableFields);
 
