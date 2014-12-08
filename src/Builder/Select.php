@@ -1,8 +1,6 @@
 <?php
 namespace Kir\MySQL\Builder;
 
-use Kir\MySQL\Tools\AliasReplacer;
-
 class Select extends Statement {
 	/**
 	 * @var string[]
