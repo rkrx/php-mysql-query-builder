@@ -83,6 +83,13 @@ class Select extends Statement {
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getFields() {
+		return $this->fields;
+	}
+
+	/**
 	 * @param string $alias
 	 * @param string $table
 	 * @return $this

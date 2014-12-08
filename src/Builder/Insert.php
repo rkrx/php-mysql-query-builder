@@ -9,26 +9,26 @@ class Insert extends InsertUpdateStatement {
 	 * @var array
 	 */
 	private $fields = array();
-
 	/**
 	 * @var array
 	 */
 	private $update = array();
-
 	/**
 	 * @var string
 	 */
 	private $table = null;
-
 	/**
 	 * @var string
 	 */
 	private $keyField = null;
-
 	/**
 	 * @var bool
 	 */
 	private $ignore = false;
+	/**
+	 * @var Select
+	 */
+	private $from = null;
 
 	/**
 	 * @param string $table
@@ -173,6 +173,15 @@ class Insert extends InsertUpdateStatement {
 	}
 
 	/**
+	 * @param Select $select
+	 * @return $this
+	 */
+	public function from(Select $select) {
+		$this->from = $select;
+		return $this;
+	}
+
+	/**
 	 * @throws Exception
 	 * @return string
 	 */
@@ -181,25 +190,35 @@ class Insert extends InsertUpdateStatement {
 			throw new Exception('Specify a table-name');
 		}
 
-		$fields = $this->fields;
-		$tableFields = $this->db()->getTableFields($this->table);
-
-		$insertData = $this->buildFieldList($fields, $tableFields);
-		$updateData = $this->buildUpdate();
-
-		if (empty($insertData)) {
-			throw new Exception('No field-data found');
-		}
-
 		$tableName = (new AliasReplacer($this->db()->getAliasRegistry()))->replace($this->table);
 
 		$queryArr = array();
 		$ignoreStr = $this->ignore ? ' IGNORE' : '';
 		$queryArr[] = "INSERT{$ignoreStr} INTO\n\t{$tableName}\n";
-		$queryArr[] = "SET\n{$insertData}\n";
+
+		if($this->from !== null) {
+			$fields = $this->from->getFields();
+			$queryArr[] = sprintf("\t(%s)\n", join(', ', array_keys($fields)));
+			$queryArr[] = trim(trim($this->from), ';');
+		} else {
+			$fields = $this->fields;
+			$tableFields = $this->db()->getTableFields($this->table);
+
+			$insertData = $this->buildFieldList($fields, $tableFields);
+
+			if (empty($insertData)) {
+				throw new Exception('No field-data found');
+			}
+
+			$queryArr[] = "SET\n{$insertData}\n";
+
+		}
+
+		$updateData = $this->buildUpdate();
 		if($updateData) {
 			$queryArr[] = "{$updateData}\n";
 		}
+
 		$queryArr[] = ";\n";
 
 		$query = join('', $queryArr);

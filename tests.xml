@@ -6,10 +6,7 @@
 		 timeoutForSmallTests="5">
 	<testsuites>
 		<testsuite name="Streams">
-			<file>tests/Builder/SelectTest.php</file>
-			<file>tests/Builder/UpdateTest.php</file>
-			<file>tests/Builder/InsertTest.php</file>
-			<file>tests/Builder/DeleteTest.php</file>
+			<directory>tests</directory>
 		</testsuite>
 	</testsuites>
 </phpunit>
