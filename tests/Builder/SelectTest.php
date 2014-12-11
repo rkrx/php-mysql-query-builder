@@ -4,18 +4,10 @@ namespace Kir\MySQL\Builder;
 use Kir\MySQL\Builder\SelectTest\TestSelect;
 use Kir\MySQL\Databases\TestDB;
 
-class SelectTest extends \PHPUnit_Framework_TestCase {
-	protected function setUp() {
-		TestDB::create()->install();
-	}
-
-	protected function tearDown() {
-		TestDB::create()->uninstall();
-	}
-
+class SelectTestX extends \PHPUnit_Framework_TestCase {
 	public function testAddition() {
 		$str = TestSelect::create()->field('1+2')->asString();
-		$this->assertEquals('SELECT 1+2 ;', $str);
+		$this->assertEquals("SELECT\n\t1+2\n;\n", $str);
 	}
 
 	public function testFrom() {
@@ -23,7 +15,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->field('a')
 		->from('t', 'test')
 		->asString();
-		$this->assertEquals('SELECT a FROM test t ;', $str);
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\n;\n", $str);
 	}
 
 	public function testMultipleFrom() {
@@ -32,29 +24,29 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->from('t1', 'test1')
 		->from('t2', 'test2')
 		->asString();
-		$this->assertEquals('SELECT a FROM test1 t1, test2 t2 ;', $str);
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest1 t1,\n\ttest2 t2\n;\n", $str);
 	}
 
 	public function testJoins() {
-		$this->_testJoin('joinInner', 'INNER');
-		$this->_testJoin('joinLeft', 'LEFT');
-		$this->_testJoin('joinRight', 'RIGHT');
-	}
+		$testFn = function ($method, $type) {
+			$sql = TestSelect::create()
+			->field('a')
+			->from('t1', 'test1')
+			->{$method}('t2', 'test2', 't2.id=t1.id')
+			->asString();
+			$this->assertEquals("SELECT\n\ta\nFROM\n\ttest1 t1\n{$type} JOIN\n\ttest2 t2 ON t2.id=t1.id\n;\n", $sql);
 
-	private function _testJoin($method, $type) {
-		$sql = TestSelect::create()
-		->field('a')
-		->from('t1', 'test1')
-		->{$method}('t2', 'test2', 't2.id=t1.id')
-		->asString();
-		$this->assertEquals("SELECT a FROM test1 t1 {$type} JOIN test2 t2 ON t2.id=t1.id ;", $sql);
+			$sql = TestSelect::create()
+			->field('a')
+			->from('t1', 'test1')
+			->{$method}('t2', 'test2', 't2.id=t1.id AND t2.id < ?', 1000)
+			->asString();
+			$this->assertEquals("SELECT\n\ta\nFROM\n\ttest1 t1\n{$type} JOIN\n\ttest2 t2 ON t2.id=t1.id AND t2.id < '1000'\n;\n", $sql);
+		};
 
-		$sql = TestSelect::create()
-		->field('a')
-		->from('t1', 'test1')
-		->{$method}('t2', 'test2', 't2.id=t1.id AND t2.id < ?', 1000)
-		->asString();
-		$this->assertEquals("SELECT a FROM test1 t1 {$type} JOIN test2 t2 ON t2.id=t1.id AND t2.id < '1000' ;", $sql);
+		$testFn('joinInner', 'INNER');
+		$testFn('joinLeft', 'LEFT');
+		$testFn('joinRight', 'RIGHT');
 	}
 
 	public function testWhere() {
@@ -63,21 +55,21 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->from('t', 'test')
 		->where('a+1<2')
 		->asString();
-		$this->assertEquals('SELECT a FROM test t WHERE (a+1<2) ;', $str);
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(a+1<2)\n;\n", $str);
 
 		$str = TestSelect::create()
 		->field('a')
 		->from('t', 'test')
 		->where('a < ?', 1000)
 		->asString();
-		$this->assertEquals("SELECT a FROM test t WHERE (a < '1000') ;", $str);
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(a < '1000')\n;\n", $str);
 
 		$str = TestSelect::create()
 		->field('a')
 		->from('t', 'test')
 		->where('a < :0', 1000)
 		->asString();
-		$this->assertEquals("SELECT a FROM test t WHERE (a < '1000') ;", $str);
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(a < '1000')\n;\n", $str);
 	}
 
 	public function testHaving() {
@@ -86,7 +78,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->from('t', 'test')
 		->having('a+1<2')
 		->asString();
-		$this->assertEquals('SELECT a FROM test t HAVING (a+1<2) ;', $str);
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nHAVING\n\t(a+1<2)\n;\n", $str);
 	}
 
 	public function testOrder() {
@@ -95,7 +87,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->from('t', 'test')
 		->orderBy('a', 'desc')
 		->asString();
-		$this->assertEquals('SELECT a FROM test t ORDER BY a DESC ;', $str);
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nORDER BY\n\ta DESC\n;\n", $str);
 	}
 
 	public function testGroup() {
@@ -104,7 +96,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->from('t', 'test')
 		->groupBy('a', 'b', 'c')
 		->asString();
-		$this->assertEquals('SELECT a FROM test t GROUP BY a, b, c ;', $str);
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nGROUP BY\n\ta,\n\tb,\n\tc\n;\n", $str);
 	}
 
 	public function testLimit() {
@@ -113,7 +105,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->from('t', 'test')
 		->limit(100)
 		->asString();
-		$this->assertEquals('SELECT a FROM test t LIMIT 100 ;', $str);
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nLIMIT\n\t100\n;\n", $str);
 	}
 
 	public function testOffset() {
@@ -123,14 +115,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->limit(100)
 		->offset(50)
 		->asString();
-		$this->assertEquals('SELECT a FROM test t LIMIT 100 OFFSET 50 ;', $str);
-
-		$str = TestSelect::create()
-		->field('a')
-		->from('t', 'test')
-		->offset(100)
-		->asString();
-		$this->assertEquals('SELECT a FROM test t ;', $str);
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nLIMIT\n\t100\nOFFSET\n\t50\n;\n", $str);
 	}
 
 	public function testForUpdate() {
@@ -139,7 +124,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->from('t', 'test')
 		->forUpdate()
 		->asString();
-		$this->assertEquals('SELECT a FROM test t FOR UPDATE ;', $str);
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nFOR UPDATE\n;\n", $str);
 	}
 
 	public function testInnerSelect() {
@@ -151,7 +136,7 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->from('t', $select)
 		->asString();
 
-		$this->assertEquals('SELECT * FROM (SELECT * FROM table a WHERE (a.id=1)) t ;', $str);
+		$this->assertEquals("SELECT\n\t*\nFROM\n\t(SELECT\n\t\t*\n\tFROM\n\t\ttable a\n\tWHERE\n\t\t(a.id=1)) t\n;\n", $str);
 	}
 
 	public function testAlias() {
@@ -159,17 +144,17 @@ class SelectTest extends \PHPUnit_Framework_TestCase {
 		->from('t', 'travis#test1')
 		->asString();
 
-		$this->assertEquals('SELECT * FROM travis_test.test1 t ;', $query);
+		$this->assertEquals("SELECT\n\t*\nFROM\n\ttravis_test.test1 t\n;\n", $query);
 	}
 
 	public function testCount() {
-		$count = TestSelect::create()
+		$query = TestSelect::create()
 		->field('COUNT(*)')
 		->from('t1', 'test1')
 		->joinInner('t2', 'test2', 't1.id=t2.id')
 		->where('t1.id > 10')
-		->fetchValue();
+		->asString();
 
-		$this->assertEquals(90, $count);
+		$this->assertEquals("SELECT\n\tCOUNT(*)\nFROM\n\ttest1 t1\nINNER JOIN\n\ttest2 t2 ON t1.id=t2.id\nWHERE\n\t(t1.id > 10)\n;\n", $query);
 	}
 }

@@ -29,14 +29,23 @@ class Insert extends InsertUpdateStatement {
 	 * @var Select
 	 */
 	private $from = null;
+	/**
+	 * @var callable
+	 */
+	private $tableFields = null;
 
 	/**
 	 * @param string $table
 	 * @return $this
-
 	 */
 	public function into($table) {
 		$this->table = $table;
+		$this->tableFields = function () {
+			static $cache = null;
+			if($cache === null) {
+				$cache = $this->db()->getTableFields($this->table);
+			}
+		};
 		return $this;
 	}
 
@@ -141,6 +150,7 @@ class Insert extends InsertUpdateStatement {
 	 * @throws UnexpectedValueException
 	 */
 	public function addAll(array $data) {
+		$data = $this->clearValues($data);
 		foreach ($data as $field => $value) {
 			$this->add($field, $value);
 		}
@@ -153,6 +163,7 @@ class Insert extends InsertUpdateStatement {
 	 * @return $this
 	 */
 	public function updateAll(array $data) {
+		$data = $this->clearValues($data);
 		foreach ($data as $field => $value) {
 			if ($field != $this->keyField) {
 				$this->update($field, $value);
@@ -202,15 +213,11 @@ class Insert extends InsertUpdateStatement {
 			$queryArr[] = trim(trim($this->from), ';');
 		} else {
 			$fields = $this->fields;
-			$tableFields = $this->db()->getTableFields($tableName);
-
-			$insertData = $this->buildFieldList($fields, $tableFields);
-
-			if (empty($insertData)) {
+			$insertData = $this->buildFieldList($fields);
+			if (!count($insertData)) {
 				throw new Exception('No field-data found');
 			}
-
-			$queryArr[] = "SET\n{$insertData}\n";
+			$queryArr[] = sprintf("SET\n%s\n", join(",\n", $insertData));
 		}
 
 		$updateData = $this->buildUpdate();
@@ -230,17 +237,15 @@ class Insert extends InsertUpdateStatement {
 	 */
 	private function buildUpdate() {
 		$queryArr = array();
-		$tableName = $this->aliasReplacer()->replace($this->table);
-		$tableFields = $this->db()->getTableFields($tableName);
 		if(!empty($this->update)) {
 			$queryArr[] = "ON DUPLICATE KEY UPDATE\n";
 			$updateArr = array();
-
 			if($this->keyField !== null) {
-				$updateArr[] = "`{$this->keyField}` = LAST_INSERT_ID({$this->keyField})";
+				$updateArr[] = "\t`{$this->keyField}` = LAST_INSERT_ID({$this->keyField})";
 			}
+			$updateArr = $this->buildFieldList($this->update, $updateArr);
 
-			$queryArr[] = $this->buildFieldList($this->update, $tableFields, $updateArr);
+			$queryArr[] = join(",\n", $updateArr);
 		}
 		return join('', $queryArr);
 	}
@@ -251,5 +256,26 @@ class Insert extends InsertUpdateStatement {
 	 */
 	private function isFieldNameValid($fieldName) {
 		return is_numeric($fieldName) || !is_scalar($fieldName);
+	}
+
+	/**
+	 * @param array $values
+	 * @return array
+	 * @throws Exception
+	 */
+	private function clearValues(array $values) {
+		if(!count($values)) {
+			return [];
+		}
+		$fields = $this->db()->getTableFields($this->table);
+		$result = array();
+
+		foreach ($values as $fieldName => $fieldValue) {
+			if(in_array($fieldName, $fields)) {
+				$result[$fieldName] = $fieldValue;
+			}
+		}
+
+		return $result;
 	}
 }

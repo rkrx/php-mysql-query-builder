@@ -23,7 +23,6 @@ class TestUpdate extends Update {
 	 * @return string
 	 */
 	public function asString() {
-		$str = $this->__toString();
-		return trim(preg_replace('/\\s+/', ' ', $str));
+		return $this->__toString();
 	}
 }

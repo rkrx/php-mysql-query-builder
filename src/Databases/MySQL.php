@@ -156,7 +156,11 @@ class MySQL implements Database {
 		if (is_numeric($field) || !is_scalar($field)) {
 			throw new UnexpectedValueException('Field name is invalid');
 		}
-		return "`{$field}`";
+		if(strpos($field, '`') !== false) {
+			return $field;
+		}
+		$parts = explode('.', $field);
+		return '`'.join('`.`', $parts).'`';
 	}
 
 	/**

@@ -8,20 +8,20 @@ use Kir\MySQL\Tools\AliasRegistry;
 use Phake;
 
 class InsertTest extends \PHPUnit_Framework_TestCase {
-	public function XtestAlias() {
-		$reg = new AliasRegistry();
-		$reg->add('travis', 'travis_test.');
-
-		$db = Phake::mock(Database::class);
-		Phake::when($db)->__call('getTableFields', ['travis_test.test1'])->thenReturn([]);
-		Phake::when($db)->__call('getAliasRegistry', [])->thenReturn($reg);
-
-		$query = (new TestInsert($db))
+	public function testAlias() {
+		$query = TestInsert::create()
 		->into('travis#test1')
 		->addExpr('last_update=NOW()')
 		->asString();
+		$this->assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\tlast_update=NOW()\n;\n", $query);
+	}
 
-		$this->assertEquals($query, 'INSERT'.' INTO travis_test.test1 SET last_update=NOW() ;');
+	public function testAddExpr() {
+		$query = TestInsert::create()
+		->into('test1')
+		->addExpr('last_update=NOW()')
+		->asString();
+		$this->assertEquals("INSERT INTO\n\ttest1\nSET\n\tlast_update=NOW()\n;\n", $query);
 	}
 
 	public function testMassInsert() {
@@ -36,6 +36,6 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 		->updateExpr('a = VALUES(a)')
 		->asString();
 
-		$this->assertEquals('INSERT INTO travis_test.test2 (a) SELECT b AS `a` FROM travis_test.test1 oi WHERE (1!=2) ON DUPLICATE KEY UPDATE a = VALUES(a) ;', $query);
+		$this->assertEquals("INSERT INTO\n\ttravis_test.test2\n\t(a)\nSELECT\n\tb AS `a`\nFROM\n\ttravis_test.test1 oi\nWHERE\n\t(1!=2)\nON DUPLICATE KEY UPDATE\n\ta = VALUES(a)\n;\n", $query);
 	}
 }

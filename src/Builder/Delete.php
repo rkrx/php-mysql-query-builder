@@ -1,39 +1,42 @@
 <?php
 namespace Kir\MySQL\Builder;
 
-use Kir\MySQL\Tools\AliasReplacer;
+use Kir\MySQL\Builder\Traits\JoinBuilder;
+use Kir\MySQL\Builder\Traits\LimitBuilder;
+use Kir\MySQL\Builder\Traits\OffsetBuilder;
+use Kir\MySQL\Builder\Traits\OrderByBuilder;
+use Kir\MySQL\Builder\Traits\TableBuilder;
+use Kir\MySQL\Builder\Traits\TableNameBuilder;
+use Kir\MySQL\Builder\Traits\WhereBuilder;
 
 class Delete extends Statement {
-	/**
-	 * @var string
-	 */
-	private $table = null;
+	use TableNameBuilder;
+	use TableBuilder;
+	use JoinBuilder;
+	use WhereBuilder;
+	use OrderByBuilder;
+	use LimitBuilder;
+	use OffsetBuilder;
 
 	/**
-	 * @var array
+	 * @var string[]
 	 */
-	private $where = array();
+	private $aliases = array();
 
 	/**
 	 * Name der Tabelle
 	 *
-	 * @param string $name
-	 * @return $this
-
-	 */
-	public function from($name) {
-		$this->table = $name;
-		return $this;
-	}
-
-	/**
-	 * @param string $expr
+	 * @param string $alias
+	 * @param string $table
 	 * @return $this
 	 */
-	public function where($expr) {
-		$arguments = array_slice(func_get_args(), 1);
-		$expr = $this->db()->quoteExpression($expr, $arguments);
-		$this->where[] = "({$expr})";
+	public function from($alias, $table = null) {
+		if($table === null) {
+			list($alias, $table) = [$table, $alias];
+		} else {
+			$this->aliases[] = $alias;
+		}
+		$this->addTable($alias, $table);
 		return $this;
 	}
 
@@ -42,20 +45,16 @@ class Delete extends Statement {
 	 * @throws Exception
 	 */
 	public function __toString() {
-		if ($this->table === null) {
-			throw new Exception('Specify a table-name');
-		}
-
-		$sqlTable = $this->aliasReplacer()->replace($this->table);
-		$queryArr = array();
-		$queryArr[] = "DELETE "."FROM\n\t{$sqlTable}\n";
-
-		if (!empty($this->where)) {
-			$sqlWhere = join("\n\tAND\n\t", $this->where);
-			$queryArr[] = "WHERE\n\t{$sqlWhere}\n";
-		}
-		$queryArr[] = ";";
-
-		return join('', $queryArr);
+		$query = "DELETE ";
+		$query .= join(', ', $this->aliases);
+		$query = trim($query) . " FROM\n";
+		$query = $this->buildTables($query);
+		$query = $this->buildJoins($query);
+		$query = $this->buildWhereConditions($query);
+		$query = $this->buildOrder($query);
+		$query = $this->buildLimit($query);
+		$query = $this->buildOffset($query);
+		$query .= ";\n";
+		return $query;
 	}
 }

@@ -1,6 +1,8 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Kir\MySQL\Builder\Internal\DefaultValue;
+
 abstract class InsertUpdateStatement extends Statement {
 	/**
 	 * @var array
@@ -25,23 +27,22 @@ abstract class InsertUpdateStatement extends Statement {
 
 	/**
 	 * @param array $fields
-	 * @param array $tableFields
-	 * @param array $result
+	 * @param array $query
 	 * @return string
 	 */
-	protected function buildFieldList(array $fields, array $tableFields, array $result = array()) {
+	protected function buildFieldList(array $fields, array $query = array()) {
 		foreach ($fields as $fieldName => $fieldValue) {
-			if(is_array($this->mask) && !in_array($fieldName, $this->mask)) {
-				continue;
+			if($fieldValue instanceof DefaultValue) {
+				$fieldValue = 'DEFAULT';
 			}
 			if (is_int($fieldName)) {
-				$result[] = $fieldValue;
-			} elseif ($this->isFieldAccessible($fieldName, $tableFields)) {
+				$query[] = "\t{$fieldValue}";
+			} else {
 				$fieldName = $this->db()->quoteField($fieldName);
-				$result[] = "\t{$fieldName} = {$fieldValue}";
+				$query[] = "\t{$fieldName}={$fieldValue}";
 			}
 		}
-		return join(",\n", $result);
+		return $query;
 	}
 
 	/**

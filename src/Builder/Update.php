@@ -1,48 +1,62 @@
 <?php
 namespace Kir\MySQL\Builder;
 
-use Kir\MySQL\Tools\AliasReplacer;
+use Kir\MySQL\Builder\Internal\DefaultValue;
+use Kir\MySQL\Builder\Traits\JoinBuilder;
+use Kir\MySQL\Builder\Traits\LimitBuilder;
+use Kir\MySQL\Builder\Traits\OffsetBuilder;
+use Kir\MySQL\Builder\Traits\OrderByBuilder;
+use Kir\MySQL\Builder\Traits\TableBuilder;
+use Kir\MySQL\Builder\Traits\TableNameBuilder;
+use Kir\MySQL\Builder\Traits\WhereBuilder;
 
 class Update extends InsertUpdateStatement {
+	use TableNameBuilder;
+	use TableBuilder;
+	use JoinBuilder;
+	use WhereBuilder;
+	use OrderByBuilder;
+	use LimitBuilder;
+	use OffsetBuilder;
+
 	/**
 	 * @var array
 	 */
 	private $fields = array();
 
 	/**
-	 * @var string
-	 */
-	private $table = null;
-
-	/**
-	 * @var array
-	 */
-	private $where = array();
-
-	/**
-	 * @var int
-	 */
-	private $limit = null;
-
-	/**
-	 * @param string $name
+	 * @param string $alias
+	 * @param string $table
 	 * @return $this
 	 */
-	public function table($name) {
-		$this->table = $name;
+	public function table($alias, $table = null) {
+		if($table === null) {
+			list($alias, $table) = [$table, $alias];
+		}
+		$this->addTable($alias, $table);
 		return $this;
 	}
 
 	/**
-	 * @param string $field
+	 * @param string $fieldName
 	 * @param string $value
 	 * @throws \UnexpectedValueException
 	 * @return $this
 	 */
-	public function set($field, $value) {
-		$sqlField = $field;
+	public function set($fieldName, $value) {
+		$sqlField = $fieldName;
 		$sqlValue = $this->db()->quote($value);
 		$this->fields[$sqlField] = $sqlValue;
+		return $this;
+	}
+
+	/**
+	 * @param string $fieldName
+	 * @return $this
+	 */
+	public function setDefault($fieldName) {
+		$sqlField = $fieldName;
+		$this->fields[$sqlField] = new DefaultValue();
 		return $this;
 	}
 
@@ -57,31 +71,23 @@ class Update extends InsertUpdateStatement {
 
 	/**
 	 * @param array $data
+	 * @param array $allowedFields
 	 * @return $this
+	 * @throws Exception
 	 */
-	public function setAll(array $data) {
-		foreach ($data as $field => $value) {
-			$this->set($field, $value);
+	public function setAll(array $data, array $allowedFields = null) {
+		if($allowedFields !== null) {
+			foreach($data as $fieldName => $value) {
+				if(in_array($fieldName, $allowedFields)) {
+					$this->set($fieldName, $value);
+				}
+			}
+		} else {
+			$values = $this->clearValues($data);
+			foreach($values as $fieldName => $value) {
+				$this->set($fieldName, $value);
+			}
 		}
-		return $this;
-	}
-
-	/**
-	 * @param string $expr
-	 * @return $this
-	 */
-	public function where($expr) {
-		$expr = $this->db()->quoteExpression($expr, array_slice(func_get_args(), 1));
-		$this->where[] = "({$expr})";
-		return $this;
-	}
-
-	/**
-	 * @param int $count
-	 * @return self
-	 */
-	public function limit($count) {
-		$this->limit = $count;
 		return $this;
 	}
 
@@ -90,33 +96,60 @@ class Update extends InsertUpdateStatement {
 	 * @return string
 	 */
 	public function __toString() {
-		if ($this->table === null) {
-			throw new Exception('Specify a table-name');
-		}
+		$query = "UPDATE\n";
+		$query = $this->buildTables($query);
+		$query = $this->buildJoins($query);
+		$query .= "SET\n";
+		$query = $this->buildAssignments($query);
+		$query = $this->buildWhereConditions($query);
+		$query = $this->buildOrder($query);
+		$query = $this->buildLimit($query);
+		$query = $this->buildOffset($query);
+		$query .= ";\n";
+		return $query;
+	}
 
-		$tableName = $this->aliasReplacer()->replace($this->table);
-
-		$tableFields = $this->db()->getTableFields($tableName);
-		$sqlFields = $this->buildFieldList($this->fields, $tableFields);
-
-		if (empty($sqlFields)) {
+	/**
+	 * @param string $query
+	 * @return string
+	 * @throws Exception
+	 */
+	private function buildAssignments($query) {
+		$sqlFields = $this->buildFieldList($this->fields);
+		if (!count($sqlFields)) {
 			throw new Exception('No field-data found');
 		}
+		return sprintf("%s%s\n", $query, join(",\n", $sqlFields));
+	}
 
-		$queryArr = array();
-		$queryArr[] = "UPDATE\n\t{$tableName}\nSET\n{$sqlFields}\n";
+	/**
+	 * @param array $values
+	 * @return array
+	 * @throws Exception
+	 */
+	private function clearValues(array $values) {
+		if(!count($values)) {
+			return [];
+		}
+		$tables = $this->getTables();
+		if(!count($tables)) {
+			throw new Exception('Table name is missing');
+		}
+		if(count($tables) > 1) {
+			throw new Exception('Batch values only work with max. one table');
+		}
+		list($table) = $tables;
+		$tableName = $table['name'];
 
-		if (!empty($this->where)) {
-			$sqlWhere = join("\n\tAND\n\t", $this->where);
-			$queryArr[] = "WHERE\n\t{$sqlWhere}\n";
+		$fields = $this->db()->getTableFields($tableName);
+		$result = array();
+
+		foreach ($values as $fieldName => $fieldValue) {
+			if(in_array($fieldName, $fields)) {
+				$result[$fieldName] = $fieldValue;
+			}
 		}
 
-		if($this->limit !== null) {
-			$queryArr[] = "LIMIT\n\t{$this->limit}\n";
-		}
-
-		$queryArr[] = ";\n";
-
-		return join('', $queryArr);
+		return $result;
 	}
 }

@@ -1,52 +1,37 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Kir\MySQL\Builder\Traits\GroupByBuilder;
+use Kir\MySQL\Builder\Traits\HavingBuilder;
+use Kir\MySQL\Builder\Traits\OffsetBuilder;
+use Kir\MySQL\Builder\Traits\OrderByBuilder;
+use Kir\MySQL\Builder\Traits\TableBuilder;
+use Kir\MySQL\Builder\Traits\JoinBuilder;
+use Kir\MySQL\Builder\Traits\LimitBuilder;
+use Kir\MySQL\Builder\Traits\TableNameBuilder;
+use Kir\MySQL\Builder\Traits\WhereBuilder;
+
 class Select extends Statement {
+	use TableNameBuilder;
+	use TableBuilder {
+		addTable as addFrom;
+	}
+	use JoinBuilder;
+	use WhereBuilder;
+	use HavingBuilder;
+	use GroupByBuilder;
+	use OrderByBuilder;
+	use LimitBuilder;
+	use OffsetBuilder;
+
 	/**
 	 * @var string[]
 	 */
-	private $fields;
-
-	/**
-	 * @var array[]
-	 */
-	private $tables = array();
-
-	/**
-	 * @var array
-	 */
-	private $orderBy = array();
-
-	/**
-	 * @var array
-	 */
-	private $groupBy = array();
-
-	/**
-	 * @var array
-	 */
-	private $where = array();
-
-	/**
-	 * @var array
-	 */
-	private $having = array();
-
-	/**
-	 * @var int
-	 */
-	private $limit = null;
-
-	/**
-	 * @var int
-	 */
-	private $offset = null;
-
+	private $fields = array();
 	/**
 	 * @var bool
 	 */
 	private $calcFoundRows = false;
-
 	/**
 	 * @var bool
 	 */
@@ -93,119 +78,7 @@ class Select extends Statement {
 	 * @return $this
 	 */
 	public function from($alias, $table) {
-		return $this->addTable('FROM', $alias, $table);
-	}
-
-	/**
-	 * @param string $alias
-	 * @param string $table
-	 * @param string $expression
-	 * @return $this
-	 */
-	public function joinInner($alias, $table, $expression = null) {
-		$arguments = array_slice(func_get_args(), 3);
-		return $this->addTable('INNER', $alias, $table, $expression, $arguments);
-	}
-
-	/**
-	 * @param string $alias
-	 * @param string $table
-	 * @param string $expression
-	 * @return $this
-	 */
-	public function joinLeft($alias, $table, $expression) {
-		$arguments = array_slice(func_get_args(), 3);
-		return $this->addTable('LEFT', $alias, $table, $expression, $arguments);
-	}
-
-	/**
-	 * @param string $alias
-	 * @param string $table
-	 * @param string $expression
-	 * @return $this
-	 */
-	public function joinRight($alias, $table, $expression) {
-		$arguments = array_slice(func_get_args(), 3);
-		return $this->addTable('RIGHT', $alias, $table, $expression, $arguments);
-	}
-
-	/**
-	 * @param string $expression
-	 * @return $this
-	 */
-	public function where($expression) {
-		$this->where[] = array($expression, array_slice(func_get_args(), 1));
-		return $this;
-	}
-
-	/**
-	 * @param string $expression
-	 * @return $this
-	 */
-	public function having($expression) {
-		$this->having[] = array($expression, array_slice(func_get_args(), 1));
-		return $this;
-	}
-
-	/**
-	 * @param string $expression
-	 * @param string $direction
-	 * @return $this
-	 */
-	public function orderBy($expression, $direction = 'asc') {
-		if(strtolower($direction) != 'desc') {
-			$direction = 'ASC';
-		}
-		if(is_array($expression)) {
-			if(!count($expression)) {
-				return $this;
-			}
-			$arguments = array(
-				$expression[0],
-				array_slice($expression, 1)
-			);
-			$expression = call_user_func_array(array($this->db(), 'quoteExpression'), $arguments);
-		}
-		$this->orderBy[] = array($expression, $direction);
-		return $this;
-	}
-
-	/**
-	 * @param string $expression
-	 * @return $this
-	 */
-	public function groupBy($expression) {
-		foreach(func_get_args() as $expression) {
-			if(is_array($expression)) {
-				if(!count($expression)) {
-					continue;
-				}
-				$arguments = array(
-					$expression[0],
-					array_slice($expression, 1)
-				);
-				$expression = call_user_func_array(array($this->db(), 'quoteExpression'), $arguments);
-			}
-			$this->groupBy[] = $expression;
-		}
-		return $this;
-	}
-
-	/**
-	 * @param int $limit
-	 * @return $this
-	 */
-	public function limit($limit) {
-		$this->limit = $limit;
-		return $this;
-	}
-
-	/**
-	 * @param int $offset
-	 * @return $this
-	 */
-	public function offset($offset) {
-		$this->offset = $offset;
+		$this->addFrom($alias, $table);
 		return $this;
 	}
 
@@ -248,35 +121,20 @@ class Select extends Statement {
 		}
 		$query .= "\n";
 		$query = $this->buildFields($query);
-		$query = $this->buildFrom($query);
+		if(count($this->getTables())) {
+			$query .= "FROM\n";
+		}
+		$query = $this->buildTables($query);
 		$query = $this->buildJoins($query);
-		$query = $this->buildConditions('WHERE', $this->where, $query);
+		$query = $this->buildWhereConditions($query);
 		$query = $this->buildGroups($query);
-		$query = $this->buildConditions('HAVING', $this->having, $query);
+		$query = $this->buildHavingConditions($query);
 		$query = $this->buildOrder($query);
 		$query = $this->buildLimit($query);
+		$query = $this->buildOffset($query);
 		$query = $this->buildForUpdate($query);
 		$query .= ";\n";
 		return $query;
-	}
-
-	/**
-	 * @param string $type
-	 * @param string $alias
-	 * @param string $name
-	 * @param string $expression
-	 * @param array $arguments
-	 * @return $this
-	 */
-	private function addTable($type, $alias, $name, $expression = null, array $arguments = array()) {
-		$this->tables[] = array(
-			'type' => $type,
-			'alias' => $alias,
-			'name' => $name,
-			'expression' => $expression,
-			'arguments' => $arguments
-		);
-		return $this;
 	}
 
 	/**
@@ -303,147 +161,10 @@ class Select extends Statement {
 	 * @param string $query
 	 * @return string
 	 */
-	private function buildFrom($query) {
-		$arr = array();
-		foreach($this->tables as $table) {
-			if($table['type'] == 'FROM') {
-				$arr[] = "\t".$this->buildTableName($table['alias'], $table['name']);
-			}
-		}
-		if(count($arr)) {
-			$query .= "FROM\n";
-			$query .= join(",\n", $arr)."\n";
-		}
-		return $query;
-	}
-
-	/**
-	 * @param string $query
-	 * @return string
-	 */
-	private function buildJoins($query) {
-		$arr = array();
-		foreach($this->tables as $table) {
-			if($table['type'] != 'FROM') {
-				$join = $table['type']." JOIN\n";
-				$join .= "\t".$this->buildTableName($table['alias'], $table['name']);
-				if($table['expression']) {
-					$join .= " ON ".$this->buildExpression($table['expression'], $table['arguments']);
-				}
-				$arr[] = $join;
-			}
-		}
-		if(count($arr)) {
-			$query .= join("\n", $arr)."\n";
-		}
-		return $query;
-	}
-
-	/**
-	 * @param string $type
-	 * @param string[] $conditions
-	 * @param string $query
-	 * @return string
-	 */
-	private function buildConditions($type, array $conditions, $query) {
-		if(!count($conditions)) {
-			return $query;
-		}
-		$query .= "{$type}\n";
-		$arr = array();
-		foreach($conditions as $condition) {
-			list($expression, $arguments) = $condition;
-			$expr = $this->db()->quoteExpression($expression, $arguments);
-			$arr[] = "\t({$expr})";
-		}
-		$query .= join("\n\tAND\n", $arr);
-		return $query."\n";
-	}
-
-	/**
-	 * @param string $query
-	 * @return string
-	 */
-	private function buildOrder($query) {
-		if(!count($this->orderBy)) {
-			return $query;
-		}
-		$query .= "ORDER BY\n";
-		$arr = array();
-		foreach($this->orderBy as $order) {
-			list($expression, $direction) = $order;
-			$arr[] = sprintf("\t%s %s", $expression, strtoupper($direction));
-		}
-		return $query.join(",\n", $arr)."\n";
-	}
-
-	/**
-	 * @param string $query
-	 * @return string
-	 */
-	private function buildGroups($query) {
-		if(!count($this->groupBy)) {
-			return $query;
-		}
-		$query .= "GROUP BY\n";
-		$arr = array();
-		foreach($this->groupBy as $expression) {
-			$arr[] = "\t{$expression}";
-		}
-		return $query.join(",\n", $arr)."\n";
-	}
-
-	/**
-	 * @param string $query
-	 * @return string
-	 */
-	private function buildLimit($query) {
-		if($this->limit === null) {
-			return $query;
-		}
-		$query .= "LIMIT\n\t{$this->limit}\n";
-		if($this->offset !== null) {
-			$query .= "OFFSET\n\t{$this->offset}\n";
-		}
-		return $query;
-	}
-
-	/**
-	 * @param string $query
-	 * @return string
-	 */
 	private function buildForUpdate($query) {
 		if($this->forUpdate) {
 			$query .= "FOR UPDATE\n";
 		}
 		return $query;
-	}
-
-	/**
-	 * @param string $alias
-	 * @param string $name
-	 * @return string
-	 */
-	private function buildTableName($alias, $name) {
-		if(is_object($name)) {
-			$name = (string) $name;
-			$lines = explode("\n", $name);
-			foreach($lines as &$line) {
-				$line = "\t{$line}";
-			}
-			$name = join("\n", $lines);
-			$name = '(' . trim(rtrim(trim($name), ';')) . ')';
-		}
-		$name = $this->aliasReplacer()->replace($name);
-		return sprintf("%s %s", $name, $alias);
-	}
-
-	/**
-	 * @param string $expression
-	 * @param array $arguments
-	 * @return string
-	 */
-	private function buildExpression($expression, array $arguments) {
-		return $this->db()->quoteExpression($expression, $arguments);
 	}
 }

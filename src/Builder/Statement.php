@@ -9,7 +9,6 @@ abstract class Statement {
 	 * @var Database
 	 */
 	private $db;
-
 	/**
 	 * @var AliasReplacer
 	 */
