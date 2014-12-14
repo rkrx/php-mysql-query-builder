@@ -52,7 +52,6 @@ class Insert extends InsertUpdateStatement {
 	/**
 	 * @param bool $value
 	 * @return $this
-
 	 */
 	public function setIgnore($value = true) {
 		$this->ignore = $value;
@@ -65,7 +64,6 @@ class Insert extends InsertUpdateStatement {
 	 *
 	 * @param string $field
 	 * @return $this
-
 	 */
 	public function setKey($field) {
 		$this->keyField = $field;
@@ -146,10 +144,13 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param array $data
+	 * @param array $mask
 	 * @return $this
-	 * @throws UnexpectedValueException
 	 */
-	public function addAll(array $data) {
+	public function addAll(array $data, array $mask = null) {
+		if($mask !== null) {
+			$data = array_intersect_key($data, array_combine($mask, $mask));
+		}
 		$data = $this->clearValues($data);
 		foreach ($data as $field => $value) {
 			$this->add($field, $value);
@@ -159,10 +160,13 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param array $data
-	 * @throws UnexpectedValueException
+	 * @param array $mask
 	 * @return $this
 	 */
-	public function updateAll(array $data) {
+	public function updateAll(array $data, array $mask = null) {
+		if($mask !== null) {
+			$data = array_intersect_key($data, array_combine($mask, $mask));
+		}
 		$data = $this->clearValues($data);
 		foreach ($data as $field => $value) {
 			if ($field != $this->keyField) {
@@ -174,12 +178,12 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param array $data
-	 * @throws UnexpectedValueException
+	 * @param array $mask
 	 * @return $this
 	 */
-	public function addOrUpdateAll(array $data) {
-		$this->addAll($data);
-		$this->updateAll($data);
+	public function addOrUpdateAll(array $data, array $mask = null) {
+		$this->addAll($data, $mask);
+		$this->updateAll($data, $mask);
 		return $this;
 	}
 
@@ -267,7 +271,9 @@ class Insert extends InsertUpdateStatement {
 		if(!count($values)) {
 			return [];
 		}
-		$fields = $this->db()->getTableFields($this->table);
+
+		$tableName = (new AliasReplacer($this->db()->getAliasRegistry()))->replace($this->table);
+		$fields = $this->db()->getTableFields($tableName);
 		$result = array();
 
 		foreach ($values as $fieldName => $fieldValue) {
