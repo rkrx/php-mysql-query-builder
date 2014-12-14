@@ -18,9 +18,8 @@ Here a few things to keep in mind:
 ### Initialization
 
 ```PHP
-$pdo = new PDO('mysql:host=127.0.0.1;dbname=test', 'root', '');
+$pdo = new PDO('mysql:host=127.0.0.1;dbname=test;charset=utf8', 'root', '');
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-$pdo->exec('SET NAMES "utf8"');
 
 $mysql = new MySQL($pdo);
 $mysql->getAliasRegistry()->add('textprefix', 'testdb.test__');
