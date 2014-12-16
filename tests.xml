@@ -5,7 +5,7 @@
 		 verbose="true"
 		 timeoutForSmallTests="5">
 	<testsuites>
-		<testsuite name="Streams">
+		<testsuite name="Tests">
 			<directory>tests</directory>
 		</testsuite>
 	</testsuites>
