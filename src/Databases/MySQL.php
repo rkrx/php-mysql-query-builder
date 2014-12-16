@@ -236,19 +236,29 @@ class MySQL implements Database {
 	}
 
 	/**
-	 * @param callable $callback
-	 * @throws \Exception
+	 * @param int|callable $tries
+	 * @param callable|null $callback
 	 * @return $this
+	 * @throws \Exception
 	 */
-	public function transaction($callback) {
-		try {
-			$this->transactionStart();
-			$result = call_user_func($callback, $this);
-			$this->transactionCommit();
-			return $result;
-		} catch (\Exception $e) {
-			$this->transactionRollback();
-			throw $e;
+	public function transaction($tries = 1, $callback = null) {
+		if(is_callable($tries)) {
+			$callback = $tries;
+			$tries = 1;
+		} elseif(!is_callable($callback)) {
+			throw new \Exception("Callable must be a callable");
 		}
+		$e = null;
+		for(; $tries--;) {
+			try {
+				$this->transactionStart();
+				$result = call_user_func($callback, $this);
+				$this->transactionCommit();
+				return $result;
+			} catch (\Exception $e) {
+				$this->transactionRollback();
+			}
+		}
+		throw $e;
 	}
 }

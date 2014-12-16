@@ -99,9 +99,10 @@ interface Database {
 	public function transactionRollback();
 
 	/**
-	 * @param callable $callback
+	 * @param int|callable $tries
+	 * @param callable|null $callback
+	 * @return $this
 	 * @throws \Exception
-	 * @return mixed
 	 */
-	public function transaction($callback);
+	public function transaction($tries = 1, $callback = null);
 }
