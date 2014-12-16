@@ -246,7 +246,7 @@ class MySQL implements Database {
 			$callback = $tries;
 			$tries = 1;
 		} elseif(!is_callable($callback)) {
-			throw new \Exception("Callable must be a callable");
+			throw new \Exception('$callback must be a callable');
 		}
 		$e = null;
 		for(; $tries--;) {
