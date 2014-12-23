@@ -157,4 +157,22 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 
 		$this->assertEquals("SELECT\n\tCOUNT(*)\nFROM\n\ttest1 t1\nINNER JOIN\n\ttest2 t2 ON t1.id=t2.id\nWHERE\n\t(t1.id > 10)\n;\n", $query);
 	}
+
+	public function testSubselectAsField() {
+		$query = TestSelect::create()
+		->field('COUNT(*)')
+		->from('t1', 'test1')
+		->joinInner('t2', 'test2', 't1.id=t2.id')
+		->where('t1.id > 10')
+		->asString();
+
+		$query = TestSelect::create()
+		->field($query, 'testfield')
+		->from('t1', 'test1')
+		->joinInner('t2', 'test2', 't1.id=t2.id')
+		->where('t1.id > 10')
+		->asString();
+
+		$this->assertEquals("SELECT\n\tCOUNT(*)\nFROM\n\ttest1 t1\nINNER JOIN\n\ttest2 t2 ON t1.id=t2.id\nWHERE\n\t(t1.id > 10)\n;\n", $query);
+	}
 }
