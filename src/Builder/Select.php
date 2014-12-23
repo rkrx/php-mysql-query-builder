@@ -43,7 +43,7 @@ class Select extends Statement {
 	 * @return $this
 	 */
 	public function field($expression, $alias = null) {
-		if($alias !== null) {
+		if(is_object($expression)) {
 			$expression = (string) $expression;
 			$expression = trim($expression);
 			$expression = rtrim($expression, ';');
