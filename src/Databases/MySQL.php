@@ -94,11 +94,11 @@ class MySQL implements Database {
 	 * @return array
 	 */
 	public function getTableFields($table) {
+		$table = $this->select()->aliasReplacer()->replace($table);
 		if(array_key_exists($table, self::$tableFields)) {
 			return self::$tableFields[$table];
 		}
 		$stmt = $this->pdo->query("DESCRIBE {$table}");
-		$stmt->execute();
 		$rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 		self::$tableFields[$table] = array_map(function ($row) { return $row['Field']; }, $rows);
 		$stmt->closeCursor();
