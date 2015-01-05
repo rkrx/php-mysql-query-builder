@@ -16,7 +16,7 @@ class MySQL implements Database {
 	 */
 	private static $tableFields = array();
 	/**
-	 * @var \PDO
+	 * @var PDO
 	 */
 	private $pdo;
 	/**

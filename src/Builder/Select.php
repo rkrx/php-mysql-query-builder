@@ -44,7 +44,14 @@ class Select extends Statement {
 	 */
 	public function field($expression, $alias = null) {
 		if(is_object($expression)) {
-			$expression = (string)$expression;
+			$expression = (string) $expression;
+			$expression = trim($expression);
+			$expression = rtrim($expression, ';');
+			$expression = trim($expression);
+			$lines = explode("\n", $expression);
+			$lines = array_map(function ($line) { return "\t\t{$line}"; }, $lines);
+			$expression = join("\n", $lines);
+			$expression = sprintf("(\n%s\n\t)", $expression);
 		}
 		if($alias === null) {
 			$this->fields[] = $expression;
