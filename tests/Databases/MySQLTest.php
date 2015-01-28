@@ -1,7 +1,6 @@
 <?php
 namespace Kir\MySQL\Databases;
 
-use Phake;
 use Pseudo\Pdo;
 
 class MySQLTest extends \PHPUnit_Framework_TestCase {
