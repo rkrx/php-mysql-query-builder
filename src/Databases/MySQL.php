@@ -238,7 +238,7 @@ class MySQL implements Database {
 	/**
 	 * @param int|callable $tries
 	 * @param callable|null $callback
-	 * @return $this
+	 * @return mixed
 	 * @throws \Exception
 	 */
 	public function transaction($tries = 1, $callback = null) {
