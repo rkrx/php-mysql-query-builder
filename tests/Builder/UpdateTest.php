@@ -111,5 +111,16 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 		->asString();
 		$this->assertEquals("UPDATE\n\ttest1\nSET\n\t`field1`='1'\nLIMIT\n\t10\nOFFSET\n\t10\n;\n", $sql);
 	}
+
+	public function testMask() {
+		$sql = TestUpdate::create()
+		->table('test1')
+		->set('field1', 1)
+		->set('field2', 2)
+		->setMask(['field1'])
+		->limit(10)
+		->asString();
+		$this->assertEquals("UPDATE\n\ttest1\nSET\n\t`field1`='1'\nLIMIT\n\t10\n;\n", $sql);
+	}
 }
  

@@ -129,4 +129,14 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 		->asString();
 		$this->assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123'\n;\n", $query);
 	}
+
+	public function testMask() {
+		$sql = TestInsert::create()
+		->into('test')
+		->addOrUpdate('field1', 1)
+		->addOrUpdate('field2', 2)
+		->setMask(['field1'])
+		->asString();
+		$this->assertEquals("INSERT INTO\n\ttest\nSET\n\t`field1`='1'\nON DUPLICATE KEY UPDATE\n\t`field1`='1'\n;\n", $sql);
+	}
 }
