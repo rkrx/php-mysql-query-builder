@@ -5,10 +5,6 @@ use Kir\MySQL\Builder;
 use Kir\MySQL\Builder\Exception;
 use Kir\MySQL\Database;
 use Kir\MySQL\Tools\AliasRegistry;
-use PDO;
-use PDOStatement;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use UnexpectedValueException;
 use Kir\MySQL\Builder\RunnableSelect;
 
@@ -31,22 +27,12 @@ class MySQL implements Database {
 	 * @var int
 	 */
 	private $transactionLevel = 0;
-	/**
-	 * @var LoggerInterface
-	 */
-	private $logger;
 
 	/**
-	 * @param PDO $pdo
-	 * @param LoggerInterface $logger
+	 * @param \PDO $pdo
 	 */
-	public function __construct(PDO $pdo, LoggerInterface $logger = null) {
-		if($logger === null) {
-			$logger = new NullLogger();
-		}
-
+	public function __construct(\PDO $pdo) {
 		$this->pdo = $pdo;
-		$this->logger = $logger;
 		$this->aliasRegistry = new AliasRegistry();
 	}
 
@@ -60,13 +46,10 @@ class MySQL implements Database {
 	/**
 	 * @param string $query
 	 * @throws Exception
-	 * @return PDOStatement
+	 * @return \PDOStatement
 	 */
 	public function query($query) {
-		$this->logger->info($query);
-		$timer = microtime(true);
 		$stmt = $this->pdo->query($query);
-		$this->logger->debug(sprintf("Last query duration: %0.5f sec.", microtime(true) - $timer));
 		if(!$stmt) {
 			throw new Exception("Could not execute statement:\n{$query}");
 		}
@@ -76,10 +59,9 @@ class MySQL implements Database {
 	/**
 	 * @param string $query
 	 * @throws Exception
-	 * @return PDOStatement
+	 * @return \PDOStatement
 	 */
 	public function prepare($query) {
-		$this->logger->info("PREPARE: {$query}");
 		$stmt = $this->pdo->prepare($query);
 		if(!$stmt) {
 			throw new Exception("Could not execute statement:\n{$query}");
@@ -93,11 +75,8 @@ class MySQL implements Database {
 	 * @return int
 	 */
 	public function exec($query, array $params = array()) {
-		$this->logger->info($query);
-		$timer = microtime(true);
 		$stmt = $this->pdo->prepare($query);
 		$stmt->execute($params);
-		$this->logger->debug(sprintf("Last query duration: %0.5f sec.", microtime(true) - $timer));
 		$result = $stmt->rowCount();
 		$stmt->closeCursor();
 		return $result;
@@ -115,12 +94,12 @@ class MySQL implements Database {
 	 * @return array
 	 */
 	public function getTableFields($table) {
+		$table = $this->select()->aliasReplacer()->replace($table);
 		if(array_key_exists($table, self::$tableFields)) {
 			return self::$tableFields[$table];
 		}
 		$stmt = $this->pdo->query("DESCRIBE {$table}");
-		$stmt->execute();
-		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		$rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 		self::$tableFields[$table] = array_map(function ($row) { return $row['Field']; }, $rows);
 		$stmt->closeCursor();
 		return self::$tableFields[$table];
