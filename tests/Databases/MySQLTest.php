@@ -4,6 +4,17 @@ namespace Kir\MySQL\Databases;
 use Pseudo\Pdo;
 
 class MySQLTest extends \PHPUnit_Framework_TestCase {
+	private $errorLvl;
+
+	protected function setUp() {
+		$this->errorLvl = error_reporting();
+		error_reporting(E_ALL ^ E_STRICT);
+	}
+
+	protected function tearDown() {
+		error_reporting($this->errorLvl);
+	}
+
 	public function testTransactionTries1() {
 		$pdo = new Pdo();
 		$mysql = new MySQL($pdo);
