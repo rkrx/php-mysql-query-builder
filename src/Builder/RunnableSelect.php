@@ -62,14 +62,14 @@ class RunnableSelect extends Select {
 	public function fetchRows(\Closure $callback = null) {
 		$statement = $this->createStatement();
 		$data = $statement->fetchAll(\PDO::FETCH_ASSOC);
-		if($callback !== null) {
-			$data = array_map($callback, $data);
-		}
 		if($this->preserveTypes) {
 			$columnDefinitions = $this->getFieldTypes($statement);
 			foreach($data as &$row) {
 				$row = $this->convertValues($row, $columnDefinitions);
 			}
+		}
+		if($callback !== null) {
+			$data = array_map($callback, $data);
 		}
 		$statement->closeCursor();
 		return $data;
