@@ -140,7 +140,6 @@ class Select extends Statement {
 		$query = $this->buildLimit($query);
 		$query = $this->buildOffset($query);
 		$query = $this->buildForUpdate($query);
-		$query .= ";\n";
 		return $query;
 	}
 

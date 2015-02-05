@@ -54,7 +54,6 @@ class Delete extends Statement {
 		$query = $this->buildOrder($query);
 		$query = $this->buildLimit($query);
 		$query = $this->buildOffset($query);
-		$query .= ";\n";
 		return $query;
 	}
 }

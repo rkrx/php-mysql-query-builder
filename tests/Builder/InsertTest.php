@@ -11,7 +11,7 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 		->into('travis#test1')
 		->addExpr('last_update=NOW()')
 		->asString();
-		$this->assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\tlast_update=NOW()\n;\n", $query);
+		$this->assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\tlast_update=NOW()\n", $query);
 	}
 
 	public function testAddExpr() {
@@ -19,7 +19,7 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 		->into('test1')
 		->addExpr('last_update=NOW()')
 		->asString();
-		$this->assertEquals("INSERT INTO\n\ttest1\nSET\n\tlast_update=NOW()\n;\n", $query);
+		$this->assertEquals("INSERT INTO\n\ttest1\nSET\n\tlast_update=NOW()\n", $query);
 	}
 
 	public function testMassInsert() {
@@ -34,7 +34,7 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 		->updateExpr('a = VALUES(a)')
 		->asString();
 
-		$this->assertEquals("INSERT INTO\n\ttravis_test.test2\n\t(a)\nSELECT\n\tb AS `a`\nFROM\n\ttravis_test.test1 oi\nWHERE\n\t(1!=2)\nON DUPLICATE KEY UPDATE\n\ta = VALUES(a)\n;\n", $query);
+		$this->assertEquals("INSERT INTO\n\ttravis_test.test2\n\t(a)\nSELECT\n\tb AS `a`\nFROM\n\ttravis_test.test1 oi\nWHERE\n\t(1!=2)\nON DUPLICATE KEY UPDATE\n\ta = VALUES(a)\n", $query);
 	}
 
 	public function testAddAll() {
@@ -52,19 +52,19 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 		->into('test1')
 		->addAll(['field1' => 123, 'field2' => 456])
 		->asString();
-		$this->assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123',\n\t`field2`='456'\n;\n", $query);
+		$this->assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123',\n\t`field2`='456'\n", $query);
 
 		$query = (new TestInsert($db))
 		->into('test1')
 		->addAll(['field1' => 123, 'field2' => 456], ['field1'])
 		->asString();
-		$this->assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123'\n;\n", $query);
+		$this->assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123'\n", $query);
 
 		$query = (new TestInsert($db))
 		->into('travis#test1')
 		->addAll(['field1' => 123, 'field2' => 456], ['field1'])
 		->asString();
-		$this->assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\t`field1`='123'\n;\n", $query);
+		$this->assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\t`field1`='123'\n", $query);
 	}
 
 	public function testUpdateAll() {
@@ -83,21 +83,21 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 		->add('field1', 123)
 		->updateAll(['field1' => 123, 'field2' => 456])
 		->asString();
-		$this->assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123',\n\t`field2`='456'\n;\n", $query);
+		$this->assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123',\n\t`field2`='456'\n", $query);
 
 		$query = (new TestInsert($db))
 		->into('test1')
 		->add('field1', 123)
 		->updateAll(['field1' => 123, 'field2' => 456], ['field1'])
 		->asString();
-		$this->assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123'\n;\n", $query);
+		$this->assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123'\n", $query);
 
 		$query = (new TestInsert($db))
 		->into('travis#test1')
 		->add('field1', 123)
 		->updateAll(['field1' => 123, 'field2' => 456], ['field1'])
 		->asString();
-		$this->assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123'\n;\n", $query);
+		$this->assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123'\n", $query);
 	}
 
 	public function testAddOrUpdateAll() {
@@ -115,19 +115,19 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 		->into('test1')
 		->addOrUpdateAll(['field1' => 123, 'field2' => 456])
 		->asString();
-		$this->assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123',\n\t`field2`='456'\nON DUPLICATE KEY UPDATE\n\t`field1`='123',\n\t`field2`='456'\n;\n", $query);
+		$this->assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123',\n\t`field2`='456'\nON DUPLICATE KEY UPDATE\n\t`field1`='123',\n\t`field2`='456'\n", $query);
 
 		$query = (new TestInsert($db))
 		->into('test1')
 		->addOrUpdateAll(['field1' => 123, 'field2' => 456], ['field1'])
 		->asString();
-		$this->assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123'\n;\n", $query);
+		$this->assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123'\n", $query);
 
 		$query = (new TestInsert($db))
 		->into('travis#test1')
 		->addOrUpdateAll(['field1' => 123, 'field2' => 456], ['field1'])
 		->asString();
-		$this->assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123'\n;\n", $query);
+		$this->assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123'\n", $query);
 	}
 
 	public function testMask() {
@@ -137,6 +137,6 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 		->addOrUpdate('field2', 2)
 		->setMask(['field1'])
 		->asString();
-		$this->assertEquals("INSERT INTO\n\ttest\nSET\n\t`field1`='1'\nON DUPLICATE KEY UPDATE\n\t`field1`='1'\n;\n", $sql);
+		$this->assertEquals("INSERT INTO\n\ttest\nSET\n\t`field1`='1'\nON DUPLICATE KEY UPDATE\n\t`field1`='1'\n", $sql);
 	}
 }
