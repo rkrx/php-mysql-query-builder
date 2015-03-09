@@ -214,7 +214,7 @@ class Insert extends InsertUpdateStatement {
 		if($this->from !== null) {
 			$fields = $this->from->getFields();
 			$queryArr[] = sprintf("\t(%s)\n", join(', ', array_keys($fields)));
-			$queryArr[] = trim(trim($this->from), ';');
+			$queryArr[] = $this->from;
 		} else {
 			$fields = $this->fields;
 			$insertData = $this->buildFieldList($fields);
@@ -228,8 +228,6 @@ class Insert extends InsertUpdateStatement {
 		if($updateData) {
 			$queryArr[] = "{$updateData}\n";
 		}
-
-		$queryArr[] = ";\n";
 
 		$query = join('', $queryArr);
 

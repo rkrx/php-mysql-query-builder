@@ -35,6 +35,9 @@ abstract class InsertUpdateStatement extends Statement {
 			if($fieldValue instanceof DefaultValue) {
 				$fieldValue = 'DEFAULT';
 			}
+			if(is_array($this->mask) && !in_array($fieldName, $this->mask)) {
+				continue;
+			}
 			if (is_int($fieldName)) {
 				$query[] = "\t{$fieldValue}";
 			} else {

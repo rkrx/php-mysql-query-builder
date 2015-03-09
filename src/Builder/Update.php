@@ -105,7 +105,6 @@ class Update extends InsertUpdateStatement {
 		$query = $this->buildOrder($query);
 		$query = $this->buildLimit($query);
 		$query = $this->buildOffset($query);
-		$query .= ";\n";
 		return $query;
 	}
 
