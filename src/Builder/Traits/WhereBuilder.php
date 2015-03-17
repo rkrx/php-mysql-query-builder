@@ -11,9 +11,10 @@ trait WhereBuilder {
 
 	/**
 	 * @param string $expression
+	 * @param mixed ...$param
 	 * @return $this
 	 */
-	public function where($expression) {
+	public function where($expression, $param = null) {
 		$this->where[] = array($expression, array_slice(func_get_args(), 1));
 		return $this;
 	}
