@@ -5,13 +5,9 @@ use Kir\MySQL\Database;
 use Kir\MySQL\Tools\AliasReplacer;
 
 abstract class Statement {
-	/**
-	 * @var Database
-	 */
+	/** @var Database */
 	private $db;
-	/**
-	 * @var AliasReplacer
-	 */
+	/** @var AliasReplacer */
 	private $aliasReplacer;
 
 	/**

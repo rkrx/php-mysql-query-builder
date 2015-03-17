@@ -3,37 +3,45 @@ namespace Kir\MySQL\Databases;
 
 use Kir\MySQL\Builder;
 use Kir\MySQL\Builder\Exception;
+use Kir\MySQL\Builder\QueryStatement;
+use Kir\MySQL\Builder\Statement;
 use Kir\MySQL\Database;
+use Kir\MySQL\QueryLogger\QueryLoggers;
 use Kir\MySQL\Tools\AliasRegistry;
+use Kir\MySQL\Tools\PDOStatementInterceptor;
+use PDO;
+use PDOStatement;
 use UnexpectedValueException;
 use Kir\MySQL\Builder\RunnableSelect;
 
 /**
  */
 class MySQL implements Database {
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private static $tableFields = array();
-	/**
-	 * @var PDO
-	 */
+	/** @var PDO */
 	private $pdo;
-	/**
-	 * @var AliasRegistry
-	 */
+	/** @var AliasRegistry */
 	private $aliasRegistry;
-	/**
-	 * @var int
-	 */
+	/** @var int */
 	private $transactionLevel = 0;
+	/** @var QueryLoggers */
+	private $queryLoggers = 0;
 
 	/**
-	 * @param \PDO $pdo
+	 * @param PDO $pdo
 	 */
-	public function __construct(\PDO $pdo) {
+	public function __construct(PDO $pdo) {
 		$this->pdo = $pdo;
 		$this->aliasRegistry = new AliasRegistry();
+		$this->queryLoggers = new QueryLoggers();
+	}
+
+	/**
+	 * @return QueryLoggers
+	 */
+	public function getQueryLoggers() {
+		return $this->queryLoggers;
 	}
 
 	/**
@@ -46,27 +54,29 @@ class MySQL implements Database {
 	/**
 	 * @param string $query
 	 * @throws Exception
-	 * @return \PDOStatement
+	 * @return QueryStatement
 	 */
 	public function query($query) {
 		$stmt = $this->pdo->query($query);
 		if(!$stmt) {
 			throw new Exception("Could not execute statement:\n{$query}");
 		}
-		return $stmt;
+		$stmtWrapper = new QueryStatement($stmt, $query, $this->queryLoggers);
+		return $stmtWrapper;
 	}
 
 	/**
 	 * @param string $query
 	 * @throws Exception
-	 * @return \PDOStatement
+	 * @return QueryStatement
 	 */
 	public function prepare($query) {
 		$stmt = $this->pdo->prepare($query);
 		if(!$stmt) {
 			throw new Exception("Could not execute statement:\n{$query}");
 		}
-		return $stmt;
+		$stmtWrapper = new QueryStatement($stmt, $query, $this->queryLoggers);
+		return $stmtWrapper;
 	}
 
 	/**
@@ -76,7 +86,9 @@ class MySQL implements Database {
 	 */
 	public function exec($query, array $params = array()) {
 		$stmt = $this->pdo->prepare($query);
+		$timer = microtime(true);
 		$stmt->execute($params);
+		$this->queryLoggers->log($query, microtime(true) - $timer);
 		$result = $stmt->rowCount();
 		$stmt->closeCursor();
 		return $result;
