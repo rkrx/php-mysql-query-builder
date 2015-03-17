@@ -161,7 +161,7 @@ class RunnableSelect extends Select {
 	}
 
 	/**
-	 * @return \PDOStatement
+	 * @return QueryStatement
 	 */
 	private function createStatement() {
 		$db = $this->db();
@@ -175,7 +175,7 @@ class RunnableSelect extends Select {
 	}
 
 	/**
-	 * @param \PDOStatement $statement
+	 * @param QueryStatement $statement
 	 * @return array
 	 */
 	private function getFieldTypes($statement) {

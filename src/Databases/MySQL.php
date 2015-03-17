@@ -4,13 +4,10 @@ namespace Kir\MySQL\Databases;
 use Kir\MySQL\Builder;
 use Kir\MySQL\Builder\Exception;
 use Kir\MySQL\Builder\QueryStatement;
-use Kir\MySQL\Builder\Statement;
 use Kir\MySQL\Database;
 use Kir\MySQL\QueryLogger\QueryLoggers;
 use Kir\MySQL\Tools\AliasRegistry;
-use Kir\MySQL\Tools\PDOStatementInterceptor;
 use PDO;
-use PDOStatement;
 use UnexpectedValueException;
 use Kir\MySQL\Builder\RunnableSelect;
 

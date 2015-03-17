@@ -75,4 +75,19 @@ class QueryStatement {
 	public function closeCursor() {
 		return $this->statement->closeCursor();
 	}
+
+	/**
+	 * @return int
+	 */
+	public function columnCount() {
+		return $this->statement->columnCount();
+	}
+
+	/**
+	 * @param int $columnNo
+	 * @return array
+	 */
+	public function getColumnMeta($columnNo) {
+		return $this->statement->getColumnMeta($columnNo);
+	}
 }
