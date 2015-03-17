@@ -68,4 +68,11 @@ class QueryStatement {
 	public function fetchColumn($columnNo = 0) {
 		return $this->statement->fetchColumn($columnNo);
 	}
+
+	/**
+	 * @return bool
+	 */
+	public function closeCursor() {
+		return $this->statement->closeCursor();
+	}
 }
