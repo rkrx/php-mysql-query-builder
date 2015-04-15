@@ -1,15 +1,17 @@
 <?php
 namespace Kir\MySQL\Databases;
 
+use PDO;
+use PDOException;
+use UnexpectedValueException;
+use Kir\MySQL\Builder\RunnableSelect;
 use Kir\MySQL\Builder;
 use Kir\MySQL\Builder\Exception;
 use Kir\MySQL\Builder\QueryStatement;
 use Kir\MySQL\Database;
+use Kir\MySQL\Databases\MySQL\MySQLExceptionInterpreter;
 use Kir\MySQL\QueryLogger\QueryLoggers;
 use Kir\MySQL\Tools\AliasRegistry;
-use PDO;
-use UnexpectedValueException;
-use Kir\MySQL\Builder\RunnableSelect;
 
 /**
  */
@@ -32,6 +34,7 @@ class MySQL implements Database {
 		$this->pdo = $pdo;
 		$this->aliasRegistry = new AliasRegistry();
 		$this->queryLoggers = new QueryLoggers();
+		$this->exceptionInterpreter = new MySQLExceptionInterpreter($pdo);
 	}
 
 	/**
@@ -84,7 +87,11 @@ class MySQL implements Database {
 	public function exec($query, array $params = array()) {
 		$stmt = $this->pdo->prepare($query);
 		$timer = microtime(true);
-		$stmt->execute($params);
+		try {
+			$stmt->execute($params);
+		} catch (PDOException $e) {
+			$this->exceptionInterpreter->throwMoreConcreteException($e);
+		}
 		$this->queryLoggers->log($query, microtime(true) - $timer);
 		$result = $stmt->rowCount();
 		$stmt->closeCursor();
@@ -216,12 +223,12 @@ class MySQL implements Database {
 
 	/**
 	 * @return $this
-	 * @throws Exception
+	 * @throws \Exception
 	 */
 	public function transactionCommit() {
 		$this->transactionLevel--;
 		if($this->transactionLevel < 0) {
-			throw new Exception("Transaction-Nesting-Problem: Trying to invoke commit on a already closed transaction");
+			throw new \Exception("Transaction-Nesting-Problem: Trying to invoke commit on a already closed transaction");
 		}
 		if((int) $this->transactionLevel === 0) {
 			$this->pdo->commit();
@@ -231,12 +238,12 @@ class MySQL implements Database {
 
 	/**
 	 * @return $this
-	 * @throws Exception
+	 * @throws \Exception
 	 */
 	public function transactionRollback() {
 		$this->transactionLevel--;
 		if($this->transactionLevel < 0) {
-			throw new Exception("Transaction-Nesting-Problem: Trying to invoke rollback on a already closed transaction");
+			throw new \Exception("Transaction-Nesting-Problem: Trying to invoke rollback on a already closed transaction");
 		}
 		if((int) $this->transactionLevel === 0) {
 			$this->pdo->rollBack();
@@ -249,6 +256,7 @@ class MySQL implements Database {
 	 * @param callable|null $callback
 	 * @return mixed
 	 * @throws \Exception
+	 * @throws null
 	 */
 	public function transaction($tries = 1, $callback = null) {
 		if(is_callable($tries)) {
