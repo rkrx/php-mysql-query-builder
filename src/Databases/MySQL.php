@@ -26,6 +26,8 @@ class MySQL implements Database {
 	private $transactionLevel = 0;
 	/** @var QueryLoggers */
 	private $queryLoggers = 0;
+	/** @var MySQLExceptionInterpreter */
+	private $exceptionInterpreter = 0;
 
 	/**
 	 * @param PDO $pdo
