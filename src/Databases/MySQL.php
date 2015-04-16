@@ -146,7 +146,8 @@ class MySQL implements Database {
 			}
 			return $value;
 		};
-		return preg_replace_callback('/(\\?|:\\d+)/', $func, $expression);
+		$result = preg_replace_callback('/(\\?|:\\d+)/', $func, $expression);
+		return (string) $result;
 	}
 
 	/**

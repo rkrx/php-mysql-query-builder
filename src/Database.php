@@ -2,6 +2,7 @@
 namespace Kir\MySQL;
 
 use Kir\MySQL\Builder\Exception;
+use Kir\MySQL\Builder\QueryStatement;
 use Kir\MySQL\Builder\RunnableSelect;
 use Kir\MySQL\Tools\AliasRegistry;
 
@@ -14,14 +15,14 @@ interface Database {
 	/**
 	 * @param string $query
 	 * @throws Exception
-	 * @return \PDOStatement
+	 * @return QueryStatement
 	 */
 	public function query($query);
 
 	/**
 	 * @param string $query
 	 * @throws Exception
-	 * @return \PDOStatement
+	 * @return QueryStatement
 	 */
 	public function prepare($query);
 
