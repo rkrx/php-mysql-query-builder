@@ -1,5 +1,5 @@
 <?php
 namespace Kir\MySQL\Exceptions;
 
-class SqlDeadLockException extends SqlException {
+class SqlDeadLockException extends SqlLockException {
 }

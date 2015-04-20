@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Databases\MySQL;
 
+use Kir\MySQL\Exceptions\LockWaitTimeoutExceededException;
 use Kir\MySQL\Exceptions\SqlDeadLockException;
 use PDO;
 use PDOException;
@@ -26,6 +27,9 @@ class MySQLExceptionInterpreter {
 		$message = $errorInfo[2];
 		if($code === 1213) {
 			throw new SqlDeadLockException($message, $code, $exception);
+		}
+		if($code === 1205) {
+			throw new LockWaitTimeoutExceededException($message, $code, $exception);
 		}
 		throw $exception;
 	}
