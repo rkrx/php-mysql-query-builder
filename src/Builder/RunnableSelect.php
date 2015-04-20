@@ -161,7 +161,7 @@ class RunnableSelect extends Select {
 		$statement = $db->prepare($query);
 		$statement->execute($this->values);
 		if($this->getCalcFoundRows()) {
-			$this->foundRows = $db->query('SELECT FOUND_ROWS()')->fetchColumn();
+			$this->foundRows = (int) $db->query('SELECT FOUND_ROWS()')->fetchColumn();
 		}
 		return $statement;
 	}
