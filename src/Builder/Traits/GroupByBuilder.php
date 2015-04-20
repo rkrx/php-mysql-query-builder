@@ -10,10 +10,9 @@ trait GroupByBuilder {
 	private $groupBy = array();
 
 	/**
-	 * @param string $expression
 	 * @return $this
 	 */
-	public function groupBy($expression) {
+	public function groupBy() {
 		foreach(func_get_args() as $expression) {
 			if(is_array($expression)) {
 				if(!count($expression)) {
@@ -23,7 +22,7 @@ trait GroupByBuilder {
 					$expression[0],
 					array_slice($expression, 1)
 				);
-				$expression = call_user_func_array(array($this->db(), 'quoteExpression'), $arguments);
+				$expression = $this->quoteExpr($arguments);
 			}
 			$this->groupBy[] = $expression;
 		}
@@ -44,5 +43,13 @@ trait GroupByBuilder {
 			$arr[] = "\t{$expression}";
 		}
 		return $query.join(",\n", $arr)."\n";
+	}
+
+	/**
+	 * @param array $arguments
+	 * @return mixed
+	 */
+	protected function quoteExpr(array $arguments) {
+		return call_user_func_array(array($this->db(), 'quoteExpression'), $arguments);
 	}
 }

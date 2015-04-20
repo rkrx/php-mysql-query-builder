@@ -43,10 +43,9 @@ class QueryStatement {
 	}
 
 	/**
-	 * @param int $fetchStyle
 	 * @return array
 	 */
-	public function fetchAll($fetchStyle = PDO::FETCH_ASSOC) {
+	public function fetchAll() {
 		$args = func_get_args();
 		return call_user_func_array([$this->statement, 'fetchAll'], $args);
 	}

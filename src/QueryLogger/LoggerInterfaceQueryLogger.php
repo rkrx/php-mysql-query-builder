@@ -10,7 +10,7 @@ class LoggerInterfaceQueryLogger implements QueryLogger {
 	/**
 	 * @param LoggerInterface $logger
 	 */
-	function __construct(LoggerInterface $logger) {
+	public function __construct(LoggerInterface $logger) {
 		$this->logger = $logger;
 	}
 

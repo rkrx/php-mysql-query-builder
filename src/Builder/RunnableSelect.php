@@ -4,19 +4,11 @@ namespace Kir\MySQL\Builder;
 /**
  */
 class RunnableSelect extends Select {
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $values = array();
-
-	/**
-	 * @var bool
-	 */
+	/** @var bool */
 	private $preserveTypes;
-
-	/**
-	 * @var bool
-	 */
+	/** @var int */
 	private $foundRows = 0;
 
 	/**

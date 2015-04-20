@@ -8,7 +8,7 @@ class ClosureQueryLogger implements QueryLogger {
 	/**
 	 * @param callable $fn
 	 */
-	function __construct($fn) {
+	public function __construct($fn) {
 		$this->fn = $fn;
 	}
 

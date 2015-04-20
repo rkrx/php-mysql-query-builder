@@ -5,33 +5,19 @@ use Kir\MySQL\Tools\AliasReplacer;
 use UnexpectedValueException;
 
 class Insert extends InsertUpdateStatement {
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $fields = array();
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $update = array();
-	/**
-	 * @var string
-	 */
+	/** @var string */
 	private $table = null;
-	/**
-	 * @var string
-	 */
+	/** @var string */
 	private $keyField = null;
-	/**
-	 * @var bool
-	 */
+	/** @var bool */
 	private $ignore = false;
-	/**
-	 * @var Select
-	 */
+	/** @var Select */
 	private $from = null;
-	/**
-	 * @var callable
-	 */
+	/** @var callable */
 	private $tableFields = null;
 
 	/**
@@ -77,12 +63,7 @@ class Insert extends InsertUpdateStatement {
 	 * @return $this
 	 */
 	public function add($field, $value) {
-		if ($this->isFieldNameValid($field)) {
-			throw new UnexpectedValueException('Field name is invalid');
-		}
-		$sqlField = $field;
-		$sqlValue = $this->db()->quote($value);
-		$this->fields[$sqlField] = $sqlValue;
+		$this->fields = $this->addTo($this->fields, $field, $value);
 		return $this;
 	}
 
@@ -93,12 +74,7 @@ class Insert extends InsertUpdateStatement {
 	 * @return $this
 	 */
 	public function update($field, $value) {
-		if ($this->isFieldNameValid($field)) {
-			throw new UnexpectedValueException('Field name is invalid');
-		}
-		$sqlField = $field;
-		$sqlValue = $this->db()->quote($value);
-		$this->update[$sqlField] = $sqlValue;
+		$this->update = $this->addTo($this->update, $field, $value);
 		return $this;
 	}
 
@@ -148,13 +124,9 @@ class Insert extends InsertUpdateStatement {
 	 * @return $this
 	 */
 	public function addAll(array $data, array $mask = null) {
-		if($mask !== null) {
-			$data = array_intersect_key($data, array_combine($mask, $mask));
-		}
-		$data = $this->clearValues($data);
-		foreach ($data as $field => $value) {
+		$this->addAllTo($data, $mask, function ($field, $value) {
 			$this->add($field, $value);
-		}
+		});
 		return $this;
 	}
 
@@ -164,15 +136,11 @@ class Insert extends InsertUpdateStatement {
 	 * @return $this
 	 */
 	public function updateAll(array $data, array $mask = null) {
-		if($mask !== null) {
-			$data = array_intersect_key($data, array_combine($mask, $mask));
-		}
-		$data = $this->clearValues($data);
-		foreach ($data as $field => $value) {
-			if ($field != $this->keyField) {
+		$this->addAllTo($data, $mask, function ($field, $value) {
+			if ($field !== $this->keyField) {
 				$this->update($field, $value);
 			}
-		}
+		});
 		return $this;
 	}
 
@@ -232,6 +200,38 @@ class Insert extends InsertUpdateStatement {
 		$query = join('', $queryArr);
 
 		return $query;
+	}
+
+	/**
+	 * @param array $fields
+	 * @param string $field
+	 * @param bool|int|float|string $value
+	 * @return array
+	 */
+	private function addTo($fields, $field, $value) {
+		if ($this->isFieldNameValid($field)) {
+			throw new UnexpectedValueException('Field name is invalid');
+		}
+		$sqlField = $field;
+		$sqlValue = $this->db()->quote($value);
+		$fields[$sqlField] = $sqlValue;
+		return $fields;
+	}
+
+	/**
+	 * @param array $data
+	 * @param array $mask
+	 * @param callable $fn
+	 * @return $this
+	 */
+	private function addAllTo($data, $mask, $fn) {
+		if($mask !== null) {
+			$data = array_intersect_key($data, array_combine($mask, $mask));
+		}
+		$data = $this->clearValues($data);
+		foreach ($data as $field => $value) {
+			call_user_func($fn, $field, $value);
+		}
 	}
 
 	/**

@@ -1,12 +1,12 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
+use Kir\MySQL\Builder\Internal\ConditionBuilder;
+
 trait WhereBuilder {
 	use AbstractDB;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $where = array();
 
 	/**
@@ -24,17 +24,6 @@ trait WhereBuilder {
 	 * @return string
 	 */
 	protected function buildWhereConditions($query) {
-		if(!count($this->where)) {
-			return $query;
-		}
-		$query .= "WHERE\n";
-		$arr = array();
-		foreach($this->where as $condition) {
-			list($expression, $arguments) = $condition;
-			$expr = $this->db()->quoteExpression($expression, $arguments);
-			$arr[] = "\t({$expr})";
-		}
-		$query .= join("\n\tAND\n", $arr);
-		return $query."\n";
+		return ConditionBuilder::build($this->db(), $query, $this->where, 'WHERE');
 	}
 }

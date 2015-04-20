@@ -1,12 +1,12 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
+use Kir\MySQL\Builder\Internal\ConditionBuilder;
+
 trait HavingBuilder {
 	use AbstractDB;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $having = array();
 
 	/**
@@ -23,17 +23,6 @@ trait HavingBuilder {
 	 * @return string
 	 */
 	protected function buildHavingConditions($query) {
-		if(!count($this->having)) {
-			return $query;
-		}
-		$query .= "HAVING\n";
-		$arr = array();
-		foreach($this->having as $condition) {
-			list($expression, $arguments) = $condition;
-			$expr = $this->db()->quoteExpression($expression, $arguments);
-			$arr[] = "\t({$expr})";
-		}
-		$query .= join("\n\tAND\n", $arr);
-		return $query."\n";
+		return ConditionBuilder::build($this->db(), $query, $this->having, 'HAVING');
 	}
 }
