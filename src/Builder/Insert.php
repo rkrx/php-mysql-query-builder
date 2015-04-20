@@ -208,7 +208,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param bool|int|float|string $value
 	 * @return array
 	 */
-	private function addTo($fields, $field, $value) {
+	private function addTo(array $fields, $field, $value) {
 		if ($this->isFieldNameValid($field)) {
 			throw new UnexpectedValueException('Field name is invalid');
 		}
@@ -224,7 +224,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param callable $fn
 	 * @return $this
 	 */
-	private function addAllTo($data, $mask, $fn) {
+	private function addAllTo(array $data, array $mask = null, $fn) {
 		if($mask !== null) {
 			$data = array_intersect_key($data, array_combine($mask, $mask));
 		}
