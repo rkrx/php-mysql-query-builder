@@ -87,17 +87,18 @@ class MySQL implements Database {
 	 * @return int
 	 */
 	public function exec($query, array $params = array()) {
-		$stmt = $this->pdo->prepare($query);
-		$timer = microtime(true);
 		try {
+			$stmt = $this->pdo->prepare($query);
+			$timer = microtime(true);
 			$stmt->execute($params);
+			$this->queryLoggers->log($query, microtime(true) - $timer);
+			$result = $stmt->rowCount();
+			$stmt->closeCursor();
+			return $result;
 		} catch (PDOException $e) {
 			$this->exceptionInterpreter->throwMoreConcreteException($e);
+			throw $e;
 		}
-		$this->queryLoggers->log($query, microtime(true) - $timer);
-		$result = $stmt->rowCount();
-		$stmt->closeCursor();
-		return $result;
 	}
 
 	/**

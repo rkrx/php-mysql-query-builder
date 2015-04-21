@@ -18,10 +18,13 @@ class RunnableInsert extends Insert {
 	}
 
 	/**
+	 * @param array $params
+	 * @return int
+	 * @throws Exception
 	 */
-	public function run() {
+	public function run(array $params = array()) {
 		$query = $this->__toString();
-		$this->db()->exec($query);
+		$this->db()->exec($query, $params);
 		return (int) $this->db()->getLastInsertId();
 	}
 }
