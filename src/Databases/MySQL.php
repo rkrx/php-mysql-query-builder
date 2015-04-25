@@ -1,39 +1,49 @@
 <?php
 namespace Kir\MySQL\Databases;
 
-use Kir\MySQL\Builder;
-use Kir\MySQL\Builder\Exception;
-use Kir\MySQL\Database;
-use Kir\MySQL\Tools\AliasRegistry;
+use PDO;
+use PDOException;
 use UnexpectedValueException;
 use Kir\MySQL\Builder\RunnableSelect;
+use Kir\MySQL\Builder;
+use Kir\MySQL\Builder\Exception;
+use Kir\MySQL\Builder\QueryStatement;
+use Kir\MySQL\Database;
+use Kir\MySQL\Databases\MySQL\MySQLExceptionInterpreter;
+use Kir\MySQL\QueryLogger\QueryLoggers;
+use Kir\MySQL\Tools\AliasRegistry;
 
 /**
  */
 class MySQL implements Database {
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private static $tableFields = array();
-	/**
-	 * @var PDO
-	 */
+	/** @var PDO */
 	private $pdo;
-	/**
-	 * @var AliasRegistry
-	 */
+	/** @var AliasRegistry */
 	private $aliasRegistry;
-	/**
-	 * @var int
-	 */
+	/** @var int */
 	private $transactionLevel = 0;
+	/** @var QueryLoggers */
+	private $queryLoggers = 0;
+	/** @var MySQLExceptionInterpreter */
+	private $exceptionInterpreter = 0;
 
 	/**
-	 * @param \PDO $pdo
+	 * @param PDO $pdo
 	 */
-	public function __construct(\PDO $pdo) {
+	public function __construct(PDO $pdo) {
 		$this->pdo = $pdo;
 		$this->aliasRegistry = new AliasRegistry();
+		$this->queryLoggers = new QueryLoggers();
+		$this->exceptionInterpreter = new MySQLExceptionInterpreter($pdo);
+	}
+
+	/**
+	 * @return QueryLoggers
+	 */
+	public function getQueryLoggers() {
+		return $this->queryLoggers;
 	}
 
 	/**
@@ -46,27 +56,29 @@ class MySQL implements Database {
 	/**
 	 * @param string $query
 	 * @throws Exception
-	 * @return \PDOStatement
+	 * @return QueryStatement
 	 */
 	public function query($query) {
 		$stmt = $this->pdo->query($query);
 		if(!$stmt) {
 			throw new Exception("Could not execute statement:\n{$query}");
 		}
-		return $stmt;
+		$stmtWrapper = new QueryStatement($stmt, $query, $this->queryLoggers);
+		return $stmtWrapper;
 	}
 
 	/**
 	 * @param string $query
 	 * @throws Exception
-	 * @return \PDOStatement
+	 * @return QueryStatement
 	 */
 	public function prepare($query) {
 		$stmt = $this->pdo->prepare($query);
 		if(!$stmt) {
 			throw new Exception("Could not execute statement:\n{$query}");
 		}
-		return $stmt;
+		$stmtWrapper = new QueryStatement($stmt, $query, $this->queryLoggers);
+		return $stmtWrapper;
 	}
 
 	/**
@@ -75,11 +87,18 @@ class MySQL implements Database {
 	 * @return int
 	 */
 	public function exec($query, array $params = array()) {
-		$stmt = $this->pdo->prepare($query);
-		$stmt->execute($params);
-		$result = $stmt->rowCount();
-		$stmt->closeCursor();
-		return $result;
+		try {
+			$stmt = $this->pdo->prepare($query);
+			$timer = microtime(true);
+			$stmt->execute($params);
+			$this->queryLoggers->log($query, microtime(true) - $timer);
+			$result = $stmt->rowCount();
+			$stmt->closeCursor();
+			return $result;
+		} catch (PDOException $e) {
+			$this->exceptionInterpreter->throwMoreConcreteException($e);
+			throw $e;
+		}
 	}
 
 	/**
@@ -128,7 +147,8 @@ class MySQL implements Database {
 			}
 			return $value;
 		};
-		return preg_replace_callback('/(\\?|:\\d+)/', $func, $expression);
+		$result = preg_replace_callback('/(\\?|:\\d+)/', $func, $expression);
+		return (string) $result;
 	}
 
 	/**
@@ -207,12 +227,12 @@ class MySQL implements Database {
 
 	/**
 	 * @return $this
-	 * @throws Exception
+	 * @throws \Exception
 	 */
 	public function transactionCommit() {
 		$this->transactionLevel--;
 		if($this->transactionLevel < 0) {
-			throw new Exception("Transaction-Nesting-Problem: Trying to invoke commit on a already closed transaction");
+			throw new \Exception("Transaction-Nesting-Problem: Trying to invoke commit on a already closed transaction");
 		}
 		if((int) $this->transactionLevel === 0) {
 			$this->pdo->commit();
@@ -222,12 +242,12 @@ class MySQL implements Database {
 
 	/**
 	 * @return $this
-	 * @throws Exception
+	 * @throws \Exception
 	 */
 	public function transactionRollback() {
 		$this->transactionLevel--;
 		if($this->transactionLevel < 0) {
-			throw new Exception("Transaction-Nesting-Problem: Trying to invoke rollback on a already closed transaction");
+			throw new \Exception("Transaction-Nesting-Problem: Trying to invoke rollback on a already closed transaction");
 		}
 		if((int) $this->transactionLevel === 0) {
 			$this->pdo->rollBack();
@@ -240,6 +260,7 @@ class MySQL implements Database {
 	 * @param callable|null $callback
 	 * @return mixed
 	 * @throws \Exception
+	 * @throws null
 	 */
 	public function transaction($tries = 1, $callback = null) {
 		if(is_callable($tries)) {

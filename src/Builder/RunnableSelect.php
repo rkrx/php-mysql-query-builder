@@ -4,19 +4,11 @@ namespace Kir\MySQL\Builder;
 /**
  */
 class RunnableSelect extends Select {
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $values = array();
-
-	/**
-	 * @var bool
-	 */
+	/** @var bool */
 	private $preserveTypes;
-
-	/**
-	 * @var bool
-	 */
+	/** @var int */
 	private $foundRows = 0;
 
 	/**
@@ -161,7 +153,7 @@ class RunnableSelect extends Select {
 	}
 
 	/**
-	 * @return \PDOStatement
+	 * @return QueryStatement
 	 */
 	private function createStatement() {
 		$db = $this->db();
@@ -169,13 +161,13 @@ class RunnableSelect extends Select {
 		$statement = $db->prepare($query);
 		$statement->execute($this->values);
 		if($this->getCalcFoundRows()) {
-			$this->foundRows = $db->query('SELECT FOUND_ROWS()')->fetchColumn();
+			$this->foundRows = (int) $db->query('SELECT FOUND_ROWS()')->fetchColumn();
 		}
 		return $statement;
 	}
 
 	/**
-	 * @param \PDOStatement $statement
+	 * @param QueryStatement $statement
 	 * @return array
 	 */
 	private function getFieldTypes($statement) {
