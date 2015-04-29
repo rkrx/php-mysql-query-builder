@@ -1,8 +1,9 @@
 mysql query builder (php 5.4+)
 ==============================
 
-[![Build Status](https://travis-ci.org/rkrx/php-mysql-query-builder.svg)](https://travis-ci.org/rkrx/php-mysql-query-builder)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/a57881f2-af75-48b7-9f5f-e821cdb75d0c/mini.png)](https://insight.sensiolabs.com/projects/a57881f2-af75-48b7-9f5f-e821cdb75d0c)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/rkrx/php-mysql-query-builder/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/rkrx/php-mysql-query-builder/?branch=master)
+[![Build Status](https://travis-ci.org/rkrx/php-mysql-query-builder.svg)](https://travis-ci.org/rkrx/php-mysql-query-builder)
 
 Simple mysql query builder to build select, insert, update and delete queries with conditional parts.
 This library was initially not intended to build prepared statements, but this is also possible.
