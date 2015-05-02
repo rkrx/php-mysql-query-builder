@@ -1,7 +1,6 @@
 <phpunit bootstrap="vendor/autoload.php"
 		 backupGlobals="false"
 		 backupStaticAttributes="false"
-		 strict="true"
 		 verbose="true"
 		 timeoutForSmallTests="5">
 	<testsuites>
