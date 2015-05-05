@@ -62,4 +62,4 @@ abstract class InsertUpdateStatement extends Statement {
 		}
 		return in_array($fieldName, $this->mask);
 	}
-} 
+}

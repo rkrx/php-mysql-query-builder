@@ -1,7 +1,8 @@
 <?php
 namespace Kir\MySQL\Databases;
 
-use Pseudo\Pdo;
+use Kir\FakePDO\EventHandlers\RegistryEventHandler;
+use Kir\FakePDO\FakePDO;
 
 class MySQLTest extends \PHPUnit_Framework_TestCase {
 	private $errorLvl;
@@ -16,7 +17,7 @@ class MySQLTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testTransactionTries1() {
-		$pdo = new Pdo();
+		$pdo = new FakePDO();
 		$mysql = new MySQL($pdo);
 
 		$this->setExpectedException('Exception', '5');
@@ -29,7 +30,7 @@ class MySQLTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testTransactionTries2() {
-		$pdo = new Pdo();
+		$pdo = new FakePDO();
 		$mysql = new MySQL($pdo);
 
 		$result = $mysql->transaction(5, function () {
@@ -45,8 +46,13 @@ class MySQLTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetTableFields() {
-		$pdo = new Pdo();
-		$pdo->mock('DESCRIBE test__table', [['Field' => 'a'], ['Field' => 'b'], ['Field' => 'c']]);
+		$eventHandler = new RegistryEventHandler();
+
+		$eventHandler->add('PDOStatement::fetchAll', function ($event) {
+			return [['Field' => 'a'], ['Field' => 'b'], ['Field' => 'c']];
+		});
+
+		$pdo = new FakePDO($eventHandler);
 
 		$mysql = new MySQL($pdo);
 		$mysql->getAliasRegistry()->add('test', 'test__');

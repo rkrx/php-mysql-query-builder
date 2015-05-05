@@ -17,8 +17,6 @@ class Insert extends InsertUpdateStatement {
 	private $ignore = false;
 	/** @var Select */
 	private $from = null;
-	/** @var callable */
-	private $tableFields = null;
 
 	/**
 	 * @param string $table
@@ -26,12 +24,6 @@ class Insert extends InsertUpdateStatement {
 	 */
 	public function into($table) {
 		$this->table = $table;
-		$this->tableFields = function () {
-			static $cache = null;
-			if($cache === null) {
-				$cache = $this->db()->getTableFields($this->table);
-			}
-		};
 		return $this;
 	}
 
