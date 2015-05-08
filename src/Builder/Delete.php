@@ -18,9 +18,7 @@ class Delete extends Statement {
 	use LimitBuilder;
 	use OffsetBuilder;
 
-	/**
-	 * @var string[]
-	 */
+	/** @var string[] */
 	private $aliases = array();
 
 	/**
@@ -31,9 +29,7 @@ class Delete extends Statement {
 	 * @return $this
 	 */
 	public function from($alias, $table = null) {
-		if($table === null) {
-			list($alias, $table) = [$table, $alias];
-		} else {
+		if($table !== null) {
 			$this->aliases[] = $alias;
 		}
 		$this->addTable($alias, $table);
