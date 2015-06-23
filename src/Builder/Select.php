@@ -13,9 +13,7 @@ use Kir\MySQL\Builder\Traits\WhereBuilder;
 
 class Select extends Statement {
 	use TableNameBuilder;
-	use TableBuilder {
-		addTable as addFrom;
-	}
+	use TableBuilder;
 	use JoinBuilder;
 	use WhereBuilder;
 	use HavingBuilder;
@@ -80,16 +78,6 @@ class Select extends Statement {
 	}
 
 	/**
-	 * @param string $alias
-	 * @param string $table
-	 * @return $this
-	 */
-	public function from($alias, $table) {
-		$this->addFrom($alias, $table);
-		return $this;
-	}
-
-	/**
 	 * @param bool $enabled
 	 * @return $this
 	 */
@@ -115,6 +103,16 @@ class Select extends Statement {
 			throw new \Exception('This function cant operate with mysql.trace_mode is set.');
 		}
 		$this->calcFoundRows = $calcFoundRows;
+		return $this;
+	}
+
+	/**
+	 * @param string $alias
+	 * @param string $tableName
+	 * @return $this
+	 */
+	public function from($alias, $tableName = null) {
+		$this->addTable($alias, $tableName);
 		return $this;
 	}
 

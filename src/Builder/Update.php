@@ -30,9 +30,6 @@ class Update extends InsertUpdateStatement {
 	 * @return $this
 	 */
 	public function table($alias, $table = null) {
-		if($table === null) {
-			list($alias, $table) = [$table, $alias];
-		}
 		$this->addTable($alias, $table);
 		return $this;
 	}

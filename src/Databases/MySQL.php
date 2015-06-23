@@ -158,6 +158,8 @@ class MySQL implements Database {
 	public function quote($value) {
 		if(is_null($value)) {
 			$result = 'NULL';
+		} elseif($value instanceof Builder\Select) {
+			$result = sprintf('(%s)', (string) $value);
 		} elseif(is_array($value)) {
 			$result = join(', ', array_map(function ($value) { return $this->quote($value); }, $value));
 		/*} elseif(is_int(trim($value)) && strpos('123456789', substr(0, 1, trim($value))) !== null) {

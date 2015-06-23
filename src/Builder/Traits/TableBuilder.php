@@ -14,7 +14,10 @@ trait TableBuilder {
 	 * @param string $table
 	 * @return $this
 	 */
-	public function addTable($alias, $table) {
+	protected function addTable($alias, $table = null) {
+		if($table === null) {
+			list($alias, $table) = [$table, $alias];
+		}
 		$this->tables[] = array('alias' => $alias, 'name' => $table);
 		return $this;
 	}
