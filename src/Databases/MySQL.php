@@ -20,6 +20,10 @@ class MySQL implements Database {
 	private static $tableFields = array();
 	/** @var PDO */
 	private $pdo;
+	/** @var string */
+	private $pdoHash = null;
+	/** @var bool */
+	private $outerTransaction = false;
 	/** @var AliasRegistry */
 	private $aliasRegistry;
 	/** @var int */
@@ -34,6 +38,7 @@ class MySQL implements Database {
 	 */
 	public function __construct(PDO $pdo) {
 		$this->pdo = $pdo;
+		$this->pdoHash = spl_object_hash($pdo);
 		$this->aliasRegistry = new AliasRegistry();
 		$this->queryLoggers = new QueryLoggers();
 		$this->exceptionInterpreter = new MySQLExceptionInterpreter($pdo);
@@ -221,7 +226,11 @@ class MySQL implements Database {
 	 */
 	public function transactionStart() {
 		if((int) $this->transactionLevel === 0) {
-			$this->pdo->beginTransaction();
+			if($this->pdo->inTransaction()) {
+				$this->outerTransaction = true;
+			} else {
+				$this->pdo->beginTransaction();
+			}
 		}
 		$this->transactionLevel++;
 		return $this;
@@ -232,14 +241,9 @@ class MySQL implements Database {
 	 * @throws \Exception
 	 */
 	public function transactionCommit() {
-		$this->transactionLevel--;
-		if($this->transactionLevel < 0) {
-			throw new \Exception("Transaction-Nesting-Problem: Trying to invoke commit on a already closed transaction");
-		}
-		if((int) $this->transactionLevel === 0) {
+		return $this->transactionEnd(function () {
 			$this->pdo->commit();
-		}
-		return $this;
+		});
 	}
 
 	/**
@@ -247,14 +251,9 @@ class MySQL implements Database {
 	 * @throws \Exception
 	 */
 	public function transactionRollback() {
-		$this->transactionLevel--;
-		if($this->transactionLevel < 0) {
-			throw new \Exception("Transaction-Nesting-Problem: Trying to invoke rollback on a already closed transaction");
-		}
-		if((int) $this->transactionLevel === 0) {
+		return $this->transactionEnd(function () {
 			$this->pdo->rollBack();
-		}
-		return $this;
+		});
 	}
 
 	/**
@@ -283,5 +282,25 @@ class MySQL implements Database {
 			}
 		}
 		throw $e;
+	}
+
+	/**
+	 * @param callable $fn
+	 * @return $this
+	 * @throws \Exception
+	 */
+	private function transactionEnd($fn) {
+		$this->transactionLevel--;
+		if($this->transactionLevel < 0) {
+			throw new \Exception("Transaction-Nesting-Problem: Trying to invoke commit on a already closed transaction");
+		}
+		if((int) $this->transactionLevel === 0) {
+			if($this->outerTransaction) {
+				$this->outerTransaction = false;
+			} else {
+				call_user_func($fn);
+			}
+		}
+		return $this;
 	}
 }
