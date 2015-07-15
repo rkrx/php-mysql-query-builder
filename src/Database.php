@@ -34,7 +34,7 @@ interface Database {
 	public function exec($query, array $params = array());
 
 	/**
-	 * @return int
+	 * @return string
 	 */
 	public function getLastInsertId();
 

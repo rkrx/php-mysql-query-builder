@@ -100,7 +100,7 @@ class MySQL implements Database {
 	}
 
 	/**
-	 * @return int
+	 * @return string
 	 */
 	public function getLastInsertId() {
 		return $this->pdo->lastInsertId();
