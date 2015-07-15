@@ -77,12 +77,10 @@ class MySQL implements Database {
 	 * @return QueryStatement
 	 */
 	public function prepare($query) {
-		$stmt = $this->pdo->prepare($query);
-		if(!$stmt) {
-			throw new Exception("Could not execute statement:\n{$query}");
-		}
-		$stmtWrapper = new QueryStatement($stmt, $query, $this->queryLoggers);
-		return $stmtWrapper;
+		return $this->buildQueryStatement($query, function ($query) {
+			$stmt = $this->pdo->prepare($query);
+			return $stmt;
+		});
 	}
 
 	/**
