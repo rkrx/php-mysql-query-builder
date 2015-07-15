@@ -23,7 +23,9 @@ Here a few things to keep in mind:
 ```PHP
 $pdo = new PDO('mysql:host=127.0.0.1;dbname=test;charset=utf8', 'root', '');
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+```
 
+```PHP
 $mysql = new MySQL($pdo);
 $mysql->getAliasRegistry()->add('textprefix', 'testdb.test__');
 ```
@@ -40,32 +42,57 @@ $select = $mysql->select(['customer_count' => 'COUNT(*)'])
 ->orderBy('t1.field2', 'DESC')
 ->limit(100)
 ->offset(50);
+```
 
+```PHP
 if($contition === true) {
 	$select->where('t1.somefield = ?', $someValue);
 }
+```
 
+```PHP
 $rows = $select->fetchRows();
-
 foreach($rows as $row) {
 	print_r($row);
 }
 ```
 
+* The order of method-calls doesn't matter.
+
 ### Insert
 
-You can insert key-value-arrays with `addAll`, `updateAll`, `addOrUpdateAll`. As the second parameter you can provide an array to specify the only fields to consider. 
-
+You can insert key-value-arrays with `addAll`, `updateAll`, `addOrUpdateAll`. As the second parameter you can provide an array to specify the only fields to consider.
+ 
 ```PHP
-$mysql->insert()
+$id = $mysql->insert()
 ->into('test')
 ->addOrUpdateAll($data, ['field1', 'field2', 'field3'])
-->add('created_at=NOW()')
+->add('created_by', $userId)
+->addOrUpdate('updated_by', $userId)
+->addExpr('created_at=NOW()')
 ->addOrUpdateExpr('updated_at=NOW()')
 ->run();
 ```
 
-There is also an option to build an `INSERT INTO ... SELECT ... FROM ... ON DUPLICATE KEY UPDATE ...`
+* `insert()` alwasy returns an id, no matter if a dataset was actually inserted or updated.
+* You can mass-insert by using `insert()->...->insertRows(array $rows)`.
+
+There is also an option to build an `INSERT INTO ... SELECT ... FROM ... ON DUPLICATE KEY UPDATE ...`:
+
+```PHP
+$id = $mysql->insert()
+->into('test')
+->addExpr('field1=:field1')
+->addOrUpdateExpr('field2=:field2')
+->addExpr('field3=NOW()')
+->from(
+	$mysql->select()
+	->field('a.myfield1', 'field1')
+	->field('a.myfield2', 'field2')
+	->from('a', 'mytable')
+	->where('field=?', 1)
+)->run();
+```
 
 ### Update
 
