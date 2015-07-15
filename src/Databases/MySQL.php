@@ -36,7 +36,6 @@ class MySQL implements Database {
 	 */
 	public function __construct(PDO $pdo) {
 		$this->pdo = $pdo;
-		$this->pdoHash = spl_object_hash($pdo);
 		$this->aliasRegistry = new AliasRegistry();
 		$this->queryLoggers = new QueryLoggers();
 		$this->exceptionInterpreter = new MySQLExceptionInterpreter($pdo);
