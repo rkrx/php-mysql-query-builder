@@ -3,6 +3,7 @@ namespace Kir\MySQL\Databases;
 
 use PDO;
 use PDOException;
+use PDOStatement;
 use UnexpectedValueException;
 use Kir\MySQL\Builder\RunnableSelect;
 use Kir\MySQL\Builder;
@@ -64,12 +65,10 @@ class MySQL implements Database {
 	 * @return QueryStatement
 	 */
 	public function query($query) {
-		$stmt = $this->pdo->query($query);
-		if(!$stmt) {
-			throw new Exception("Could not execute statement:\n{$query}");
-		}
-		$stmtWrapper = new QueryStatement($stmt, $query, $this->queryLoggers);
-		return $stmtWrapper;
+		return $this->buildQueryStatement($query, function ($query) {
+			$stmt = $this->pdo->query($query);
+			return $stmt;
+		});
 	}
 
 	/**
@@ -302,5 +301,20 @@ class MySQL implements Database {
 			}
 		}
 		return $this;
+	}
+
+	/**
+	 * @param string $query
+	 * @param callable $fn
+	 * @return QueryStatement
+	 * @throws Exception
+	 */
+	private function buildQueryStatement($query, $fn) {
+		$stmt = call_user_func($fn, $query);
+		if(!$stmt) {
+			throw new Exception("Could not execute statement:\n{$query}");
+		}
+		$stmtWrapper = new QueryStatement($stmt, $query, $this->queryLoggers);
+		return $stmtWrapper;
 	}
 }

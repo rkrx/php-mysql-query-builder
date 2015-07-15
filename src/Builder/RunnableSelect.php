@@ -74,6 +74,7 @@ class RunnableSelect extends Select {
 		$statement = $this->createStatement();
 		$row = $statement->fetch(\PDO::FETCH_ASSOC);
 		if(!is_array($row)) {
+			$statement->closeCursor();
 			return array();
 		}
 		if($this->preserveTypes) {
@@ -135,13 +136,13 @@ class RunnableSelect extends Select {
 	public function fetchValue($default = null) {
 		$statement = $this->createStatement();
 		$row = $statement->fetch(\PDO::FETCH_ASSOC);
+		$statement->closeCursor();
 		if(!is_array($row)) {
 			return $default;
 		}
 		if(!count($row)) {
 			return null;
 		}
-		$statement->closeCursor();
 		return array_shift($row);
 	}
 

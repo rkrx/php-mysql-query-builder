@@ -14,6 +14,7 @@ class RunnableInsert extends Insert {
 			$stmt->execute($row);
 			$result[] = (int) $this->db()->getLastInsertId();
 		}
+		$stmt->closeCursor();
 		return $result;
 	}
 

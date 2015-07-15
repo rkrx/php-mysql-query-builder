@@ -11,6 +11,7 @@ trait HavingBuilder {
 
 	/**
 	 * @param string $expression
+	 * @param mixed ...$param
 	 * @return $this
 	 */
 	public function having($expression) {
