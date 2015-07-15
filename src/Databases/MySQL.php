@@ -179,11 +179,11 @@ class MySQL implements Database {
 	 * @return string
 	 */
 	public function quoteField($field) {
-		if (is_numeric($field) || !is_scalar($field)) {
+		if (is_numeric($field) || !is_string($field)) {
 			throw new UnexpectedValueException('Field name is invalid');
 		}
 		if(strpos($field, '`') !== false) {
-			return $field;
+			return (string) $field;
 		}
 		$parts = explode('.', $field);
 		return '`'.join('`.`', $parts).'`';
