@@ -5,13 +5,9 @@ use Kir\MySQL\Builder;
 use Kir\MySQL\Tools\AliasRegistry;
 
 class TestDB extends MySQL {
-	/**
-	 * @var \PDO
-	 */
+	/** @var \PDO */
 	private $pdo = null;
-	/**
-	 * @var AliasRegistry
-	 */
+	/** @var AliasRegistry */
 	private $aliasRegistry;
 
 	/**
@@ -23,7 +19,7 @@ class TestDB extends MySQL {
 
 	/**
 	 */
-	function __construct() {
+	public function __construct() {
 		static $pdo = null;
 		if($pdo === null) {
 			$pdo = new \PDO('mysql:host=localhost;charset=utf8', 'root');
@@ -37,7 +33,7 @@ class TestDB extends MySQL {
 
 	/**
 	 */
-	/*public function install() {
+	public function install() {
 		$this->pdo->exec('DROP DATABASE IF EXISTS `travis_test`;');
 		$this->pdo->exec('CREATE DATABASE `travis_test`;');
 		$this->pdo->exec('USE `travis_test`;');
@@ -49,11 +45,11 @@ class TestDB extends MySQL {
 			$stmt1->execute(array('field1' => $i, 'field2' => $i / 10, 'field3' => '2000-01-01 00:00:00', 'field4' => "Test text #{$i}"));
 			$stmt2->execute(array('field1' => $i, 'field2' => $i / 10, 'field3' => '2000-01-01 00:00:00', 'field4' => "Test text #{$i}"));
 		}
-	}*/
+	}
 
 	/**
 	 */
-	/*public function uninstall() {
-		#$this->pdo->exec('DROP DATABASE IF EXISTS `travis_test`;');
-	}*/
+	public function uninstall() {
+		$this->pdo->exec('DROP DATABASE IF EXISTS `travis_test`;');
+	}
 }

@@ -6,9 +6,13 @@ php:
   - 5.5
   - 5.4
 
+services:
+  - mysql
+
 before_script:
   - composer self-update
   - composer update
 
 script:
   - phpunit -c tests.xml
+

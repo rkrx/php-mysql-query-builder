@@ -5,37 +5,39 @@ use Kir\FakePDO\EventHandlers\RegistryEventHandler;
 use Kir\FakePDO\FakePDO;
 
 class MySQLTest extends \PHPUnit_Framework_TestCase {
-	private $errorLvl;
+	/** @var TestDB */
+	private $db = null;
 
 	protected function setUp() {
-		$this->errorLvl = error_reporting();
-		error_reporting(E_ALL ^ E_STRICT);
+		$this->db = new TestDB();
+		$this->db->install();
 	}
 
 	protected function tearDown() {
-		error_reporting($this->errorLvl);
+		$this->db->uninstall();
 	}
 
+	/**
+	 * Check if exceptions are thrown after a certain amount of tries
+	 */
 	public function testTransactionTries1() {
-		$pdo = new FakePDO();
-		$mysql = new MySQL($pdo);
-
 		$this->setExpectedException('Exception', '5');
 
-		$mysql->transaction(5, function () {
+		$this->db->transaction(5, function () {
 			static $i;
 			$i++;
 			throw new \Exception($i);
 		});
 	}
 
+	/**
+	 * Check if the number of tries exactly corresponds to the actual amount of tries needed
+	 */
 	public function testTransactionTries2() {
-		$pdo = new FakePDO();
-		$mysql = new MySQL($pdo);
-
-		$result = $mysql->transaction(5, function () {
+		$result = $this->db->transaction(5, function () {
 			static $i;
 			$i++;
+			// Fail four times, succeed at the fifth time
 			if($i < 5) {
 				throw new \Exception($i);
 			}
@@ -59,5 +61,60 @@ class MySQLTest extends \PHPUnit_Framework_TestCase {
 		$fields = $mysql->getTableFields('test#table');
 
 		$this->assertEquals(array('a', 'b', 'c'), $fields);
+	}
+
+	/**
+	 * Test if the outer nested transaction detection works as expected
+	 */
+	public function testNestedTransaction() {
+		$eventHandler = new RegistryEventHandler();
+		$pdo = new FakePDO($eventHandler);
+		$mysql = new MySQL($pdo);
+
+		$mysql->transactionStart();
+
+		$eventHandler->add('PDO::beginTransaction', function () {
+			throw new \Exception('Invalid transaction state');
+		});
+
+		$eventHandler->add('PDO::rollback', function () {
+			throw new \Exception('Invalid transaction state');
+		});
+
+		$mysql->transactionStart();
+		$mysql->transactionStart();
+		$mysql->transactionRollback();
+		$mysql->transactionRollback();
+
+		$eventHandler->add('PDO::rollback', function () {
+		});
+
+		$mysql->transactionRollback();
+	}
+
+	/**
+	 * Test if the outer nested transaction detection works as expected
+	 */
+	public function testOuterNestedTransaction() {
+		$eventHandler = new RegistryEventHandler();
+		$pdo = new FakePDO($eventHandler);
+		$mysql = new MySQL($pdo);
+
+		$pdo->beginTransaction();
+
+		$eventHandler->add('PDO::beginTransaction', function () {
+			throw new \Exception('Invalid transaction state');
+		});
+
+		$eventHandler->add('PDO::rollback', function () {
+			throw new \Exception('Invalid transaction state');
+		});
+
+		$mysql->transactionStart();
+		$mysql->transactionStart();
+		$mysql->transactionStart();
+		$mysql->transactionRollback();
+		$mysql->transactionRollback();
+		$mysql->transactionRollback();
 	}
 }
