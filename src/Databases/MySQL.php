@@ -3,7 +3,6 @@ namespace Kir\MySQL\Databases;
 
 use PDO;
 use PDOException;
-use PDOStatement;
 use UnexpectedValueException;
 use Kir\MySQL\Builder\RunnableSelect;
 use Kir\MySQL\Builder;
@@ -21,8 +20,6 @@ class MySQL implements Database {
 	private static $tableFields = array();
 	/** @var PDO */
 	private $pdo;
-	/** @var string */
-	private $pdoHash = null;
 	/** @var bool */
 	private $outerTransaction = false;
 	/** @var AliasRegistry */
