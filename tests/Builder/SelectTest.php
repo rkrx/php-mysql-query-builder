@@ -174,4 +174,22 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 
 		$this->assertEquals("SELECT\n\t(\n\t\tSELECT\n\t\t\tCOUNT(*)\n\t\tFROM\n\t\t\ttest1 t1\n\t\tINNER JOIN\n\t\t\ttest2 t2 ON t1.id=t2.id\n\t\tWHERE\n\t\t\t(t1.id > 10)\n\t) AS `testfield`\nFROM\n\ttest1 t1\nINNER JOIN\n\ttest2 t2 ON t1.id=t2.id\nWHERE\n\t(t1.id > 10)\n", $query);
 	}
+
+	public function testSubselectUnion() {
+		$query = TestSelect::create()
+		->field('t1.field')
+		->from('t1', 'test1')
+		->joinInner('t2', 'test2', 't1.id=t2.id')
+		->where('t1.id > 10');
+
+		$query = TestSelect::create()
+		->union($query)
+		->field('t1.field')
+		->from('t1', 'test1')
+		->joinInner('t2', 'test2', 't1.id=t2.id')
+		->where('t1.id > 10')
+		->asString();
+
+		$this->assertEquals("SELECT\n\tt1.field\nFROM\n\ttest1 t1\nINNER JOIN\n\ttest2 t2 ON t1.id=t2.id\nWHERE\n\t(t1.id > 10)\n\nUNION\nSELECT\n\tt1.field\nFROM\n\ttest1 t1\nINNER JOIN\n\ttest2 t2 ON t1.id=t2.id\nWHERE\n\t(t1.id > 10)\n", $query);
+	}
 }

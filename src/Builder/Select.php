@@ -9,6 +9,7 @@ use Kir\MySQL\Builder\Traits\TableBuilder;
 use Kir\MySQL\Builder\Traits\JoinBuilder;
 use Kir\MySQL\Builder\Traits\LimitBuilder;
 use Kir\MySQL\Builder\Traits\TableNameBuilder;
+use Kir\MySQL\Builder\Traits\UnionBuilder;
 use Kir\MySQL\Builder\Traits\WhereBuilder;
 
 class Select extends Statement {
@@ -21,18 +22,13 @@ class Select extends Statement {
 	use OrderByBuilder;
 	use LimitBuilder;
 	use OffsetBuilder;
+	use UnionBuilder;
 
-	/**
-	 * @var string[]
-	 */
+	/** @var string[] */
 	private $fields = array();
-	/**
-	 * @var bool
-	 */
+	/** @var bool */
 	private $calcFoundRows = false;
-	/**
-	 * @var bool
-	 */
+	/** @var bool */
 	private $forUpdate = false;
 
 	/**
@@ -137,6 +133,7 @@ class Select extends Statement {
 		$query = $this->buildOrder($query);
 		$query = $this->buildLimit($query);
 		$query = $this->buildOffset($query);
+		$query = $this->buildUnions($query);
 		$query = $this->buildForUpdate($query);
 		return $query;
 	}
