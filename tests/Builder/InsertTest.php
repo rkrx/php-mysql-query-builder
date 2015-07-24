@@ -41,7 +41,7 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 		$reg = Phake::mock('Kir\\MySQL\\Tools\\AliasRegistry');
 		Phake::when($reg)->__call('get', ['travis'])->thenReturn('travis_test.');
 
-		$db = Phake::mock('Kir\\MySQL\\Database');
+		$db = Phake::mock('Kir\\MySQL\\Databases\\MySQL');
 		Phake::when($db)->__call('getTableFields', ['test1'])->thenReturn(['field1', 'field2']);
 		Phake::when($db)->__call('getTableFields', ['travis_test.test1'])->thenReturn(['field1', 'field2']);
 		Phake::when($db)->__call('quoteField', [Phake::anyParameters()])->thenGetReturnByLambda(function ($fieldName) { return "`{$fieldName}`"; });
@@ -71,7 +71,7 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 		$reg = Phake::mock('Kir\\MySQL\\Tools\\AliasRegistry');
 		Phake::when($reg)->__call('get', ['travis'])->thenReturn('travis_test.');
 
-		$db = Phake::mock('Kir\\MySQL\\Database');
+		$db = Phake::mock('Kir\\MySQL\\Databases\\MySQL');
 		Phake::when($db)->__call('getTableFields', ['test1'])->thenReturn(['field1', 'field2']);
 		Phake::when($db)->__call('getTableFields', ['travis_test.test1'])->thenReturn(['field1', 'field2']);
 		Phake::when($db)->__call('quoteField', [Phake::anyParameters()])->thenGetReturnByLambda(function ($fieldName) { return "`{$fieldName}`"; });
@@ -104,7 +104,7 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 		$reg = Phake::mock('Kir\\MySQL\\Tools\\AliasRegistry');
 		Phake::when($reg)->__call('get', ['travis'])->thenReturn('travis_test.');
 
-		$db = Phake::mock('Kir\\MySQL\\Database');
+		$db = Phake::mock('Kir\\MySQL\\Databases\\MySQL');
 		Phake::when($db)->__call('getTableFields', ['test1'])->thenReturn(['field1', 'field2']);
 		Phake::when($db)->__call('getTableFields', ['travis_test.test1'])->thenReturn(['field1', 'field2']);
 		Phake::when($db)->__call('quoteField', [Phake::anyParameters()])->thenGetReturnByLambda(function ($fieldName) { return "`{$fieldName}`"; });

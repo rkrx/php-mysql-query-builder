@@ -64,7 +64,7 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testSetAll2() {
-		$db = Phake::mock('Kir\\MySQL\\Database');
+		$db = Phake::mock('Kir\\MySQL\\Databases\\MySQL');
 		$reg = Phake::mock('Kir\\MySQL\\Tools\\AliasRegistry');
 		Phake::when($db)->__call('getTableFields', ['test1'])->thenReturn(['field1', 'field2']);
 		Phake::when($db)->__call('quoteField', [Phake::anyParameters()])->thenGetReturnByLambda(function ($fieldName) { return "`{$fieldName}`"; });
@@ -123,4 +123,3 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals("UPDATE\n\ttest1\nSET\n\t`field1`='1'\nLIMIT\n\t10\n", $sql);
 	}
 }
- 

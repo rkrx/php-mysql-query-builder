@@ -2,20 +2,20 @@
 namespace Kir\MySQL;
 
 use Kir\MySQL\Builder\Exception;
-use Kir\MySQL\Builder\QueryStatement;
+use Kir\MySQL\Database\DatabaseStatement;
 
 interface Database {
 	/**
 	 * @param string $query
 	 * @throws Exception
-	 * @return QueryStatement
+	 * @return DatabaseStatement
 	 */
 	public function query($query);
 
 	/**
 	 * @param string $query
 	 * @throws Exception
-	 * @return QueryStatement
+	 * @return DatabaseStatement
 	 */
 	public function prepare($query);
 

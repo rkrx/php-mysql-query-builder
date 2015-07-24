@@ -2,6 +2,7 @@
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Database;
+use Kir\MySQL\Databases\MySQL;
 use Kir\MySQL\Tools\AliasReplacer;
 
 abstract class Statement {
@@ -11,9 +12,9 @@ abstract class Statement {
 	private $aliasReplacer;
 
 	/**
-	 * @param Database $db
+	 * @param MySQL $db
 	 */
-	public function __construct(Database $db) {
+	public function __construct(MySQL $db) {
 		$this->db = $db;
 		$this->aliasReplacer = new AliasReplacer($db->getAliasRegistry());
 	}

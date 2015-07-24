@@ -1,11 +1,12 @@
 <?php
 namespace Kir\MySQL\Builder;
 
-use Kir\MySQL\QueryLogger\QueryLoggers;
 use PDO;
 use PDOStatement;
+use Kir\MySQL\Database\DatabaseStatement;
+use Kir\MySQL\QueryLogger\QueryLoggers;
 
-class QueryStatement {
+class QueryStatement implements DatabaseStatement {
 	/** @var PDOStatement */
 	private $statement;
 	/** @var QueryLoggers */
