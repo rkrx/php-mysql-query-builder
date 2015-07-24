@@ -3,15 +3,8 @@ namespace Kir\MySQL;
 
 use Kir\MySQL\Builder\Exception;
 use Kir\MySQL\Builder\QueryStatement;
-use Kir\MySQL\Builder\RunnableSelect;
-use Kir\MySQL\Tools\AliasRegistry;
 
 interface Database {
-	/**
-	 * @return AliasRegistry
-	 */
-	public function getAliasRegistry();
-
 	/**
 	 * @param string $query
 	 * @throws Exception
@@ -65,7 +58,7 @@ interface Database {
 
 	/**
 	 * @param array $fields
-	 * @return RunnableSelect
+	 * @return Builder\RunnableSelect
 	 */
 	public function select(array $fields = array());
 
