@@ -86,14 +86,22 @@ class RunnableSelect extends Select {
 	}
 
 	/**
+	 * @param bool $treatValueAsArray
 	 * @return mixed[]
 	 */
-	public function fetchKeyValue() {
+	public function fetchKeyValue($treatValueAsArray = false) {
 		$rows = $this->fetchRows();
 		$result = array();
-		foreach($rows as $row) {
-			list($key, $value) = array_values($row);
-			$result[$key] = $value;
+		if(!$treatValueAsArray) {
+			foreach($rows as $row) {
+				list($key, $value) = array_values($row);
+				$result[$key] = $value;
+			}
+		} else {
+			foreach($rows as $row) {
+				list($key) = array_values($row);
+				$result[$key] = $row;
+			}
 		}
 		return $result;
 	}
