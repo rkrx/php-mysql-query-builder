@@ -187,24 +187,36 @@ class MySQL implements Database {
 	 * @param array $fields
 	 * @return RunnableSelect
 	 */
-	public function select(array $fields = array()) {
+	public function select(array $fields = null) {
 		$select = new RunnableSelect($this);
-		$select->fields($fields);
+		if($fields !== null) {
+			$select->fields($fields);
+		}
 		return $select;
 	}
 
 	/**
+	 * @param array $fields
 	 * @return Builder\RunnableInsert
 	 */
-	public function insert() {
-		return new Builder\RunnableInsert($this);
+	public function insert(array $fields = null) {
+		$insert = new Builder\RunnableInsert($this);
+		if($fields !== null) {
+			$insert->addAll($fields);
+		}
+		return $insert;
 	}
 
 	/**
+	 * @param array $fields
 	 * @return Builder\RunnableUpdate
 	 */
-	public function update() {
-		return new Builder\RunnableUpdate($this);
+	public function update(array $fields = null) {
+		$update = new Builder\RunnableUpdate($this);
+		if($fields !== null) {
+			$update->setAll($fields);
+		}
+		return $update;
 	}
 
 	/**

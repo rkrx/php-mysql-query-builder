@@ -60,17 +60,19 @@ interface Database {
 	 * @param array $fields
 	 * @return Builder\RunnableSelect
 	 */
-	public function select(array $fields = array());
+	public function select(array $fields = null);
 
 	/**
+	 * @param array $fields
 	 * @return Builder\RunnableInsert
 	 */
-	public function insert();
+	public function insert(array $fields = null);
 
 	/**
+	 * @param array $fields
 	 * @return Builder\RunnableUpdate
 	 */
-	public function update();
+	public function update(array $fields = null);
 
 	/**
 	 * @return Builder\RunnableDelete
