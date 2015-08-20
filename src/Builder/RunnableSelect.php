@@ -1,6 +1,11 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Generator;
+use Kir\MySQL\Builder\Helpers\FieldTypeProvider;
+use Kir\MySQL\Builder\Helpers\FieldValueConverter;
+use Kir\MySQL\Builder\Helpers\LazyRowGenerator;
+
 /**
  */
 class RunnableSelect extends Select {
@@ -55,9 +60,9 @@ class RunnableSelect extends Select {
 		$statement = $this->createStatement();
 		$data = $statement->fetchAll(\PDO::FETCH_ASSOC);
 		if($this->preserveTypes) {
-			$columnDefinitions = $this->getFieldTypes($statement);
+			$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
 			foreach($data as &$row) {
-				$row = $this->convertValues($row, $columnDefinitions);
+				$row = FieldValueConverter::convertValues($row, $columnDefinitions);
 			}
 		}
 		if($callback !== null) {
@@ -65,6 +70,19 @@ class RunnableSelect extends Select {
 		}
 		$statement->closeCursor();
 		return $data;
+	}
+
+	/**
+	 * @param \Closure $callback
+	 * @return array[]|Generator
+	 */
+	public function fetchRowsLazy(\Closure $callback = null) {
+		if(version_compare(PHP_VERSION, '5.5', '<=')) {
+			return $this->fetchRows($callback);
+		}
+		$statement = $this->createStatement();
+		$generator = new LazyRowGenerator($this->preserveTypes);
+		return $generator->generate($statement, $callback);
 	}
 
 	/**
@@ -78,8 +96,8 @@ class RunnableSelect extends Select {
 			return array();
 		}
 		if($this->preserveTypes) {
-			$columnDefinitions = $this->getFieldTypes($statement);
-			$row = $this->convertValues($row, $columnDefinitions);
+			$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
+			$row = FieldValueConverter::convertValues($row, $columnDefinitions);
 		}
 		$statement->closeCursor();
 		return $row;
@@ -173,69 +191,5 @@ class RunnableSelect extends Select {
 			$this->foundRows = (int) $db->query('SELECT FOUND_ROWS()')->fetchColumn();
 		}
 		return $statement;
-	}
-
-	/**
-	 * @param QueryStatement $statement
-	 * @return array
-	 */
-	private function getFieldTypes($statement) {
-		$c = $statement->columnCount();
-		$fieldTypes = array();
-		for($i=0; $i<$c+20; $i++) {
-			$column = $statement->getColumnMeta($i);
-			$fieldTypes[$column['name']] = $this->getTypeFromNativeType($column['native_type']);
-		}
-		return $fieldTypes;
-	}
-
-	/**
-	 * @param string $type
-	 * @return string
-	 */
-	private function getTypeFromNativeType($type) {
-		switch ($type) {
-			case 'NEWDECIMAL':
-			case 'DECIMAL':
-			case 'FLOAT':
-			case 'DOUBLE':
-				return 'f';
-			case 'TINY':
-			case 'SHORT':
-			case 'LONG':
-			case 'LONGLONG':
-			case 'INT24':
-				return 'i';
-		}
-		return $type;
-	}
-
-	/**
-	 * @param array $row
-	 * @param array $columnDefinitions
-	 * @return mixed
-	 */
-	private function convertValues(array $row, array $columnDefinitions) {
-		foreach($row as $key => &$value) {
-			if($value !== null) {
-				$value = $this->convertValue($value, $columnDefinitions[$key]);
-			}
-		}
-		return $row;
-	}
-
-	/**
-	 * @param mixed $value
-	 * @param string $type
-	 * @return mixed
-	 */
-	private function convertValue($value, $type) {
-		switch ($type) {
-			case 'i':
-				return (int) $value;
-			case 'f':
-				return (float) $value;
-		}
-		return $value;
 	}
 }
