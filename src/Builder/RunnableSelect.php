@@ -1,7 +1,6 @@
 <?php
 namespace Kir\MySQL\Builder;
 
-use Generator;
 use Kir\MySQL\Builder\Helpers\FieldTypeProvider;
 use Kir\MySQL\Builder\Helpers\FieldValueConverter;
 use Kir\MySQL\Builder\Helpers\LazyRowGenerator;
@@ -74,7 +73,7 @@ class RunnableSelect extends Select {
 
 	/**
 	 * @param \Closure $callback
-	 * @return array[]|Generator
+	 * @return array[]|\Generator
 	 */
 	public function fetchRowsLazy(\Closure $callback = null) {
 		if(version_compare(PHP_VERSION, '5.5', '<=')) {

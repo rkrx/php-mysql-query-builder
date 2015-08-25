@@ -2,7 +2,6 @@
 namespace Kir\MySQL\Builder\Helpers;
 
 use Closure;
-use Generator;
 use Kir\MySQL\Builder\QueryStatement;
 
 class LazyRowGenerator {
@@ -19,7 +18,7 @@ class LazyRowGenerator {
 	/**
 	 * @param QueryStatement $statement
 	 * @param Closure $callback
-	 * @return array[]|Generator
+	 * @return array[]|\Generator
 	 */
 	public function generate(QueryStatement $statement, Closure $callback = null) {
 		while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
