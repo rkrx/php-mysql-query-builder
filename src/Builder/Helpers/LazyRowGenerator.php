@@ -21,7 +21,7 @@ class LazyRowGenerator {
 	 * @param Closure $callback
 	 * @return array[]|Generator
 	 */
-	public function generate(QueryStatement $statement, Closure $callback) {
+	public function generate(QueryStatement $statement, Closure $callback = null) {
 		while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 			if($this->preserveTypes) {
 				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
