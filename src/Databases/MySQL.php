@@ -73,7 +73,7 @@ class MySQL implements Database {
 	 * @return QueryStatement
 	 */
 	public function prepare($query) {
-		return $this->buildQueryStatement($query, function ($query) {
+		return $this->buildQueryStatement((string) $query, function ($query) {
 			$stmt = $this->pdo->prepare($query);
 			return $stmt;
 		});

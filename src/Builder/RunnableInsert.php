@@ -2,9 +2,14 @@
 namespace Kir\MySQL\Builder;
 
 use BadMethodCallException;
+use Kir\MySQL\Builder\Internal\DDLPreparable;
+use Kir\MySQL\Builder\Internal\DDLRunnable;
+use Kir\MySQL\Builder\Traits\CreateDDLRunnable;
 use Traversable;
 
-class RunnableInsert extends Insert {
+class RunnableInsert extends Insert implements DDLPreparable {
+	use CreateDDLRunnable;
+
 	/**
 	 * @param array|Traversable $rows
 	 * @return int[] Insert IDs
@@ -25,13 +30,20 @@ class RunnableInsert extends Insert {
 	}
 
 	/**
+	 * @return DDLRunnable
+	 */
+	public function prepare() {
+		return $this->createPreparable($this->db()->prepare($this), function () {
+			return (int) $this->db()->getLastInsertId();
+		});
+	}
+
+	/**
 	 * @param array $params
 	 * @return int
 	 * @throws Exception
 	 */
 	public function run(array $params = array()) {
-		$query = $this->__toString();
-		$this->db()->exec($query, $params);
-		return (int) $this->db()->getLastInsertId();
+		return $this->prepare()->run($params);
 	}
 }
