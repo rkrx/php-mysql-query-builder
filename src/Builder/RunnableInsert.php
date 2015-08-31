@@ -1,12 +1,18 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use BadMethodCallException;
+use Traversable;
+
 class RunnableInsert extends Insert {
 	/**
-	 * @param array $rows
+	 * @param array|Traversable $rows
 	 * @return int[] Insert IDs
 	 */
-	public function insertRows(array $rows) {
+	public function insertRows($rows) {
+		if(!(is_array($rows) || $rows instanceof Traversable)) {
+			throw new BadMethodCallException('Expected $rows to by an array or an instance of \\Traversable');
+		}
 		$result = [];
 		$query = $this->__toString();
 		$stmt = $this->db()->prepare($query);
