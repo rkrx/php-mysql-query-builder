@@ -113,10 +113,11 @@ class Insert extends InsertUpdateStatement {
 	/**
 	 * @param array $data
 	 * @param array $mask
+	 * @param array $excludeFields
 	 * @return $this
 	 */
-	public function addAll(array $data, array $mask = null) {
-		$this->addAllTo($data, $mask, function ($field, $value) {
+	public function addAll(array $data, array $mask = null, array $excludeFields = null) {
+		$this->addAllTo($data, $mask, $excludeFields, function ($field, $value) {
 			$this->add($field, $value);
 		});
 		return $this;
@@ -125,10 +126,11 @@ class Insert extends InsertUpdateStatement {
 	/**
 	 * @param array $data
 	 * @param array $mask
+	 * @param array $excludeFields
 	 * @return $this
 	 */
-	public function updateAll(array $data, array $mask = null) {
-		$this->addAllTo($data, $mask, function ($field, $value) {
+	public function updateAll(array $data, array $mask = null, array $excludeFields = null) {
+		$this->addAllTo($data, $mask, $excludeFields, function ($field, $value) {
 			if ($field !== $this->keyField) {
 				$this->update($field, $value);
 			}
@@ -139,11 +141,12 @@ class Insert extends InsertUpdateStatement {
 	/**
 	 * @param array $data
 	 * @param array $mask
+	 * @param array $excludeFields
 	 * @return $this
 	 */
-	public function addOrUpdateAll(array $data, array $mask = null) {
-		$this->addAll($data, $mask);
-		$this->updateAll($data, $mask);
+	public function addOrUpdateAll(array $data, array $mask = null, array $excludeFields = null) {
+		$this->addAll($data, $mask, $excludeFields);
+		$this->updateAll($data, $mask, $excludeFields);
 		return $this;
 	}
 
@@ -213,12 +216,20 @@ class Insert extends InsertUpdateStatement {
 	/**
 	 * @param array $data
 	 * @param array $mask
+	 * @param array $excludeFields
 	 * @param callable $fn
 	 * @return $this
 	 */
-	private function addAllTo(array $data, array $mask = null, $fn) {
+	private function addAllTo(array $data, array $mask = null, array $excludeFields = null, $fn) {
 		if($mask !== null) {
 			$data = array_intersect_key($data, array_combine($mask, $mask));
+		}
+		if($excludeFields !== null) {
+			foreach($excludeFields as $excludeField) {
+				if(array_key_exists($excludeField, $data)) {
+					unset($data);
+				}
+			}
 		}
 		$data = $this->clearValues($data);
 		foreach ($data as $field => $value) {
