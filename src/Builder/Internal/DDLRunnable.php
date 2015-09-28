@@ -23,7 +23,8 @@ class DDLRunnable {
 	 * @return mixed
 	 */
 	public function run(array $params = array()) {
-		$response = $this->query->execute($params);
+		$this->query->execute($params);
+		$response = $this->query->getStatement()->rowCount();
 		if($this->callbackFn !== null) {
 			$response = call_user_func($this->callbackFn, $response);
 		}
