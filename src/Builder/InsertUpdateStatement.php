@@ -4,9 +4,7 @@ namespace Kir\MySQL\Builder;
 use Kir\MySQL\Builder\Internal\DefaultValue;
 
 abstract class InsertUpdateStatement extends Statement {
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $mask = null;
 
 	/**
@@ -39,6 +37,9 @@ abstract class InsertUpdateStatement extends Statement {
 				continue;
 			}
 			if (is_int($fieldName)) {
+				if(is_array($fieldValue)) {
+					$fieldValue = $this->db()->quoteExpression($fieldValue[0], array_slice($fieldValue, 1));
+				}
 				$query[] = "\t{$fieldValue}";
 			} else {
 				$fieldName = $this->db()->quoteField($fieldName);

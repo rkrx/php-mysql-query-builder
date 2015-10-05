@@ -55,6 +55,14 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals("UPDATE\n\ttest1\nSET\n\tfield1=1\n", $sql);
 	}
 
+	public function testSetExprWithParams() {
+		$sql = TestUpdate::create()
+		->table('test1')
+		->setExpr('field1=COALESCE(?, ?)', 1, 2)
+		->asString();
+		$this->assertEquals("UPDATE\n\ttest1\nSET\n\tfield1=COALESCE('1', '2')\n", $sql);
+	}
+
 	public function testSetAll1() {
 		$sql = TestUpdate::create()
 		->table('test1')

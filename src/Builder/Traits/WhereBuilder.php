@@ -15,7 +15,7 @@ trait WhereBuilder {
 	 * @return $this
 	 */
 	public function where($expression) {
-		$this->where[] = array($expression, array_slice(func_get_args(), 1));
+		$this->where[] = [$expression, array_slice(func_get_args(), 1)];
 		return $this;
 	}
 
