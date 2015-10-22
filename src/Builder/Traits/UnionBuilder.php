@@ -30,15 +30,23 @@ trait UnionBuilder {
 	 * @return string
 	 */
 	protected function buildUnions($query) {
-		$qaueries = [$query];
+		$wrap = function ($query) {
+			$query = trim($query);
+			$query = join("\n\t", explode("\n", $query));
+			return sprintf("(\n\t%s\n)", $query);
+		};
+		$queries = [$wrap($query)];
 		foreach($this->unions as $unionQuery) {
 			if($unionQuery[0] === 'ALL') {
-				$qaueries[] = 'UNION ALL';
+				$queries[] = 'UNION ALL';
 			} else {
-				$qaueries[] = 'UNION';
+				$queries[] = 'UNION';
 			}
-			$qaueries[] = $unionQuery[1];
+			$queries[] = $wrap($unionQuery[1]);
 		}
-		return join("\n", $qaueries);
+		if(count($queries) > 1) {
+			return join(" ", $queries);
+		}
+		return $query;
 	}
 }

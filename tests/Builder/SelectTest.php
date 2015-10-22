@@ -190,6 +190,6 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		->where('t1.id > 10')
 		->asString();
 
-		$this->assertEquals("SELECT\n\tt1.field\nFROM\n\ttest1 t1\nINNER JOIN\n\ttest2 t2 ON t1.id=t2.id\nWHERE\n\t(t1.id > 10)\n\nUNION\nSELECT\n\tt1.field\nFROM\n\ttest1 t1\nINNER JOIN\n\ttest2 t2 ON t1.id=t2.id\nWHERE\n\t(t1.id > 10)\n", $query);
+		$this->assertEquals("(\n\tSELECT\n\t\tt1.field\n\tFROM\n\t\ttest1 t1\n\tINNER JOIN\n\t\ttest2 t2 ON t1.id=t2.id\n\tWHERE\n\t\t(t1.id > 10)\n) UNION (\n\tSELECT\n\t\tt1.field\n\tFROM\n\t\ttest1 t1\n\tINNER JOIN\n\t\ttest2 t2 ON t1.id=t2.id\n\tWHERE\n\t\t(t1.id > 10)\n)", $query);
 	}
 }
