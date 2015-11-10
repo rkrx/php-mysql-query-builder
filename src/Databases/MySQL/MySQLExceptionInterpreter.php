@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Databases\MySQL;
 
+use Kir\MySQL\Exceptions\DuplicateUniqueKeyException;
 use Kir\MySQL\Exceptions\LockWaitTimeoutExceededException;
 use Kir\MySQL\Exceptions\SqlDeadLockException;
 use PDO;
@@ -30,6 +31,9 @@ class MySQLExceptionInterpreter {
 		}
 		if($code === 1205) {
 			throw new LockWaitTimeoutExceededException($message, $code, $exception);
+		}
+		if($code === 1062) {
+			throw new DuplicateUniqueKeyException($message, $code, $exception);
 		}
 		throw $exception;
 	}
