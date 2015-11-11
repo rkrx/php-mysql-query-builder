@@ -35,6 +35,9 @@ class MySQL implements Database {
 	 * @param PDO $pdo
 	 */
 	public function __construct(PDO $pdo) {
+		if($pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_SILENT) {
+			$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		}
 		$this->pdo = $pdo;
 		$this->aliasRegistry = new AliasRegistry();
 		$this->queryLoggers = new QueryLoggers();
@@ -320,7 +323,7 @@ class MySQL implements Database {
 		if(!$stmt) {
 			throw new Exception("Could not execute statement:\n{$query}");
 		}
-		$stmtWrapper = new QueryStatement($stmt, $query, $this->queryLoggers);
+		$stmtWrapper = new QueryStatement($stmt, $query, $this->exceptionInterpreter, $this->queryLoggers);
 		return $stmtWrapper;
 	}
 }
