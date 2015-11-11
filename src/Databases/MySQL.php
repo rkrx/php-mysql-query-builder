@@ -41,7 +41,7 @@ class MySQL implements Database {
 		$this->pdo = $pdo;
 		$this->aliasRegistry = new AliasRegistry();
 		$this->queryLoggers = new QueryLoggers();
-		$this->exceptionInterpreter = new MySQLExceptionInterpreter($pdo);
+		$this->exceptionInterpreter = new MySQLExceptionInterpreter();
 	}
 
 	/**

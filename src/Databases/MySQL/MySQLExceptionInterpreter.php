@@ -1,23 +1,12 @@
 <?php
 namespace Kir\MySQL\Databases\MySQL;
 
-use PDO;
 use PDOException;
 use Kir\MySQL\Exceptions\SqlDeadLockException;
 use Kir\MySQL\Exceptions\DuplicateUniqueKeyException;
 use Kir\MySQL\Exceptions\LockWaitTimeoutExceededException;
 
 class MySQLExceptionInterpreter {
-	/** @var PDO */
-	private $pdo;
-
-	/**
-	 * @param PDO $pdo
-	 */
-	public function __construct(PDO $pdo) {
-		$this->pdo = $pdo;
-	}
-
 	/**
 	 * @param PDOException $exception
 	 * @throw PDOException
