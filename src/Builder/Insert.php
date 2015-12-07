@@ -227,7 +227,7 @@ class Insert extends InsertUpdateStatement {
 		if($excludeFields !== null) {
 			foreach($excludeFields as $excludeField) {
 				if(array_key_exists($excludeField, $data)) {
-					unset($data);
+					unset($data[$excludeField]);
 				}
 			}
 		}
