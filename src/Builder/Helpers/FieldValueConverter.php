@@ -21,7 +21,7 @@ class FieldValueConverter {
 	 * @param string $type
 	 * @return mixed
 	 */
-	private function convertValue($value, $type) {
+	private static function convertValue($value, $type) {
 		switch ($type) {
 			case 'i':
 				return (int) $value;
