@@ -84,19 +84,21 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $str
+	 * @param string ...$params
 	 * @return $this
 	 */
 	public function addExpr($str) {
-		$this->fields[] = $str;
+		$this->fields[] = func_get_args();
 		return $this;
 	}
 
 	/**
 	 * @param string $str
+	 * @param string ...$params
 	 * @return $this
 	 */
 	public function updateExpr($str) {
-		$this->update[] = $str;
+		$this->update[] = func_get_args();
 		return $this;
 	}
 
@@ -105,8 +107,8 @@ class Insert extends InsertUpdateStatement {
 	 * @return $this
 	 */
 	public function addOrUpdateExpr($str) {
-		$this->addExpr($str);
-		$this->updateExpr($str);
+		$this->fields[] = func_get_args();
+		$this->update[] = func_get_args();
 		return $this;
 	}
 
@@ -284,5 +286,18 @@ class Insert extends InsertUpdateStatement {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * @param string $expression
+	 * @param array $args
+	 * @return string
+	 */
+	private function formatExtraArgs($expression, $args) {
+		if(count($args) > 1) {
+			$args = array_slice($args, 1);
+			$expression = $this->db()->quoteExpression($expression, $args);
+		}
+		return $expression;
 	}
 }

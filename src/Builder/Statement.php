@@ -50,7 +50,7 @@ abstract class Statement {
 	}
 
 	/**
-	 * @return Database
+	 * @return MySQL
 	 */
 	protected function db() {
 		return $this->db;
