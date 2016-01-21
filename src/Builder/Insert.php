@@ -88,7 +88,11 @@ class Insert extends InsertUpdateStatement {
 	 * @return $this
 	 */
 	public function addExpr($str) {
-		$this->fields[] = func_get_args();
+		if(count(func_get_args()) > 1) {
+			$this->fields[] = func_get_args();
+		} else {
+			$this->fields[] = $str;
+		}
 		return $this;
 	}
 
@@ -98,7 +102,11 @@ class Insert extends InsertUpdateStatement {
 	 * @return $this
 	 */
 	public function updateExpr($str) {
-		$this->update[] = func_get_args();
+		if(count(func_get_args()) > 1) {
+			$this->update[] = func_get_args();
+		} else {
+			$this->update[] = $str;
+		}
 		return $this;
 	}
 
@@ -107,8 +115,13 @@ class Insert extends InsertUpdateStatement {
 	 * @return $this
 	 */
 	public function addOrUpdateExpr($str) {
-		$this->fields[] = func_get_args();
-		$this->update[] = func_get_args();
+		if(count(func_get_args()) > 1) {
+			$this->fields[] = func_get_args();
+			$this->update[] = func_get_args();
+		} else {
+			$this->fields[] = $str;
+			$this->update[] = $str;
+		}
 		return $this;
 	}
 
