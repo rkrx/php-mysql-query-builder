@@ -300,17 +300,4 @@ class Insert extends InsertUpdateStatement {
 
 		return $result;
 	}
-
-	/**
-	 * @param string $expression
-	 * @param array $args
-	 * @return string
-	 */
-	private function formatExtraArgs($expression, $args) {
-		if(count($args) > 1) {
-			$args = array_slice($args, 1);
-			$expression = $this->db()->quoteExpression($expression, $args);
-		}
-		return $expression;
-	}
 }
