@@ -136,10 +136,6 @@ class MySQL implements Database {
 			$idx++;
 			$index = $idx;
 
-			if(substr($oldValue[0], 0, 1) == ':') {
-				$index = (int) substr($oldValue[0], 1);
-			}
-
 			if(array_key_exists($index, $arguments)) {
 				$argument = $arguments[$index];
 				$value = $this->quote($argument);
@@ -148,7 +144,7 @@ class MySQL implements Database {
 			}
 			return $value;
 		};
-		$result = preg_replace_callback('/(\\?|:\\d+)/', $func, $expression);
+		$result = preg_replace_callback('/(\\?)/', $func, $expression);
 		return (string) $result;
 	}
 

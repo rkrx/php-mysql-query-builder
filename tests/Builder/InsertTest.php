@@ -147,6 +147,6 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 		->updateExpr('b=?', 'b')
 		->addOrUpdateExpr('c=?', 'c')
 		->asString();
-		$this->assertEquals("INSERT INTO\n\ttest\nSET\n\ta='a',\n\tb='b'\n", $sql);
+		$this->assertEquals("INSERT INTO\n\ttest\nSET\n\ta='a',\n\tc='c'\nON DUPLICATE KEY UPDATE\n\tb='b',\n\tc='c'\n", $sql);
 	}
 }

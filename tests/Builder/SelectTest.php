@@ -63,13 +63,6 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		->where('a < ?', 1000)
 		->asString();
 		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(a < '1000')\n", $str);
-
-		$str = TestSelect::create()
-		->field('a')
-		->from('t', 'test')
-		->where('a < :0', 1000)
-		->asString();
-		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(a < '1000')\n", $str);
 	}
 
 	public function testHaving() {
