@@ -131,11 +131,10 @@ class MySQL implements Database {
 	 * @return string
 	 */
 	public function quoteExpression($expression, array $arguments = array()) {
-		$func = function ($oldValue) use ($arguments) {
+		$func = function () use ($arguments) {
 			static $idx = -1;
 			$idx++;
 			$index = $idx;
-
 			if(array_key_exists($index, $arguments)) {
 				$argument = $arguments[$index];
 				$value = $this->quote($argument);
