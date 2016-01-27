@@ -12,8 +12,8 @@ class MySQLExceptionInterpreter {
 	 * @throw PDOException
 	 */
 	public function throwMoreConcreteException(PDOException $exception) {
-		$code = $exception->errorInfo[1];
-		$message = $exception->errorInfo[2];
+		$code = (int) $exception->errorInfo[1];
+		$message = (string) $exception->errorInfo[2];
 		if($code === 1213) {
 			throw new SqlDeadLockException($message, $code, $exception);
 		}
