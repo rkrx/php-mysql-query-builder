@@ -88,7 +88,7 @@ class MySQL implements Database {
 	 * @return int
 	 */
 	public function exec($query, array $params = array()) {
-		try {
+		$this->exceptionHandler(function () use ($query, $params) {
 			$stmt = $this->pdo->prepare($query);
 			$timer = microtime(true);
 			$stmt->execute($params);
@@ -96,10 +96,7 @@ class MySQL implements Database {
 			$result = $stmt->rowCount();
 			$stmt->closeCursor();
 			return $result;
-		} catch (PDOException $e) {
-			$this->exceptionInterpreter->throwMoreConcreteException($e);
-			throw $e;
-		}
+		});
 	}
 
 	/**
@@ -158,8 +155,6 @@ class MySQL implements Database {
 			$result = sprintf('(%s)', (string) $value);
 		} elseif(is_array($value)) {
 			$result = join(', ', array_map(function ($value) { return $this->quote($value); }, $value));
-		/*} elseif(is_int(trim($value)) && strpos('123456789', substr(0, 1, trim($value))) !== null) {
-			$result = $value;*/
 		} else {
 			$result = $this->pdo->quote($value);
 		}
@@ -320,5 +315,17 @@ class MySQL implements Database {
 		}
 		$stmtWrapper = new QueryStatement($stmt, $query, $this->exceptionInterpreter, $this->queryLoggers);
 		return $stmtWrapper;
+	}
+
+	/**
+	 * @param callable $fn
+	 * @return mixed
+	 */
+	private function exceptionHandler($fn) {
+		try {
+			return call_user_func($fn);
+		} catch (PDOException $e) {
+			$this->exceptionInterpreter->throwMoreConcreteException($e);
+		}
 	}
 }

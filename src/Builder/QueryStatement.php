@@ -45,12 +45,7 @@ class QueryStatement implements DatabaseStatement {
 	public function execute(array $params = []) {
 		return $this->exceptionHandler(function () use ($params) {
 			$timer = microtime(true);
-			try {
-				$response = $this->statement->execute($params);
-			} catch (PDOException $e) {
-				/** @link http://php.net/manual/en/class.exception.php#Hcom115813 (cHao's comment) */
-				throw new PDOException($e->getMessage(), (int) $e->getCode());
-			}
+			$response = $this->statement->execute($params);
 			$this->queryLoggers->log($this->query, microtime(true) - $timer);
 			return $response;
 		});
@@ -125,7 +120,6 @@ class QueryStatement implements DatabaseStatement {
 			return call_user_func($fn);
 		} catch (PDOException $e) {
 			$this->exceptionInterpreter->throwMoreConcreteException($e);
-			throw $e;
 		}
 	}
 }
