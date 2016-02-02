@@ -185,4 +185,15 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 
 		$this->assertEquals("(\n\tSELECT\n\t\tt1.field\n\tFROM\n\t\ttest1 t1\n\tINNER JOIN\n\t\ttest2 t2 ON t1.id=t2.id\n\tWHERE\n\t\t(t1.id > 10)\n) UNION (\n\tSELECT\n\t\tt1.field\n\tFROM\n\t\ttest1 t1\n\tINNER JOIN\n\t\ttest2 t2 ON t1.id=t2.id\n\tWHERE\n\t\t(t1.id > 10)\n)", $query);
 	}
+
+	public function testOrderByValues() {
+		$query = TestSelect::create()
+		->field('t1.field')
+		->from('t1', 'test1')
+		->joinInner('t2', 'test2', 't1.id=t2.id')
+		->orderByValues('t1.field', [5, 1, 66, 183, 99, 2, 6])
+		->asString();
+
+		$this->assertEquals("SELECT\n\tt1.field\nFROM\n\ttest1 t1\nINNER JOIN\n\ttest2 t2 ON t1.id=t2.id\nORDER BY\n\tCASE `t1`.`field`\n\t\tWHEN '5' THEN '0'\n\t\tWHEN '1' THEN '1'\n\t\tWHEN '66' THEN '2'\n\t\tWHEN '183' THEN '3'\n\t\tWHEN '99' THEN '4'\n\t\tWHEN '2' THEN '5'\n\t\tWHEN '6' THEN '6'\n\tEND ASC\n", $query);
+	}
 }

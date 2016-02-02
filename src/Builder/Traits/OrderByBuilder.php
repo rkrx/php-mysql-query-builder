@@ -4,9 +4,7 @@ namespace Kir\MySQL\Builder\Traits;
 trait OrderByBuilder {
 	use AbstractDB;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $orderBy = array();
 
 	/**
@@ -29,6 +27,17 @@ trait OrderByBuilder {
 			$expression = call_user_func_array(array($this->db(), 'quoteExpression'), $arguments);
 		}
 		$this->orderBy[] = array($expression, $direction);
+		return $this;
+	}
+
+	/**
+	 */
+	public function orderByValues($fieldName, array $values) {
+		$expr = [];
+		foreach(array_values($values) as $idx => $value) {
+			$expr[] = $this->db()->quoteExpression("WHEN ? THEN ?", array($value, $idx));
+		}
+		$this->orderBy[] = array(sprintf("CASE %s\n\t\t%s\n\tEND", $this->db()->quoteField($fieldName), join("\n\t\t", $expr)), 'ASC');
 		return $this;
 	}
 
