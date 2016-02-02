@@ -74,15 +74,15 @@ class Update extends InsertUpdateStatement {
 	 * @throws Exception
 	 */
 	public function setAll(array $data, array $allowedFields = null) {
-		if($allowedFields !== null) {
-			foreach($data as $fieldName => $value) {
-				if(in_array($fieldName, $allowedFields)) {
+		if ($allowedFields !== null) {
+			foreach ($data as $fieldName => $value) {
+				if (in_array($fieldName, $allowedFields)) {
 					$this->set($fieldName, $value);
 				}
 			}
 		} else {
 			$values = $this->clearValues($data);
-			foreach($values as $fieldName => $value) {
+			foreach ($values as $fieldName => $value) {
 				$this->set($fieldName, $value);
 			}
 		}
@@ -125,14 +125,14 @@ class Update extends InsertUpdateStatement {
 	 * @throws Exception
 	 */
 	private function clearValues(array $values) {
-		if(!count($values)) {
+		if (!count($values)) {
 			return [];
 		}
 		$tables = $this->getTables();
-		if(!count($tables)) {
+		if (!count($tables)) {
 			throw new Exception('Table name is missing');
 		}
-		if(count($tables) > 1) {
+		if (count($tables) > 1) {
 			throw new Exception('Batch values only work with max. one table');
 		}
 		list($table) = $tables;
@@ -142,7 +142,7 @@ class Update extends InsertUpdateStatement {
 		$result = array();
 
 		foreach ($values as $fieldName => $fieldValue) {
-			if(in_array($fieldName, $fields)) {
+			if (in_array($fieldName, $fields)) {
 				$result[$fieldName] = $fieldValue;
 			}
 		}

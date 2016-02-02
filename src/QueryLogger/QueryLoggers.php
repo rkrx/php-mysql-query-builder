@@ -20,7 +20,7 @@ class QueryLoggers {
 	 * @return $this
 	 */
 	public function log($query, $duration) {
-		foreach($this->queryLoggers as $queryLogger) {
+		foreach ($this->queryLoggers as $queryLogger) {
 			$queryLogger->log($query, $duration);
 		}
 		return $this;

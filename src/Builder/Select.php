@@ -37,17 +37,17 @@ class Select extends Statement {
 	 * @return $this
 	 */
 	public function field($expression, $alias = null) {
-		if(is_object($expression)) {
+		if (is_object($expression)) {
 			$expression = (string) $expression;
 			$expression = trim($expression);
 			$expression = rtrim($expression, ';');
 			$expression = trim($expression);
 			$lines = explode("\n", $expression);
-			$lines = array_map(function ($line) { return "\t\t{$line}"; }, $lines);
+			$lines = array_map(function($line) { return "\t\t{$line}"; }, $lines);
 			$expression = join("\n", $lines);
 			$expression = sprintf("(\n%s\n\t)", $expression);
 		}
-		if($alias === null) {
+		if ($alias === null) {
 			$this->fields[] = $expression;
 		} else {
 			$this->fields[$alias] = $expression;
@@ -60,7 +60,7 @@ class Select extends Statement {
 	 * @return $this
 	 */
 	public function fields(array $fields) {
-		foreach($fields as $alias => $expression) {
+		foreach ($fields as $alias => $expression) {
 			$this->field($expression, $alias);
 		}
 		return $this;
@@ -95,7 +95,7 @@ class Select extends Statement {
 	 * @return $this
 	 */
 	public function setCalcFoundRows($calcFoundRows = true) {
-		if(ini_get("mysql.trace_mode")) {
+		if (ini_get("mysql.trace_mode")) {
 			throw new \Exception('This function cant operate with mysql.trace_mode is set.');
 		}
 		$this->calcFoundRows = $calcFoundRows;
@@ -117,12 +117,12 @@ class Select extends Statement {
 	 */
 	public function __toString() {
 		$query = "SELECT";
-		if($this->calcFoundRows) {
+		if ($this->calcFoundRows) {
 			$query .= " SQL_CALC_FOUND_ROWS";
 		}
 		$query .= "\n";
 		$query = $this->buildFields($query);
-		if(count($this->getTables())) {
+		if (count($this->getTables())) {
 			$query .= "FROM\n";
 		}
 		$query = $this->buildTables($query);
@@ -144,9 +144,9 @@ class Select extends Statement {
 	 */
 	private function buildFields($query) {
 		$fields = array();
-		if(count($this->fields)) {
-			foreach($this->fields as $alias => $expression) {
-				if(is_numeric($alias)) {
+		if (count($this->fields)) {
+			foreach ($this->fields as $alias => $expression) {
+				if (is_numeric($alias)) {
 					$fields[] = "\t{$expression}";
 				} else {
 					$fields[] = "\t{$expression} AS `{$alias}`";
@@ -163,7 +163,7 @@ class Select extends Statement {
 	 * @return string
 	 */
 	private function buildForUpdate($query) {
-		if($this->forUpdate) {
+		if ($this->forUpdate) {
 			$query .= "FOR UPDATE\n";
 		}
 		return $query;

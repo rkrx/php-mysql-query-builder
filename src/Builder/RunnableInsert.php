@@ -15,13 +15,13 @@ class RunnableInsert extends Insert implements DDLPreparable {
 	 * @return int[] Insert IDs
 	 */
 	public function insertRows($rows) {
-		if(!(is_array($rows) || $rows instanceof Traversable)) {
+		if (!(is_array($rows) || $rows instanceof Traversable)) {
 			throw new BadMethodCallException('Expected $rows to by an array or an instance of \\Traversable');
 		}
 		$result = [];
 		$query = $this->__toString();
 		$stmt = $this->db()->prepare($query);
-		foreach($rows as $row) {
+		foreach ($rows as $row) {
 			$stmt->execute($row);
 			$result[] = (int) $this->db()->getLastInsertId();
 		}
@@ -33,7 +33,7 @@ class RunnableInsert extends Insert implements DDLPreparable {
 	 * @return DDLRunnable
 	 */
 	public function prepare() {
-		return $this->createPreparable($this->db()->prepare($this), function () {
+		return $this->createPreparable($this->db()->prepare($this), function() {
 			return (int) $this->db()->getLastInsertId();
 		});
 	}
