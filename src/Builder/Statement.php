@@ -24,12 +24,12 @@ abstract class Statement {
 	 * @return $this
 	 */
 	public function debug($stop = true) {
-		if(php_sapi_name() == 'cli') {
+		if (php_sapi_name() == 'cli') {
 			echo "\n{$this->__toString()}\n";
 		} else {
 			echo "<pre>{$this->__toString()}</pre>";
 		}
-		if($stop) {
+		if ($stop) {
 			exit;
 		}
 		return $this;

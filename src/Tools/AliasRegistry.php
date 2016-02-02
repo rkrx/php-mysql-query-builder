@@ -23,7 +23,7 @@ class AliasRegistry {
 	 * @return string
 	 */
 	public function get($alias) {
-		if(!array_key_exists($alias, $this->aliases)) {
+		if (!array_key_exists($alias, $this->aliases)) {
 			throw new \Exception("Alias not found: {$alias}");
 		}
 		return $this->aliases[$alias];

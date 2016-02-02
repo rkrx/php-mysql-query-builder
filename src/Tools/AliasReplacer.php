@@ -19,11 +19,11 @@ class AliasReplacer {
 	 * @return string
 	 */
 	public function replace($name) {
-		$fn = function ($values) {
+		$fn = function($values) {
 			$alias = $values[1];
 			$part = $values[2];
 			$string = $this->aliasRegistry->get($alias);
-			return $string . $part;
+			return $string.$part;
 		};
 		return preg_replace_callback('/^(\\w+)#(\\w+)$/', $fn, $name);
 	}

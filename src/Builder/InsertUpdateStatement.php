@@ -30,14 +30,14 @@ abstract class InsertUpdateStatement extends Statement {
 	 */
 	protected function buildFieldList(array $fields, array $query = array()) {
 		foreach ($fields as $fieldName => $fieldValue) {
-			if($fieldValue instanceof DefaultValue) {
+			if ($fieldValue instanceof DefaultValue) {
 				$fieldValue = 'DEFAULT';
 			}
-			if(is_array($this->mask) && !in_array($fieldName, $this->mask)) {
+			if (is_array($this->mask) && !in_array($fieldName, $this->mask)) {
 				continue;
 			}
 			if (is_int($fieldName)) {
-				if(is_array($fieldValue)) {
+				if (is_array($fieldValue)) {
 					$fieldValue = $this->db()->quoteExpression($fieldValue[0], array_slice($fieldValue, 1));
 				}
 				$query[] = "\t{$fieldValue}";
@@ -55,10 +55,10 @@ abstract class InsertUpdateStatement extends Statement {
 	 * @return bool
 	 */
 	protected function isFieldAccessible($fieldName, array $tableFields) {
-		if(!in_array($fieldName, $tableFields)) {
+		if (!in_array($fieldName, $tableFields)) {
 			return false;
 		}
-		if(!is_array($this->mask)) {
+		if (!is_array($this->mask)) {
 			return true;
 		}
 		return in_array($fieldName, $this->mask);

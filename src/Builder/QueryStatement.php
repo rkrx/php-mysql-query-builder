@@ -43,10 +43,10 @@ class QueryStatement implements DatabaseStatement {
 	 * @return bool
 	 */
 	public function execute(array $params = []) {
-		return $this->exceptionHandler(function () use ($params) {
+		return $this->exceptionHandler(function() use ($params) {
 			$timer = microtime(true);
 			$response = $this->statement->execute($params);
-			$this->queryLoggers->log($this->query, microtime(true) - $timer);
+			$this->queryLoggers->log($this->query, microtime(true)-$timer);
 			return $response;
 		});
 	}
@@ -56,7 +56,7 @@ class QueryStatement implements DatabaseStatement {
 	 */
 	public function fetchAll() {
 		$args = func_get_args();
-		return $this->exceptionHandler(function () use ($args) {
+		return $this->exceptionHandler(function() use ($args) {
 			return call_user_func_array([$this->statement, 'fetchAll'], $args);
 		});
 	}
@@ -68,7 +68,7 @@ class QueryStatement implements DatabaseStatement {
 	 * @return mixed
 	 */
 	public function fetch($fetchStyle = PDO::FETCH_ASSOC, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0) {
-		return $this->exceptionHandler(function () use ($fetchStyle, $cursorOrientation, $cursorOffset) {
+		return $this->exceptionHandler(function() use ($fetchStyle, $cursorOrientation, $cursorOffset) {
 			return $this->statement->fetch($fetchStyle, $cursorOrientation, $cursorOffset);
 		});
 	}
@@ -78,7 +78,7 @@ class QueryStatement implements DatabaseStatement {
 	 * @return mixed
 	 */
 	public function fetchColumn($columnNo = 0) {
-		return $this->exceptionHandler(function () use ($columnNo) {
+		return $this->exceptionHandler(function() use ($columnNo) {
 			return $this->statement->fetchColumn($columnNo);
 		});
 	}
@@ -87,7 +87,7 @@ class QueryStatement implements DatabaseStatement {
 	 * @return bool
 	 */
 	public function closeCursor() {
-		return $this->exceptionHandler(function () {
+		return $this->exceptionHandler(function() {
 			return $this->statement->closeCursor();
 		});
 	}
@@ -96,7 +96,7 @@ class QueryStatement implements DatabaseStatement {
 	 * @return int
 	 */
 	public function columnCount() {
-		return $this->exceptionHandler(function () {
+		return $this->exceptionHandler(function() {
 			return $this->statement->columnCount();
 		});
 	}
@@ -106,7 +106,7 @@ class QueryStatement implements DatabaseStatement {
 	 * @return array
 	 */
 	public function getColumnMeta($columnNo) {
-		return $this->exceptionHandler(function () use ($columnNo) {
+		return $this->exceptionHandler(function() use ($columnNo) {
 			return $this->statement->getColumnMeta($columnNo);
 		});
 	}
