@@ -27,7 +27,7 @@ class LazyRowGenerator {
 				$row = FieldValueConverter::convertValues($row, $columnDefinitions);
 			}
 			if($callback !== null) {
-				$row = call_user_func($callback);
+				$row = call_user_func($callback, $row);
 				if($row !== null) {
 					yield $row;
 				}
