@@ -56,19 +56,19 @@ class RunnableSelect extends Select {
 	 * @return array[]
 	 */
 	public function fetchRows(\Closure $callback = null) {
-		$statement = $this->createStatement();
-		$data = $statement->fetchAll(\PDO::FETCH_ASSOC);
-		if($this->preserveTypes) {
-			$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
-			foreach($data as &$row) {
-				$row = FieldValueConverter::convertValues($row, $columnDefinitions);
+		return $this->createTempStatement(function (QueryStatement $statement) use ($callback) {
+			$data = $statement->fetchAll(\PDO::FETCH_ASSOC);
+			if($this->preserveTypes) {
+				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
+				foreach($data as &$row) {
+					$row = FieldValueConverter::convertValues($row, $columnDefinitions);
+				}
 			}
-		}
-		if($callback !== null) {
-			$data = array_map($callback, $data);
-		}
-		$statement->closeCursor();
-		return $data;
+			if($callback !== null) {
+				$data = array_map($callback, $data);
+			}
+			return $data;
+		});
 	}
 
 	/**
@@ -88,18 +88,17 @@ class RunnableSelect extends Select {
 	 * @return string[]
 	 */
 	public function fetchRow() {
-		$statement = $this->createStatement();
-		$row = $statement->fetch(\PDO::FETCH_ASSOC);
-		if(!is_array($row)) {
-			$statement->closeCursor();
-			return array();
-		}
-		if($this->preserveTypes) {
-			$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
-			$row = FieldValueConverter::convertValues($row, $columnDefinitions);
-		}
-		$statement->closeCursor();
-		return $row;
+		return $this->createTempStatement(function (QueryStatement $statement) {
+			$row = $statement->fetch(\PDO::FETCH_ASSOC);
+			if(!is_array($row)) {
+				return array();
+			}
+			if($this->preserveTypes) {
+				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
+				$row = FieldValueConverter::convertValues($row, $columnDefinitions);
+			}
+			return $row;
+		});
 	}
 
 	/**
@@ -107,20 +106,18 @@ class RunnableSelect extends Select {
 	 * @return mixed[]
 	 */
 	public function fetchKeyValue($treatValueAsArray = false) {
-		$rows = $this->fetchRows();
-		$result = array();
-		if(!$treatValueAsArray) {
-			foreach($rows as $row) {
-				list($key, $value) = array_values($row);
-				$result[$key] = $value;
+		return $this->createTempStatement(function (QueryStatement $statement) use ($treatValueAsArray) {
+			if($treatValueAsArray) {
+				$rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
+				$result = array();
+				foreach($rows as $row) {
+					list($key) = array_values($row);
+					$result[$key] = $row;
+				}
+				return $result;
 			}
-		} else {
-			foreach($rows as $row) {
-				list($key) = array_values($row);
-				$result[$key] = $row;
-			}
-		}
-		return $result;
+			return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
+		});
 	}
 
 	/**
@@ -148,9 +145,8 @@ class RunnableSelect extends Select {
 	 * @return string[]
 	 */
 	public function fetchArray() {
-		return $this->fetchRows(function ($row) {
-			reset($row);
-			return current($row);
+		return $this->createTempStatement(function (QueryStatement $stmt) {
+			return $stmt->fetchAll(\PDO::FETCH_COLUMN);
 		});
 	}
 
@@ -159,16 +155,13 @@ class RunnableSelect extends Select {
 	 * @return null|bool|string|int|float
 	 */
 	public function fetchValue($default = null) {
-		$statement = $this->createStatement();
-		$row = $statement->fetch(\PDO::FETCH_ASSOC);
-		$statement->closeCursor();
-		if(!is_array($row)) {
+		return $this->createTempStatement(function (QueryStatement $stmt) use ($default) {
+			$result = $stmt->fetch(\PDO::FETCH_NUM);
+			if($result !== false) {
+				return $result[0];
+			}
 			return $default;
-		}
-		if(!count($row)) {
-			return null;
-		}
-		return array_shift($row);
+		});
 	}
 
 	/**
@@ -176,6 +169,24 @@ class RunnableSelect extends Select {
 	 */
 	public function getFoundRows() {
 		return $this->foundRows;
+	}
+
+	/**
+	 * @param callback $fn
+	 * @return mixed
+	 * @throws \Exception
+	 */
+	private function createTempStatement($fn) {
+		$stmt = $this->createStatement();
+		$res = null;
+		try {
+			$res = call_user_func($fn, $stmt);
+		} catch (\Exception $e) { // PHP 5.4 compatibility
+			$stmt->closeCursor();
+			throw $e;
+		}
+		$stmt->closeCursor();
+		return $res;
 	}
 
 	/**
