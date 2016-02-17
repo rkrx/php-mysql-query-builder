@@ -88,7 +88,7 @@ class MySQL implements Database {
 	 * @return int
 	 */
 	public function exec($query, array $params = array()) {
-		$this->exceptionHandler(function () use ($query, $params) {
+		return $this->exceptionHandler(function () use ($query, $params) {
 			$stmt = $this->pdo->prepare($query);
 			$timer = microtime(true);
 			$stmt->execute($params);
