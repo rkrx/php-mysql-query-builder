@@ -2,9 +2,7 @@
 namespace Kir\MySQL\Builder\Traits;
 
 trait LimitBuilder {
-	/**
-	 * @var int
-	 */
+	/** @var int */
 	private $limit = null;
 
 	/**
@@ -14,6 +12,13 @@ trait LimitBuilder {
 	public function limit($limit) {
 		$this->limit = $limit;
 		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getLimit() {
+		return $this->limit;
 	}
 
 	/**

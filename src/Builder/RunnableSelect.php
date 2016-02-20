@@ -165,6 +165,26 @@ class RunnableSelect extends Select {
 	}
 
 	/**
+	 * @param bool $ignoreLimit
+	 * @return int
+	 */
+	public function fetchCount($ignoreLimit = true) {
+		$tempLimit = $this->getLimit();
+		$tempOffset = $this->getOffset();
+		if($ignoreLimit) {
+			$this->limit(null);
+			$this->offset(null);
+		}
+		$tempFields = $this->getFields();
+		$this->setFields(['COUNT(*)']);
+		$result = $this->fetchValue();
+		$this->setFields($tempFields);
+		$this->limit($tempLimit);
+		$this->offset($tempOffset);
+		return $result;
+	}
+
+	/**
 	 * @return bool
 	 */
 	public function getFoundRows() {

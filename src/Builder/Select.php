@@ -74,6 +74,16 @@ class Select extends Statement {
 	}
 
 	/**
+	 * @param array $fields
+	 * @return $this
+	 */
+	protected function setFields(array $fields) {
+		$this->fields = [];
+		$this->fields($fields);
+		return $this;
+	}
+
+	/**
 	 * @param bool $enabled
 	 * @return $this
 	 */
@@ -112,6 +122,8 @@ class Select extends Statement {
 		return $this;
 	}
 
+
+
 	/**
 	 * @return string
 	 */
@@ -124,9 +136,9 @@ class Select extends Statement {
 		$query = $this->buildFields($query);
 		if (count($this->getTables())) {
 			$query .= "FROM\n";
+			$query = $this->buildTables($query);
+			$query = $this->buildJoins($query);
 		}
-		$query = $this->buildTables($query);
-		$query = $this->buildJoins($query);
 		$query = $this->buildWhereConditions($query);
 		$query = $this->buildGroups($query);
 		$query = $this->buildHavingConditions($query);
