@@ -43,6 +43,13 @@ class Select extends Statement {
 	}
 
 	/**
+	 * @return bool
+	 */
+	public function getDistinct() {
+		return $this->distinct;
+	}
+
+	/**
 	 * @param string $expression
 	 * @param string $alias
 	 * @return $this

@@ -167,21 +167,29 @@ class RunnableSelect extends Select {
 	/**
 	 * @param bool $ignoreLimit
 	 * @return int
+	 * @throws \Exception
 	 */
 	public function fetchCount($ignoreLimit = true) {
 		$tempLimit = $this->getLimit();
 		$tempOffset = $this->getOffset();
-		if($ignoreLimit) {
-			$this->limit(null);
-			$this->offset(null);
+		try {
+			if($ignoreLimit) {
+				$this->limit(null);
+				$this->offset(null);
+			}
+			$result = $this->db()->select()
+			->field('COUNT(*)')
+			->from('COUNT_ALL_WRAPPER', $this)
+			->debug()
+			->fetchValue();
+			$this->limit($tempLimit);
+			$this->offset($tempOffset);
+			return $result;
+		} catch(\Exception $e) {
+			$this->limit($tempLimit);
+			$this->offset($tempOffset);
+			throw $e;
 		}
-		$tempFields = $this->getFields();
-		$this->setFields(['COUNT(*)']);
-		$result = $this->fetchValue();
-		$this->setFields($tempFields);
-		$this->limit($tempLimit);
-		$this->offset($tempOffset);
-		return $result;
 	}
 
 	/**
