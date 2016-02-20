@@ -22,23 +22,22 @@ Here a few things to keep in mind:
 ### Initialization
 
 ```PHP
-$pdo = new PDO('mysql:host=127.0.0.1;dbname=test;charset=utf8', 'root', '');
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$pdo = new PDO('mysql:host=127.0.0.1;dbname=test;charset=utf8', 'root', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 ```
 
 ```PHP
 $mysql = new MySQL($pdo);
-$mysql->getAliasRegistry()->add('textprefix', 'testdb.test__');
+$mysql->getAliasRegistry()->add('t', 'testdb.test__');
 ```
 
 ### Select
 
 ```PHP
 $select = $mysql->select(['customer_count' => 'COUNT(*)'])
-->from('t1', 'textprefix#test1') // You are forced to used aliases for tables.
-->joinInner('t2', 'textprefix#test2', 't2.test_id = t1.id AND t2.field1 = ?', 123)
-->joinLeft('t3', 'textprefix#test3', 't3.test_id = t1.id')
-->joinRight('t4', 'textprefix#test4', 't4.test_id = t1.id')
+->from('t1', 't#test1') // You are forced to used aliases for tables.
+->joinInner('t2', 't#test2', 't2.test_id = t1.id AND t2.field1 = ?', 123)
+->joinLeft('t3', 't#test3', 't3.test_id = t1.id')
+->joinRight('t4', 't#test4', 't4.test_id = t1.id')
 ->orderBy('t1.field1')
 ->orderBy('t1.field2', 'DESC')
 ->limit(100)
