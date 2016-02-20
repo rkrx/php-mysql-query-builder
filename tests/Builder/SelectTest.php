@@ -196,4 +196,15 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 
 		$this->assertEquals("SELECT\n\tt1.field\nFROM\n\ttest1 t1\nINNER JOIN\n\ttest2 t2 ON t1.id=t2.id\nORDER BY\n\tCASE `t1`.`field`\n\t\tWHEN '5' THEN '0'\n\t\tWHEN '1' THEN '1'\n\t\tWHEN '66' THEN '2'\n\t\tWHEN '183' THEN '3'\n\t\tWHEN '99' THEN '4'\n\t\tWHEN '2' THEN '5'\n\t\tWHEN '6' THEN '6'\n\tEND ASC\n", $query);
 	}
+
+	public function testDistinct() {
+		$query = TestSelect::create()
+		->distinct()
+		->field('t1.field1')
+		->field('t1.field2')
+		->from('t1', 'test1')
+		->asString();
+
+		$this->assertEquals("SELECT DISTINCT\n\tt1.field1,\n\tt1.field2\nFROM\n\ttest1 t1\n", $query);
+	}
 }

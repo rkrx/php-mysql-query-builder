@@ -30,6 +30,17 @@ class Select extends Statement {
 	private $calcFoundRows = false;
 	/** @var bool */
 	private $forUpdate = false;
+	/** @var bool */
+	private $distinct = false;
+
+	/**
+	 * @param bool $distinct
+	 * @return $this
+	 */
+	public function distinct($distinct = true) {
+		$this->distinct = $distinct;
+		return $this;
+	}
 
 	/**
 	 * @param string $expression
@@ -119,6 +130,9 @@ class Select extends Statement {
 		$query = "SELECT";
 		if ($this->calcFoundRows) {
 			$query .= " SQL_CALC_FOUND_ROWS";
+		}
+		if ($this->distinct) {
+			$query .= " DISTINCT";
 		}
 		$query .= "\n";
 		$query = $this->buildFields($query);
