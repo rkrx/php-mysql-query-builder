@@ -180,7 +180,6 @@ class RunnableSelect extends Select {
 			$result = $this->db()->select()
 			->field('COUNT(*)')
 			->from('COUNT_ALL_WRAPPER', $this)
-			->debug()
 			->fetchValue();
 			$this->limit($tempLimit);
 			$this->offset($tempOffset);
