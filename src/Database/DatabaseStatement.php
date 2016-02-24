@@ -17,9 +17,12 @@ interface DatabaseStatement {
 	public function execute(array $params = []);
 
 	/**
+	 * @param int $fetchStyle
+	 * @param mixed $fetchArgument
+	 * @param array $ctorArgs
 	 * @return array
 	 */
-	public function fetchAll();
+	public function fetchAll($fetchStyle = PDO::FETCH_ASSOC, $fetchArgument = null, array $ctorArgs = []);
 
 	/**
 	 * @param int $fetchStyle

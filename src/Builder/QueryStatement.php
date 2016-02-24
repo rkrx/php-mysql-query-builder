@@ -52,12 +52,14 @@ class QueryStatement implements DatabaseStatement {
 	}
 
 	/**
+	 * @param int $fetchStyle
+	 * @param mixed $fetchArgument
+	 * @param array $ctorArgs
 	 * @return array
 	 */
-	public function fetchAll() {
-		$args = func_get_args();
-		return $this->exceptionHandler(function() use ($args) {
-			return call_user_func_array([$this->statement, 'fetchAll'], $args);
+	public function fetchAll($fetchStyle = PDO::FETCH_ASSOC, $fetchArgument = null, array $ctorArgs = []) {
+		return $this->exceptionHandler(function() use ($fetchStyle, $fetchArgument, $ctorArgs) {
+			return $this->statement->fetchAll($fetchStyle, $fetchArgument, $ctorArgs);
 		});
 	}
 
