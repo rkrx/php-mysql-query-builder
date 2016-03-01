@@ -14,8 +14,8 @@ class MySQLExceptionInterpreter {
 	 * @throw PDOException
 	 */
 	public function throwMoreConcreteException(PDOException $exception) {
-		$code = $exception->errorInfo[1];
-		$message = (string) $exception->errorInfo[2];
+		$code = $exception->getCode();
+		$message = (string) $exception->getMessage();
 		switch($code) {
 			case 2006: throw new DatabaseHasGoneAwayException($message, $code, $exception);
 			case 1213: throw new SqlDeadLockException($message, $code, $exception);
