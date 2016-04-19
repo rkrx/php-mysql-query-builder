@@ -76,7 +76,7 @@ class RunnableSelect extends Select {
 	 * @return array[]|\Generator
 	 */
 	public function fetchRowsLazy(\Closure $callback = null) {
-		if(version_compare(PHP_VERSION, '5.5', '<=')) {
+		if(version_compare(PHP_VERSION, '5.5', '<')) {
 			return $this->fetchRows($callback);
 		}
 		$statement = $this->createStatement();
