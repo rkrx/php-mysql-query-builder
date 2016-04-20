@@ -151,6 +151,8 @@ class MySQL implements Database {
 	public function quote($value) {
 		if(is_null($value)) {
 			$result = 'NULL';
+		} elseif($value instanceof Builder\DBExpr) {
+			$result = $value->getExpression();
 		} elseif($value instanceof Builder\Select) {
 			$result = sprintf('(%s)', (string) $value);
 		} elseif(is_array($value)) {

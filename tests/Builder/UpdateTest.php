@@ -130,4 +130,14 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 		->asString();
 		$this->assertEquals("UPDATE\n\ttest1\nSET\n\t`field1`='1'\nLIMIT\n\t10\n", $sql);
 	}
+
+	public function testDBExpr() {
+		$sql = TestUpdate::create()
+		->table('test1')
+		->set('field1', 1)
+		->set('field2', new DBExpr('NOW()'))
+		->limit(10)
+		->asString();
+		$this->assertEquals("UPDATE\n\ttest1\nSET\n\t`field1`='1',\n\t`field2`=NOW()\nLIMIT\n\t10\n", $sql);
+	}
 }

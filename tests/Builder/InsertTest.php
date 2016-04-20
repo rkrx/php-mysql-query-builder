@@ -149,4 +149,14 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 		->asString();
 		$this->assertEquals("INSERT INTO\n\ttest\nSET\n\ta='a',\n\tc='c'\nON DUPLICATE KEY UPDATE\n\tb='b',\n\tc='c'\n", $sql);
 	}
+
+	public function testDBExpr() {
+		$sql = TestInsert::create()
+		->into('test')
+		->addExpr('a=?', new DBExpr('NOW()'))
+		->updateExpr('b=?', new DBExpr('NOW()'))
+		->addOrUpdateExpr('c=?', new DBExpr('NOW()'))
+		->asString();
+		$this->assertEquals("INSERT INTO\n\ttest\nSET\n\ta=NOW(),\n\tc=NOW()\nON DUPLICATE KEY UPDATE\n\tb=NOW(),\n\tc=NOW()\n", $sql);
+	}
 }

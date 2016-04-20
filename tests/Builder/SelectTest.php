@@ -74,6 +74,23 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nHAVING\n\t(a+1<2)\n", $str);
 	}
 
+	public function testDBExpr() {
+		$str = TestSelect::create()
+		->field('a')
+		->from('t', 'test')
+		->where('a=?', new DBExpr('NOW()'))
+		->having('b=?', new DBExpr('NOW()'))
+		->asString();
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(a=NOW())\nHAVING\n\t(b=NOW())\n", $str);
+
+		$str = TestSelect::create()
+		->field('a')
+		->from('t', 'test')
+		->where('a < ?', 1000)
+		->asString();
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(a < '1000')\n", $str);
+	}
+
 	public function testOrder() {
 		$str = TestSelect::create()
 		->field('a')
