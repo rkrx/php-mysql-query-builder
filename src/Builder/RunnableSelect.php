@@ -1,13 +1,17 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Closure;
+use Generator;
+use IteratorAggregate;
 use Kir\MySQL\Builder\Helpers\FieldTypeProvider;
 use Kir\MySQL\Builder\Helpers\FieldValueConverter;
 use Kir\MySQL\Builder\Helpers\LazyRowGenerator;
+use Traversable;
 
 /**
  */
-class RunnableSelect extends Select {
+class RunnableSelect extends Select implements IteratorAggregate {
 	/** @var array */
 	private $values = array();
 	/** @var bool */
@@ -52,10 +56,10 @@ class RunnableSelect extends Select {
 	}
 
 	/**
-	 * @param \Closure $callback
+	 * @param Closure $callback
 	 * @return array[]
 	 */
-	public function fetchRows(\Closure $callback = null) {
+	public function fetchRows(Closure $callback = null) {
 		return $this->createTempStatement(function (QueryStatement $statement) use ($callback) {
 			$data = $statement->fetchAll(\PDO::FETCH_ASSOC);
 			if($this->preserveTypes) {
@@ -72,10 +76,10 @@ class RunnableSelect extends Select {
 	}
 
 	/**
-	 * @param \Closure $callback
-	 * @return array[]|\Generator
+	 * @param Closure $callback
+	 * @return array[]|Generator
 	 */
-	public function fetchRowsLazy(\Closure $callback = null) {
+	public function fetchRowsLazy(Closure $callback = null) {
 		if(version_compare(PHP_VERSION, '5.5', '<')) {
 			return $this->fetchRows($callback);
 		}
@@ -201,5 +205,12 @@ class RunnableSelect extends Select {
 			$this->foundRows = (int) $db->query('SELECT FOUND_ROWS()')->fetchColumn();
 		}
 		return $statement;
+	}
+
+	/**
+	 * @return Traversable|array[]|Generator
+	 */
+	public function getIterator() {
+		return $this->fetchRowsLazy();
 	}
 }
