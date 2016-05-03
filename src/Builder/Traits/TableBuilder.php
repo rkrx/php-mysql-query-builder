@@ -4,9 +4,7 @@ namespace Kir\MySQL\Builder\Traits;
 trait TableBuilder {
 	use AbstractTableNameBuilder;
 
-	/**
-	 * @var array[]
-	 */
+	/** @var array[] */
 	private $tables = array();
 
 	/**

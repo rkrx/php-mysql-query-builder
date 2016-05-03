@@ -5,9 +5,7 @@ trait JoinBuilder {
 	use AbstractDB;
 	use AbstractTableNameBuilder;
 
-	/**
-	 * @var array[]
-	 */
+	/** @var array[] */
 	private $joinTables = array();
 
 	/**

@@ -4,9 +4,7 @@ namespace Kir\MySQL\Builder\Traits;
 trait GroupByBuilder {
 	use AbstractDB;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	private $groupBy = array();
 
 	/**

@@ -2,9 +2,7 @@
 namespace Kir\MySQL\Builder\Traits;
 
 trait LimitBuilder {
-	/**
-	 * @var int
-	 */
+	/** @var int */
 	private $limit = null;
 
 	/**

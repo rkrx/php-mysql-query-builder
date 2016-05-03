@@ -2,9 +2,7 @@
 namespace Kir\MySQL\Builder\Traits;
 
 trait OffsetBuilder {
-	/**
-	 * @var int
-	 */
+	/** @var int */
 	private $offset = null;
 
 	/**
