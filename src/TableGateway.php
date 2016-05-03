@@ -153,7 +153,7 @@ class TableGateway {
 		}
 		$valueData = array_diff_key($data, array_combine($this->primaryKeys, $this->primaryKeys));
 		$update->setAll($valueData);
-		if(array_key_exists($options, 'debug')) {
+		if(array_key_exists('debug', $options)) {
 			$update->debug($options['debug']);
 		}
 		return $update->run();
@@ -182,7 +182,7 @@ class TableGateway {
 		foreach($keyData as $fieldName => $value) {
 			$delete->where(sprintf("%s=?", $this->db->quoteField($fieldName)), $value);
 		}
-		if(array_key_exists($options, 'debug')) {
+		if(array_key_exists('debug', $options)) {
 			$delete->debug($options['debug']);
 		}
 		return $delete->run();
