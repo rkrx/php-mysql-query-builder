@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Database;
 
+use Kir\MySQL\Exceptions\SqlException;
 use PDO;
 use PDOStatement;
 
@@ -12,7 +13,8 @@ interface DatabaseStatement {
 
 	/**
 	 * @param array $params
-	 * @return bool
+	 * @throws SqlException
+	 * @return $this
 	 */
 	public function execute(array $params = []);
 

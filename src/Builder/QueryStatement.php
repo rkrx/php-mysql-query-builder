@@ -2,6 +2,7 @@
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Databases\MySQL\MySQLExceptionInterpreter;
+use Kir\MySQL\Exceptions\SqlException;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -40,15 +41,19 @@ class QueryStatement implements DatabaseStatement {
 
 	/**
 	 * @param array $params
-	 * @return bool
+	 * @throws SqlException
+	 * @return $this
 	 */
 	public function execute(array $params = []) {
-		return $this->exceptionHandler(function() use ($params) {
+		$this->exceptionHandler(function() use ($params) {
 			$timer = microtime(true);
 			$response = $this->statement->execute($params);
 			$this->queryLoggers->log($this->query, microtime(true)-$timer);
-			return $response;
+			if(!$response) {
+				throw new SqlException('Execution returned with "false".');
+			}
 		});
+		return $this;
 	}
 
 	/**
