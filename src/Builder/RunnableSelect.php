@@ -2,7 +2,6 @@
 namespace Kir\MySQL\Builder;
 
 use Closure;
-use Generator;
 use IteratorAggregate;
 use Kir\MySQL\Builder\Helpers\FieldTypeProvider;
 use Kir\MySQL\Builder\Helpers\FieldValueConverter;
@@ -77,7 +76,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 
 	/**
 	 * @param Closure $callback
-	 * @return array[]|Generator
+	 * @return array[]|\Generator
 	 */
 	public function fetchRowsLazy(Closure $callback = null) {
 		if(version_compare(PHP_VERSION, '5.5', '<')) {
@@ -208,7 +207,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	}
 
 	/**
-	 * @return Traversable|array[]|Generator
+	 * @return Traversable|array[]|\Generator
 	 */
 	public function getIterator() {
 		return $this->fetchRowsLazy();
