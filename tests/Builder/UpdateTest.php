@@ -92,6 +92,13 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 		->where('field1=?', 2)
 		->asString();
 		$this->assertEquals("UPDATE\n\ttest1\nSET\n\t`field1`='1'\nWHERE\n\t(field1='2')\n", $sql);
+
+		$sql = TestUpdate::create()
+		->table('test1')
+		->set('field1', 1)
+		->where(['field1' => 1, 'field2' => 'aaa'])
+		->asString();
+		$this->assertEquals("UPDATE\n\ttest1\nSET\n\t`field1`='1'\nWHERE\n\t(`field1`='1')\n\tAND\n\t(`field2`='aaa')\n", $sql);
 	}
 
 	public function testOrder() {

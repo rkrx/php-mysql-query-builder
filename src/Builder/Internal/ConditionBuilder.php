@@ -16,13 +16,31 @@ final class ConditionBuilder {
 			return $query;
 		}
 		$query .= "{$token}\n";
-		$arr = array();
+		$arr = [];
 		foreach($conditions as $condition) {
 			list($expression, $arguments) = $condition;
-			$expr = $db->quoteExpression($expression, $arguments);
-			$arr[] = "\t({$expr})";
+			if(is_array($expression)) {
+				foreach($expression as $key => $value) {
+					$arr = self::buildCondition($arr, "`{$key}`=?", [$value], $db);
+				}
+			} else {
+				$arr = self::buildCondition($arr, $expression, $arguments, $db);
+			}
 		}
 		$query .= join("\n\tAND\n", $arr);
-		return $query."\n";
+		return "{$query}\n";
+	}
+
+	/**
+	 * @param array $conditions
+	 * @param mixed $expression
+	 * @param mixed $arguments
+	 * @param Database $db
+	 * @return array
+	 */
+	private static function buildCondition(array $conditions, $expression, $arguments, Database $db) {
+		$expr = $db->quoteExpression($expression, $arguments);
+		$conditions[] = "\t({$expr})";
+		return $conditions;
 	}
 }

@@ -38,6 +38,14 @@ class DeleteTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals("DELETE FROM\n\ttravis_test.test1\nWHERE\n\t(field1='1')\n\tAND\n\t(field2 != field1)\n", $sql);
 	}
 
+	public function testWhereViaArray() {
+		$sql = TestDelete::create()
+		->from('travis#test1')
+		->where(['field1' => 1, 'field2' => 'aaa'])
+		->asString();
+		$this->assertEquals("DELETE FROM\n\ttravis_test.test1\nWHERE\n\t(`field1`='1')\n\tAND\n\t(`field2`='aaa')\n", $sql);
+	}
+
 	public function testDBExpr() {
 		$sql = TestDelete::create()
 		->from('travis#test1')

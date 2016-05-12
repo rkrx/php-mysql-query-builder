@@ -63,6 +63,13 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		->where('a < ?', 1000)
 		->asString();
 		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(a < '1000')\n", $str);
+
+		$str = TestSelect::create()
+		->field('a')
+		->from('t', 'test')
+		->where(['field1' => 1, 'field2' => 'aaa'])
+		->asString();
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(`field1`='1')\n\tAND\n\t(`field2`='aaa')\n", $str);
 	}
 
 	public function testHaving() {
@@ -72,6 +79,13 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		->having('a+1<2')
 		->asString();
 		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nHAVING\n\t(a+1<2)\n", $str);
+
+		$str = TestSelect::create()
+		->field('a')
+		->from('t', 'test')
+		->having(['field1' => 1, 'field2' => 'aaa'])
+		->asString();
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nHAVING\n\t(`field1`='1')\n\tAND\n\t(`field2`='aaa')\n", $str);
 	}
 
 	public function testDBExpr() {
