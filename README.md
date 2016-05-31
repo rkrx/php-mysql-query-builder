@@ -160,6 +160,7 @@ $mysql->transaction(function () use ($mysql, $test) {
 
 	$test();
 
+    // $mysql->transaction or...
 	$mysql->dryRun(function () use ($mysql, $test) {
 		$mysql->update()
 		->table('test')
