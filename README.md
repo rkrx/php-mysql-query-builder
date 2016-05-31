@@ -126,3 +126,57 @@ $mysql->delete()
 ->where('t1.field1=? AND t2.field2 > ?', 1, 10)
 ->run();
 ```
+
+### True nested transactions
+
+```php
+$mysql = new \Kir\MySQL\Databases\MySQL($pdo);
+
+$mysql->delete()->from('test')->run();
+
+$test = function () use ($mysql) {
+	$name = $mysql->select()
+	->field('t.name')
+	->from('t', 'test')
+	->where('t.id=?', 1)
+	->fetchValue();
+	printf("Current name is %s\n", $name);
+};
+
+$mysql->insert()
+->into('test')
+->add('id', 1)
+->add('name', 'Peter')
+->run();
+
+$test();
+
+$mysql->transaction(function () use ($mysql, $test) {
+	$mysql->update()
+	->table('test')
+	->set('name', 'Paul')
+	->where('id=?', 1)
+	->run();
+
+	$test();
+
+	$mysql->dryRun(function () use ($mysql, $test) {
+		$mysql->update()
+		->table('test')
+		->set('name', 'Bert')
+		->where('id=?', 1)
+		->run();
+
+		$test();
+	});
+});
+
+$test();
+```
+
+```
+Current name is Peter
+Current name is Paul
+Current name is Bert
+Current name is Paul
+```

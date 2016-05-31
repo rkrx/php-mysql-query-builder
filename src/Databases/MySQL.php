@@ -265,18 +265,29 @@ class MySQL implements Database {
 	public function dryRun($callback = null) {
 		$result = null;
 		$exception = null;
-		if($this->pdo->inTransaction()) {
-			throw new \Exception('Connection is already in a transaction. Dry-run not possible.');
-		}
-		$this->transactionStart();
-		try {
-			$result = call_user_func($callback, $this);
-		} catch (\Exception $e) {
-			$exception = $e;
-		}
-		$this->transactionRollback();
-		if($exception !== null) {
-			throw $exception;
+		if(!$this->pdo->inTransaction()) {
+			$this->transactionStart();
+			try {
+				$result = call_user_func($callback, $this);
+			} catch (\Exception $e) {
+				$exception = $e;
+			}
+			$this->transactionRollback();
+			if($exception !== null) {
+				throw $exception;
+			}
+		} else {
+			$uniqueId = $this->genUniqueId();
+			$this->exec("SAVEPOINT {$uniqueId}");
+			try {
+				$result = call_user_func($callback, $this);
+			} catch (\Exception $e) {
+				$exception = $e;
+			}
+			$this->exec("ROLLBACK TO {$uniqueId}");
+			if($exception !== null) {
+				throw $exception;
+			}
 		}
 		return $result;
 	}
@@ -296,14 +307,26 @@ class MySQL implements Database {
 			throw new \Exception('$callback must be a callable');
 		}
 		$e = null;
-		for(; $tries--;) {
+		if(!$this->pdo->inTransaction()) {
+			for(; $tries--;) {
+				try {
+					$this->transactionStart();
+					$result = call_user_func($callback, $this);
+					$this->transactionCommit();
+					return $result;
+				} catch (\Exception $e) {
+					$this->transactionRollback();
+				}
+			}
+		} else {
+			$uniqueId = $this->genUniqueId();
 			try {
-				$this->transactionStart();
+				$this->exec("SAVEPOINT {$uniqueId}");
 				$result = call_user_func($callback, $this);
-				$this->transactionCommit();
+				$this->exec("RELEASE SAVEPOINT {$uniqueId}");
 				return $result;
 			} catch (\Exception $e) {
-				$this->transactionRollback();
+				$this->exec("ROLLBACK TO {$uniqueId}");
 			}
 		}
 		throw $e;
@@ -354,5 +377,22 @@ class MySQL implements Database {
 		} catch (PDOException $e) {
 			$this->exceptionInterpreter->throwMoreConcreteException($e);
 		}
+	}
+
+	/**
+	 * @return string
+	 */
+	private function genUniqueId() {
+		// Generate a unique id from a former random-uuid-generator
+		return sprintf('ID%04x%04x%04x%04x%04x%04x%04x%04x',
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0x0fff) | 0x4000,
+			mt_rand(0, 0x3fff) | 0x8000,
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff)
+		);
 	}
 }
