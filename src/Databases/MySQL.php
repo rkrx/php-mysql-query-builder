@@ -257,6 +257,28 @@ class MySQL implements Database {
 	}
 
 	/**
+	 * @param callable|null $callback
+	 * @return mixed
+	 * @throws \Exception
+	 * @throws null
+	 */
+	public function dryRun($callback = null) {
+		$result = null;
+		$exception = null;
+		$this->transactionStart();
+		try {
+			$result = call_user_func($callback, $this);
+		} catch (\Exception $e) {
+			$exception = $e;
+		}
+		$this->transactionRollback();
+		if($exception !== null) {
+			throw $exception;
+		}
+		return $result;
+	}
+
+	/**
 	 * @param int|callable $tries
 	 * @param callable|null $callback
 	 * @return mixed

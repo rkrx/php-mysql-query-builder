@@ -101,4 +101,11 @@ interface Database {
 	 * @throws \Exception
 	 */
 	public function transaction($tries = 1, $callback = null);
+
+	/**
+	 * @param callable|null $callback
+	 * @return mixed
+	 * @throws \Exception
+	 */
+	public function dryRun($callback = null);
 }
