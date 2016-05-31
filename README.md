@@ -164,6 +164,8 @@ $mysql->transaction(function () use ($mysql, $setName, $test) {
 		$test();
 	});
 });
+
+$test();
 ```
 
 ```
