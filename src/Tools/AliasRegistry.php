@@ -2,9 +2,7 @@
 namespace Kir\MySQL\Tools;
 
 class AliasRegistry {
-	/**
-	 * @var string[]
-	 */
+	/** @var string[] */
 	private $aliases = array();
 
 	/**

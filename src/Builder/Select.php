@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Kir\MySQL\Builder\Traits\ExtensionMethodBuilder;
 use Kir\MySQL\Builder\Traits\GroupByBuilder;
 use Kir\MySQL\Builder\Traits\HavingBuilder;
 use Kir\MySQL\Builder\Traits\OffsetBuilder;
@@ -23,6 +24,7 @@ class Select extends Statement {
 	use LimitBuilder;
 	use OffsetBuilder;
 	use UnionBuilder;
+	use ExtensionMethodBuilder;
 
 	/** @var string[] */
 	private $fields = array();

@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Databases;
 
+use Kir\MySQL\Tools\ExtensionMethodRegistry;
 use PDO;
 use PDOException;
 use UnexpectedValueException;
@@ -30,6 +31,8 @@ class MySQL implements Database {
 	private $queryLoggers = 0;
 	/** @var MySQLExceptionInterpreter */
 	private $exceptionInterpreter = 0;
+	/** @var ExtensionMethodRegistry */
+	private $extensionMethodRegistry;
 
 	/**
 	 * @param PDO $pdo
@@ -40,6 +43,7 @@ class MySQL implements Database {
 		}
 		$this->pdo = $pdo;
 		$this->aliasRegistry = new AliasRegistry();
+		$this->extensionMethodRegistry = new ExtensionMethodRegistry();
 		$this->queryLoggers = new QueryLoggers();
 		$this->exceptionInterpreter = new MySQLExceptionInterpreter();
 	}
@@ -56,6 +60,13 @@ class MySQL implements Database {
 	 */
 	public function getAliasRegistry() {
 		return $this->aliasRegistry;
+	}
+
+	/**
+	 * @return ExtensionMethodRegistry
+	 */
+	public function getExtensionMethodRegistry() {
+		return $this->extensionMethodRegistry;
 	}
 
 	/**

@@ -2,6 +2,7 @@
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\Internal\DefaultValue;
+use Kir\MySQL\Builder\Traits\ExtensionMethodBuilder;
 use Kir\MySQL\Builder\Traits\JoinBuilder;
 use Kir\MySQL\Builder\Traits\LimitBuilder;
 use Kir\MySQL\Builder\Traits\OffsetBuilder;
@@ -18,6 +19,7 @@ class Update extends InsertUpdateStatement {
 	use OrderByBuilder;
 	use LimitBuilder;
 	use OffsetBuilder;
+	use ExtensionMethodBuilder;
 
 	/**
 	 * @var array

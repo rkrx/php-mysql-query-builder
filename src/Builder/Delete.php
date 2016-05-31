@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Kir\MySQL\Builder\Traits\ExtensionMethodBuilder;
 use Kir\MySQL\Builder\Traits\JoinBuilder;
 use Kir\MySQL\Builder\Traits\LimitBuilder;
 use Kir\MySQL\Builder\Traits\OffsetBuilder;
@@ -17,6 +18,7 @@ class Delete extends Statement {
 	use OrderByBuilder;
 	use LimitBuilder;
 	use OffsetBuilder;
+	use ExtensionMethodBuilder;
 
 	/** @var string[] */
 	private $aliases = array();

@@ -3,8 +3,26 @@ namespace Kir\MySQL;
 
 use Kir\MySQL\Builder\Exception;
 use Kir\MySQL\Database\DatabaseStatement;
+use Kir\MySQL\QueryLogger\QueryLoggers;
+use Kir\MySQL\Tools\AliasRegistry;
+use Kir\MySQL\Tools\ExtensionMethodRegistry;
 
 interface Database {
+	/**
+	 * @return QueryLoggers
+	 */
+	public function getQueryLoggers();
+
+	/**
+	 * @return AliasRegistry
+	 */
+	public function getAliasRegistry();
+
+	/**
+	 * @return ExtensionMethodRegistry
+	 */
+	public function getExtensionMethodRegistry();
+
 	/**
 	 * @param string $query
 	 * @throws Exception

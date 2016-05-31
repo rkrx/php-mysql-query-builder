@@ -2,7 +2,6 @@
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\SelectTest\TestSelect;
-use Kir\MySQL\Databases\TestDB;
 
 class SelectTestX extends \PHPUnit_Framework_TestCase {
 	public function testAddition() {
@@ -237,5 +236,37 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		->asString();
 
 		$this->assertEquals("SELECT DISTINCT\n\tt1.field1,\n\tt1.field2\nFROM\n\ttest1 t1\n", $query);
+	}
+
+	public function testExtensionMethodDirect() {
+		$filters = ['daterange' => ['from' => '2015-01-01', 'till' => '2016-01-01'], 'field1' => 1];
+		$query = TestSelect::create()
+		->distinct()
+		->field('t1.field1')
+		->field('t1.field2')
+		->from('t1', 'test1')
+		->whereCond('t1.event_date >= ?', $filters, 'daterange.from')
+		->whereCond('t1.event_date <= ?', $filters, 'daterange.till')
+		->whereCond('t1.event_active <= ?', $filters, 'active')
+		->havingCond('field1 <= ?', $filters, 'field1')
+		->asString();
+
+		$this->assertEquals("SELECT DISTINCT\n\tt1.field1,\n\tt1.field2\nFROM\n\ttest1 t1\nWHERE\n\t(t1.event_date >= '2015-01-01')\n\tAND\n\t(t1.event_date <= '2016-01-01')\nHAVING\n\t(field1 <= '1')\n", $query);
+	}
+
+	public function testExtensionMethodExt() {
+		$filters = ['daterange' => ['from' => '2015-01-01', 'till' => '2016-01-01'], 'field1' => 1];
+		$query = TestSelect::create()
+		->distinct()
+		->field('t1.field1')
+		->field('t1.field2')
+		->from('t1', 'test1')
+		->ext('whereCond', 't1.event_date >= ?', $filters, 'daterange.from')
+		->ext('whereCond', 't1.event_date <= ?', $filters, 'daterange.till')
+		->ext('whereCond', 't1.event_active <= ?', $filters, 'active')
+		->ext('havingCond', 'field1 <= ?', $filters, 'field1')
+		->asString();
+
+		$this->assertEquals("SELECT DISTINCT\n\tt1.field1,\n\tt1.field2\nFROM\n\ttest1 t1\nWHERE\n\t(t1.event_date >= '2015-01-01')\n\tAND\n\t(t1.event_date <= '2016-01-01')\nHAVING\n\t(field1 <= '1')\n", $query);
 	}
 }
