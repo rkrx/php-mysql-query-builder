@@ -143,36 +143,27 @@ $test = function () use ($mysql) {
 	printf("Current name is %s\n", $name);
 };
 
-$mysql->insert()
-->into('test')
-->add('id', 1)
-->add('name', 'Peter')
-->run();
+$setName = function ($name) use ($mysql) {
+	$mysql->insert()
+	->into('test')
+	->add('id', 1)
+	->addOrUpdate('name', $name)
+	->run();
+};
 
+$setName('Peter');
 $test();
 
-$mysql->transaction(function () use ($mysql, $test) {
-	$mysql->update()
-	->table('test')
-	->set('name', 'Paul')
-	->where('id=?', 1)
-	->run();
-
+$mysql->transaction(function () use ($mysql, $setName, $test) {
+	$setName('Paul');
 	$test();
 
-    // $mysql->transaction or...
-	$mysql->dryRun(function () use ($mysql, $test) {
-		$mysql->update()
-		->table('test')
-		->set('name', 'Bert')
-		->where('id=?', 1)
-		->run();
-
+	// $mysql->transaction or...
+	$mysql->dryRun(function () use ($mysql, $setName, $test) {
+		$setName('Bert');
 		$test();
 	});
 });
-
-$test();
 ```
 
 ```
