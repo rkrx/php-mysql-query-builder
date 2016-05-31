@@ -265,6 +265,9 @@ class MySQL implements Database {
 	public function dryRun($callback = null) {
 		$result = null;
 		$exception = null;
+		if($this->pdo->inTransaction()) {
+			throw new \Exception('Connection is already in a transaction. Dry-run not possible.');
+		}
 		$this->transactionStart();
 		try {
 			$result = call_user_func($callback, $this);
