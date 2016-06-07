@@ -14,7 +14,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	/** @var array */
 	private $values = array();
 	/** @var bool */
-	private $preserveTypes;
+	private $preserveTypes = false;
 	/** @var int */
 	private $foundRows = 0;
 
