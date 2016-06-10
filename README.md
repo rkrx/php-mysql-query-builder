@@ -20,29 +20,14 @@ Here a few things to keep in mind:
 
 ## Some examples
 
-[Initialization](doc/initialization.md)
-
-### Select
-
-[Simple select](doc/simple-select.md)
-[Complex select](doc/complex-select.md)
-[Optional conditions](doc/optional-conditions.md)
-
-### Insert
-
-[Insert](doc/insert.md)
-
-### Update
-
-[Insert](doc/update.md)
-
-### Delete
-
-[Insert](doc/delete.md)
-
-### Misc
-
-[Nested transactions](doc/nested-transactions.md)
+* [Initialization](doc/initialization.md)
+* [Simple select](doc/simple-select.md)
+* [Complex select](doc/complex-select.md)
+* [Optional conditions](doc/optional-conditions.md)
+* [Insert](doc/insert.md)
+* [Update](doc/update.md)
+* [Delete](doc/delete.md)
+* [Nested transactions](doc/nested-transactions.md)
 
 
 
