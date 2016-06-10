@@ -24,9 +24,9 @@ class FieldValueConverter {
 	private static function convertValue($value, $type) {
 		switch ($type) {
 			case 'i':
-				return (int) $value;
+				return $value !== null ? (int) $value : null;
 			case 'f':
-				return (float) $value;
+				return $value !== null ? (float) $value : null;
 		}
 		return $value;
 	}
