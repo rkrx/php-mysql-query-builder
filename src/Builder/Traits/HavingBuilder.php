@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
+use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Builder\Internal\ConditionBuilder;
 
 trait HavingBuilder {
@@ -15,7 +16,13 @@ trait HavingBuilder {
 	 * @return $this
 	 */
 	public function having($expression) {
-		$this->having[] = array($expression, array_slice(func_get_args(), 1));
+		if($expression instanceof OptionalExpression) {
+			if($expression->isValid()) {
+				$this->having[] = [$expression->getExpression(), $expression->getData()];
+			}
+		} else {
+			$this->having[] = [$expression, array_slice(func_get_args(), 1)];
+		}
 		return $this;
 	}
 
