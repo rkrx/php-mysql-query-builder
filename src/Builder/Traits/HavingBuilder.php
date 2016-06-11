@@ -18,7 +18,7 @@ trait HavingBuilder {
 	public function having($expression) {
 		if($expression instanceof OptionalExpression) {
 			if($expression->isValid()) {
-				$this->having[] = [$expression->getExpression(), $expression->getData()];
+				$this->having[] = [$expression->getExpression(), $expression->getValue()];
 			}
 		} else {
 			$this->having[] = [$expression, array_slice(func_get_args(), 1)];

@@ -1,7 +1,10 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Kir\MySQL\Builder\Expr\DBExprFilter;
 use Kir\MySQL\Builder\Expr\OptionalDBFilterMap;
+use Kir\MySQL\Builder\Expr\RequiredDBFilterMap;
+use Kir\MySQL\Builder\Expr\RequiredValueNotFoundException;
 use Kir\MySQL\Builder\SelectTest\TestSelect;
 use Kir\MySQL\Databases\TestDB;
 
@@ -240,35 +243,58 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals("SELECT DISTINCT\n\tt1.field1,\n\tt1.field2\nFROM\n\ttest1 t1\n", $query);
 	}
 
-	public function testOptional() {
+	public function testOptionalExpressions() {
 		$filter = ['filter' => ['name' => 'aaa']];
+		$opt = new OptionalDBFilterMap($filter);
+
 		$query = TestSelect::create()
 		->distinct()
 		->field('t.field')
 		->from('t', 'test')
-		->where(new OptionalDBFilterMap('t.field=?', $filter, ['filter', 'name']))
+		->where($opt('t.field=?', ['filter', 'name']))
 		->asString();
 
 		$this->assertEquals("SELECT DISTINCT\n\tt.field\nFROM\n\ttest t\nWHERE\n\t(t.field='aaa')\n", $query);
 
-		$filter = ['filter' => ['name' => 'aaa']];
 		$query = TestSelect::create()
 		->distinct()
 		->field('t.field')
 		->from('t', 'test')
-		->where(new OptionalDBFilterMap('t.field=?', $filter, 'filter.name'))
+		->where($opt('t.field=?', 'filter.name'))
 		->asString();
 
 		$this->assertEquals("SELECT DISTINCT\n\tt.field\nFROM\n\ttest t\nWHERE\n\t(t.field='aaa')\n", $query);
 
-		$filter = ['filter' => ['name' => 'aaa']];
 		$query = TestSelect::create()
 		->distinct()
 		->field('t.field')
 		->from('t', 'test')
-		->where(new OptionalDBFilterMap('t.field=?', $filter, ['filter', 'age']))
+		->where($opt('t.field=?', ['filter', 'age']))
 		->asString();
 
 		$this->assertEquals("SELECT DISTINCT\n\tt.field\nFROM\n\ttest t\n", $query);
+	}
+
+	public function testRequired() {
+		$filter = ['filter' => ['name' => 'aaa']];
+		$req = new RequiredDBFilterMap($filter);
+
+		$query = TestSelect::create()
+		->distinct()
+		->field('t.field')
+		->from('t', 'test')
+		->where($req('t.field=?', ['filter', 'name']))
+		->asString();
+
+		$this->assertEquals("SELECT DISTINCT\n\tt.field\nFROM\n\ttest t\nWHERE\n\t(t.field='aaa')\n", $query);
+
+		$this->setExpectedException(RequiredValueNotFoundException::class);
+
+		TestSelect::create()
+		->distinct()
+		->field('t.field')
+		->from('t', 'test')
+		->where($req('t.field=?', 'filter.id'))
+		->asString();
 	}
 }

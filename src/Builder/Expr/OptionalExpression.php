@@ -15,5 +15,5 @@ interface OptionalExpression {
 	/**
 	 * @return mixed
 	 */
-	public function getData();
+	public function getValue();
 }

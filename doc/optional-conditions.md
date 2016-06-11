@@ -9,11 +9,15 @@ $filter = [
 	],
 ];
 
+$req = new RequiredFilterMap($filter);
+$opt = new OptionalFilterMap($filter);
+
 $query = $db
 ->from('t', 'test')
-->where(new OptionalDBFilterMap('t.name=?', $filter, 'name'))
-->where(new OptionalDBFilterMap('t.date >= ?', $filter, 'date.start')) // Key in dot-notation
-->where(new OptionalDBFilterMap('t.date <= ?', $filter, ['date', 'end'])) // Array-Key
+->where($req('t.name=?', $filter, 'name'))
+->where($opt('t.date >= ?', $filter, 'date.start')) // Key in dot-notation
+->where($opt('t.date <= ?', $filter, ['date', 'end'])) // Array-Key
 ```
+
 
 [Back](../README.md)

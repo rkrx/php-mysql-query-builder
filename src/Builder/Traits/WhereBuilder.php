@@ -18,7 +18,7 @@ trait WhereBuilder {
 	public function where($expression) {
 		if($expression instanceof OptionalExpression) {
 			if($expression->isValid()) {
-				$this->where[] = [$expression->getExpression(), $expression->getData()];
+				$this->where[] = [$expression->getExpression(), $expression->getValue()];
 			}
 		} else {
 			$this->where[] = [$expression, array_slice(func_get_args(), 1)];

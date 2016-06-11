@@ -1,7 +1,7 @@
 <?php
 namespace Kir\MySQL\Builder\Expr;
 
-class OptionalDBFilterMap {
+class RequiredDBFilterMap {
 	/** @var array */
 	private $map;
 
@@ -27,6 +27,10 @@ class OptionalDBFilterMap {
 	 * @return DBExprFilter
 	 */
 	public function __invoke($expression, $keyPath, $validator = null) {
-		return new DBExprFilter($expression, $this->map, $keyPath, $validator);
+		return new DBExprFilter($expression, $this->map, $keyPath, $validator, function ($result, array $data) {
+			if(!$result) {
+				throw new RequiredValueNotFoundException(sprintf("Required value %s not found", $data['key']));
+			}
+		});
 	}
 }

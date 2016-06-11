@@ -18,7 +18,7 @@ Here a few things to keep in mind:
 * No animals were harmed due to the production of this library.
 * The order of method-calls doesn't matter.
 
-## Some examples
+## Some simplified examples
 
 * [Initialization](doc/initialization.md)
 * [Simple select](doc/simple-select.md)
@@ -29,5 +29,6 @@ Here a few things to keep in mind:
 * [Delete](doc/delete.md)
 * [Nested transactions](doc/nested-transactions.md)
 
+## Some extended examples
 
-
+* [How a simple repository could look like](doc/simple-repository.md)
