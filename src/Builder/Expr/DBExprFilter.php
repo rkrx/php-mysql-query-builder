@@ -12,7 +12,7 @@ class DBExprFilter implements OptionalExpression {
 	private $keyPath;
 	/** @var callable|null */
 	private $validator;
-	/** @var null */
+	/** @var callable */
 	private $validationResultHandler;
 
 	/**
@@ -34,7 +34,7 @@ class DBExprFilter implements OptionalExpression {
 			};
 		}
 		if($validationResultHandler === null) {
-			$validationResultHandler = function ($data) {};
+			$validationResultHandler = function () {};
 		}
 		$this->validator = $validator;
 		$this->validationResultHandler = $validationResultHandler;
