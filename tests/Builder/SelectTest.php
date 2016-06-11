@@ -288,7 +288,7 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 
 		$this->assertEquals("SELECT DISTINCT\n\tt.field\nFROM\n\ttest t\nWHERE\n\t(t.field='aaa')\n", $query);
 
-		$this->setExpectedException(RequiredValueNotFoundException::class);
+		$this->setExpectedException('Kir\\MySQL\\Builder\\Expr\\RequiredValueNotFoundException');
 
 		TestSelect::create()
 		->distinct()
