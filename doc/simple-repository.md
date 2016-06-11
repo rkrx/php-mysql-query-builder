@@ -1,4 +1,4 @@
-# Optional conditions
+# Simple repository
 
 ```PHP
 $pdo = new PDO('mysql:host=127.0.0.1;dbname=test;charset=utf8', 'root', null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
