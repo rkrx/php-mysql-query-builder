@@ -4,6 +4,7 @@ namespace Kir\MySQL\Databases;
 use Kir\FakePDO\EventHandlers\RegistryEventHandler;
 use Kir\FakePDO\FakePDO;
 use Kir\MySQL\Builder\SelectTest\TestSelect;
+use Traversable;
 
 class MySQLTest extends \PHPUnit_Framework_TestCase {
 	/** @var TestDB */
@@ -200,7 +201,9 @@ class MySQLTest extends \PHPUnit_Framework_TestCase {
 			$row['test'] = 10;
 			return $row;
 		});
-		$rows = iterator_to_array($rows);
+		if($rows instanceof Traversable) {
+			$rows = iterator_to_array($rows);
+		}
 		$this->assertEquals([['id' => 1, 'test' => 10]], $rows);
 	}
 }

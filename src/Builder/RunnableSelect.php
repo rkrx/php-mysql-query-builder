@@ -7,6 +7,7 @@ use Kir\MySQL\Builder\Helpers\DBIgnoreRow;
 use Kir\MySQL\Builder\Helpers\FieldTypeProvider;
 use Kir\MySQL\Builder\Helpers\FieldValueConverter;
 use Kir\MySQL\Builder\Helpers\LazyRowGenerator;
+use Kir\MySQL\Builder\Helpers\YieldPolyfillIterator;
 use Traversable;
 
 /**
@@ -90,7 +91,9 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 */
 	public function fetchRowsLazy(Closure $callback = null) {
 		if(version_compare(PHP_VERSION, '5.5', '<')) {
-			return $this->fetchRows($callback);
+			return new YieldPolyfillIterator($this, $callback, $this->preserveTypes, function () {
+				return $this->createStatement();
+			});
 		}
 		$statement = $this->createStatement();
 		$generator = new LazyRowGenerator($this->preserveTypes);
