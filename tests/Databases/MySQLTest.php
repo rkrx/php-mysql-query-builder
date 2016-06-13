@@ -3,6 +3,7 @@ namespace Kir\MySQL\Databases;
 
 use Kir\FakePDO\EventHandlers\RegistryEventHandler;
 use Kir\FakePDO\FakePDO;
+use Kir\MySQL\Builder\SelectTest\TestSelect;
 
 class MySQLTest extends \PHPUnit_Framework_TestCase {
 	/** @var TestDB */
@@ -116,5 +117,90 @@ class MySQLTest extends \PHPUnit_Framework_TestCase {
 		$mysql->transactionRollback();
 		$mysql->transactionRollback();
 		$mysql->transactionRollback();
+	}
+
+	public function testFetchRow() {
+		// Closure w/o return, but with reference
+		$row = TestSelect::create()
+		->field('t.id')
+		->from('t', 'test#test1')
+		->where('t.id=?', 1)
+		->fetchRow(function (array &$row) {
+			$row['test'] = 10;
+		});
+		$this->assertEquals(['id' => 1, 'test' => 10], $row);
+
+		// Closure with return
+		$row = TestSelect::create()
+		->field('t.id')
+		->from('t', 'test#test1')
+		->where('t.id=?', 1)
+		->fetchRow(function (array $row) {
+			$row['test'] = 10;
+			return $row;
+		});
+		$this->assertEquals(['id' => 1, 'test' => 10], $row);
+	}
+
+	public function testFetchRows() {
+		// Closure w/o return, but with reference
+		$rows = TestSelect::create()
+		->field('t.id')
+		->from('t', 'test#test1')
+		->where('t.id=?', 1)
+		->fetchRows(function (array &$row) {
+			$row['test'] = 10;
+		});
+
+		$this->assertEquals([['id' => 1, 'test' => 10]], $rows);
+
+		// Closure with return
+		$rows = TestSelect::create()
+		->field('t.id')
+		->from('t', 'test#test1')
+		->where('t.id=?', 1)
+		->fetchRows(function (array $row) {
+			$row['test'] = 10;
+			return $row;
+		});
+
+		$this->assertEquals([['id' => 1, 'test' => 10]], $rows);
+	}
+
+	public function testFetchRowsLazy() {
+		// Closure w/o return, but with reference
+		$rows = TestSelect::create()
+		->field('t.id')
+		->from('t', 'test#test1')
+		->where('t.id=?', 1)
+		->fetchRowsLazy(function (array &$row) {
+			$row['test'] = 10;
+		});
+		$rows = iterator_to_array($rows);
+		$this->assertEquals([['id' => 1, 'test' => 10]], $rows);
+
+		// Closure with return
+		$rows = TestSelect::create()
+		->field('t.id')
+		->from('t', 'test#test1')
+		->where('t.id=?', 1)
+		->fetchRowsLazy(function (array $row) {
+			$row['test'] = 10;
+			return $row;
+		});
+		$rows = iterator_to_array($rows);
+		$this->assertEquals([['id' => 1, 'test' => 10]], $rows);
+
+		// IgnoredRow
+		$rows = TestSelect::create()
+		->field('t.id')
+		->from('t', 'test#test1')
+		->where('t.id=?', 1)
+		->fetchRowsLazy(function (array $row) {
+			$row['test'] = 10;
+			return $row;
+		});
+		$rows = iterator_to_array($rows);
+		$this->assertEquals([['id' => 1, 'test' => 10]], $rows);
 	}
 }

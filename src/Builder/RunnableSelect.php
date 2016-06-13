@@ -3,6 +3,7 @@ namespace Kir\MySQL\Builder;
 
 use Closure;
 use IteratorAggregate;
+use Kir\MySQL\Builder\Helpers\DBIgnoreRow;
 use Kir\MySQL\Builder\Helpers\FieldTypeProvider;
 use Kir\MySQL\Builder\Helpers\FieldValueConverter;
 use Kir\MySQL\Builder\Helpers\LazyRowGenerator;
@@ -68,7 +69,16 @@ class RunnableSelect extends Select implements IteratorAggregate {
 				}
 			}
 			if($callback !== null) {
-				$data = array_map($callback, $data);
+				$resultData = [];
+				foreach($data as $row) {
+					$result = $callback($row);
+					if($result !== null && !($result instanceof DBIgnoreRow)) {
+						$resultData[] = $result;
+					} else {
+						$resultData[] = $row;
+					}
+				}
+				return $resultData;
 			}
 			return $data;
 		});
@@ -88,17 +98,25 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	}
 
 	/**
+	 * @param Closure|null $callback
 	 * @return string[]
+	 * @throws \Exception
 	 */
-	public function fetchRow() {
-		return $this->createTempStatement(function (QueryStatement $statement) {
+	public function fetchRow(Closure $callback = null) {
+		return $this->createTempStatement(function (QueryStatement $statement) use ($callback) {
 			$row = $statement->fetch(\PDO::FETCH_ASSOC);
 			if(!is_array($row)) {
-				return array();
+				return [];
 			}
 			if($this->preserveTypes) {
 				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
 				$row = FieldValueConverter::convertValues($row, $columnDefinitions);
+			}
+			if($callback !== null) {
+				$result = $callback($row);
+				if($result !== null) {
+					$row = $result;
+				}
 			}
 			return $row;
 		});

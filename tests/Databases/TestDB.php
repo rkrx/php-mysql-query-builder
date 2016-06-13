@@ -29,6 +29,7 @@ class TestDB extends MySQL {
 		parent::__construct($this->pdo);
 		$this->aliasRegistry = new AliasRegistry();
 		$this->getAliasRegistry()->add('travis', 'travis_test.');
+		$this->getAliasRegistry()->add('test', 'travis_test.');
 	}
 
 	/**

@@ -27,8 +27,12 @@ class LazyRowGenerator {
 				$row = FieldValueConverter::convertValues($row, $columnDefinitions);
 			}
 			if($callback !== null) {
-				$row = call_user_func($callback, $row);
-				if($row !== null) {
+				$result = $callback($row);
+				if($result instanceof DBIgnoreRow) {
+					// Do nothing in this case
+				} elseif($result !== null) {
+					yield $result;
+				} else {
 					yield $row;
 				}
 			} else {
