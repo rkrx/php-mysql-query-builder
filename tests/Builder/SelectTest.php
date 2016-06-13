@@ -244,7 +244,7 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testOptionalExpressions() {
-		$filter = ['filter' => ['name' => 'aaa']];
+		$filter = ['filter' => ['name' => 'aaa', 'ids' => [1, 2, 3], 'empty' => [null, '', ['']]]];
 		$opt = new OptionalDBFilterMap($filter);
 
 		$query = TestSelect::create()
@@ -270,6 +270,24 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		->field('t.field')
 		->from('t', 'test')
 		->where($opt('t.field=?', ['filter', 'age']))
+		->asString();
+
+		$this->assertEquals("SELECT DISTINCT\n\tt.field\nFROM\n\ttest t\n", $query);
+
+		$query = TestSelect::create()
+		->distinct()
+		->field('t.field')
+		->from('t', 'test')
+		->where($opt('t.field IN (?)', ['filter', 'ids']))
+		->asString();
+
+		$this->assertEquals("SELECT DISTINCT\n\tt.field\nFROM\n\ttest t\nWHERE\n\t(t.field IN ('1', '2', '3'))\n", $query);
+
+		$query = TestSelect::create()
+		->distinct()
+		->field('t.field')
+		->from('t', 'test')
+		->where($opt('t.field=?', ['filter', 'empty']))
 		->asString();
 
 		$this->assertEquals("SELECT DISTINCT\n\tt.field\nFROM\n\ttest t\n", $query);

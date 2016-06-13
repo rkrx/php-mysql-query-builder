@@ -30,6 +30,9 @@ class DBExprFilter implements OptionalExpression {
 		$this->value = $this->recursiveGet($data, $this->keyPath, null);
 		if($validator === null) {
 			$validator = function ($data) {
+				if(is_array($data)) {
+					return $this->isValidArray($data);
+				}
 				return (string) $data !== '';
 			};
 		}
@@ -79,6 +82,20 @@ class DBExprFilter implements OptionalExpression {
 			throw new Exception('Invalid key');
 		}
 		return $keyPath;
+	}
+
+	/**
+	 * @param array $array
+	 * @return bool
+	 */
+	private function isValidArray(array $array) {
+		$data = array_filter($array, function ($value) {
+			if(is_array($value)) {
+				return $this->isValidArray($value);
+			}
+			return (string) $value !== '';
+		});
+		return count($data) > 0;
 	}
 
 	/**
