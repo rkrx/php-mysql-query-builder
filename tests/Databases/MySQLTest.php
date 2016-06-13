@@ -201,9 +201,7 @@ class MySQLTest extends \PHPUnit_Framework_TestCase {
 			$row['test'] = 10;
 			return $row;
 		});
-		if($rows instanceof Traversable) {
-			$rows = iterator_to_array($rows);
-		}
+		$rows = iterator_to_array($rows);
 		$this->assertEquals([['id' => 1, 'test' => 10]], $rows);
 	}
 }
