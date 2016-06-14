@@ -6,6 +6,13 @@ trait OffsetBuilder {
 	private $offset = null;
 
 	/**
+	 * @return int
+	 */
+	protected function getOffset() {
+		return $this->offset;
+	}
+
+	/**
 	 * @param int $offset
 	 * @return $this
 	 */

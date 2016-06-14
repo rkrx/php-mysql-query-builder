@@ -146,6 +146,15 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nLIMIT\n\t100\nOFFSET\n\t50\n", $str);
 	}
 
+	public function testOffsetWithoutLimit() {
+		$str = TestSelect::create()
+		->field('a')
+		->from('t', 'test')
+		->offset(50)
+		->asString();
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nLIMIT\n\t18446744073709551615\nOFFSET\n\t50\n", $str);
+	}
+
 	public function testForUpdate() {
 		$str = TestSelect::create()
 		->field('a')

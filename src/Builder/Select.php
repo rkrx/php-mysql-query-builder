@@ -145,7 +145,7 @@ class Select extends Statement {
 		$query = $this->buildGroups($query);
 		$query = $this->buildHavingConditions($query);
 		$query = $this->buildOrder($query);
-		$query = $this->buildLimit($query);
+		$query = $this->buildLimit($query, $this->getOffset());
 		$query = $this->buildOffset($query);
 		$query = $this->buildUnions($query);
 		$query = $this->buildForUpdate($query);
