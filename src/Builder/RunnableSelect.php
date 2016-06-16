@@ -70,16 +70,17 @@ class RunnableSelect extends Select implements IteratorAggregate {
 				}
 			}
 			if($callback !== null) {
-				$resultData = [];
-				foreach($data as $row) {
-					$result = $callback($row);
-					if($result !== null && !($result instanceof DBIgnoreRow)) {
-						$resultData[] = $result;
-					} else {
-						$resultData[] = $row;
+				return call_user_func(function ($resultData = []) use ($data, $callback) {
+					foreach($data as $row) {
+						$result = $callback($row);
+						if($result !== null && !($result instanceof DBIgnoreRow)) {
+							$resultData[] = $result;
+						} else {
+							$resultData[] = $row;
+						}
 					}
-				}
-				return $resultData;
+					return $resultData;
+				});
 			}
 			return $data;
 		});
