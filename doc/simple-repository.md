@@ -75,7 +75,7 @@ class ProductRepository {
 		->where($req('spl.lang_id=?', 'language.id'))
 		->where($opt('sp.reference=?', 'product.reference'))
 		->where($opt('spl.name LIKE ?', 'product.name'))
-		->where($opt('spl.description LIKE ?', 'product.description'))->debug();
+		->where($opt('spl.description LIKE ?', 'product.description'));
 	}
 
 	/**
