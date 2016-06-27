@@ -4,7 +4,6 @@ namespace Kir\MySQL\Builder\Helpers;
 use Closure;
 use Iterator;
 use Kir\MySQL\Builder\QueryStatement;
-use Kir\MySQL\Builder\RunnableSelect;
 use PDO;
 
 class YieldPolyfillIterator implements Iterator {
