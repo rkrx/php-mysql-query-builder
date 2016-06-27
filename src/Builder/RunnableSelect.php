@@ -92,7 +92,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 */
 	public function fetchRowsLazy(Closure $callback = null) {
 		if(version_compare(PHP_VERSION, '5.5', '<')) {
-			return new YieldPolyfillIterator($this, $callback, $this->preserveTypes, function () {
+			return new YieldPolyfillIterator($callback, $this->preserveTypes, function () {
 				return $this->createStatement();
 			});
 		}

@@ -8,8 +8,6 @@ use Kir\MySQL\Builder\RunnableSelect;
 use PDO;
 
 class YieldPolyfillIterator implements Iterator {
-	/** @var RunnableSelect */
-	private $select;
 	/** @var Closure|null */
 	private $callback;
 	/** @var bool */
@@ -24,13 +22,11 @@ class YieldPolyfillIterator implements Iterator {
 	private $idx = -1;
 
 	/**
-	 * @param RunnableSelect $select
 	 * @param Closure|null $callback
 	 * @param bool $preserveTypes
 	 * @param callable $statementFactory
 	 */
-	public function __construct(RunnableSelect $select, Closure $callback = null, $preserveTypes, $statementFactory) {
-		$this->select = $select;
+	public function __construct(Closure $callback = null, $preserveTypes, $statementFactory) {
 		$this->callback = $callback;
 		$this->preserveTypes = $preserveTypes;
 		$this->statementFactory = $statementFactory;
@@ -61,9 +57,8 @@ class YieldPolyfillIterator implements Iterator {
 			} else {
 				return $row;
 			}
-		} else {
-			return $row;
 		}
+		return $row;
 	}
 
 	/**
