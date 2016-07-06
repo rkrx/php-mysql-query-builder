@@ -80,7 +80,9 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @throws \Exception
 	 */
 	public function fetchRow(Closure $callback = null) {
-		return $this->fetch($callback, PDO::FETCH_ASSOC);
+		return $this->fetch($callback, PDO::FETCH_ASSOC, null, function ($row) {
+			return ['valid' => is_array($row), 'default' => []];
+		});
 	}
 
 	/**
@@ -109,7 +111,9 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @throws \Exception
 	 */
 	public function fetchObject($className, Closure $callback = null) {
-		return $this->fetch($callback, PDO::FETCH_CLASS, $className);
+		return $this->fetch($callback, PDO::FETCH_CLASS, $className, function ($row) {
+			return ['valid' => is_object($row), 'default' => null];
+		});
 	}
 
 	/**
@@ -279,15 +283,17 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @param Closure $callback
 	 * @param int $mode
 	 * @param mixed $arg0
+	 * @param Closure $resultValidator
 	 * @return mixed
 	 * @throws \Exception
 	 */
-	private function fetch(Closure $callback = null, $mode, $arg0 = null) {
-		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0) {
+	private function fetch(Closure $callback = null, $mode, $arg0 = null, Closure $resultValidator = null) {
+		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0, $resultValidator) {
 			$statement->setFetchMode($mode, $arg0);
 			$row = $statement->fetch();
-			if(!is_array($row)) {
-				return [];
+			$result = $resultValidator($row);
+			if(!$result['valid']) {
+				return $result['default'];
 			}
 			if($this->preserveTypes) {
 				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
