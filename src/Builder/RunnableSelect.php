@@ -63,30 +63,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @return array[]
 	 */
 	public function fetchRows(Closure $callback = null) {
-		return $this->createTempStatement(function (QueryStatement $statement) use ($callback) {
-			$statement->setFetchMode(PDO::FETCH_ASSOC);
-			$data = $statement->fetchAll();
-			if($this->preserveTypes) {
-				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
-				foreach($data as &$row) {
-					$row = FieldValueConverter::convertValues($row, $columnDefinitions);
-				}
-			}
-			if($callback !== null) {
-				return call_user_func(function ($resultData = []) use ($data, $callback) {
-					foreach($data as $row) {
-						$result = $callback($row);
-						if($result !== null && !($result instanceof DBIgnoreRow)) {
-							$resultData[] = $result;
-						} else {
-							$resultData[] = $row;
-						}
-					}
-					return $resultData;
-				});
-			}
-			return $data;
-		});
+		return $this->fetchAll($callback, PDO::FETCH_ASSOC);
 	}
 
 	/**
@@ -94,122 +71,45 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @return array[]|\Generator
 	 */
 	public function fetchRowsLazy(Closure $callback = null) {
-		if(version_compare(PHP_VERSION, '5.5', '<')) {
-			return new YieldPolyfillIterator($callback, $this->preserveTypes, function () {
-				$statement = $this->createStatement();
-				$statement->setFetchMode(PDO::FETCH_ASSOC);
-				return $statement;
-			});
-		}
-		$statement = $this->createStatement();
-		$statement->setFetchMode(PDO::FETCH_ASSOC);
-		$generator = new LazyRowGenerator($this->preserveTypes);
-		return $generator->generate($statement, $callback);
+		return $this->fetchLazy($callback, PDO::FETCH_ASSOC);
 	}
 
 	/**
 	 * @param Closure|null $callback
-	 * @return string[]
+	 * @return mixed[]
 	 * @throws \Exception
 	 */
 	public function fetchRow(Closure $callback = null) {
-		return $this->createTempStatement(function (QueryStatement $statement) use ($callback) {
-			$statement->setFetchMode(PDO::FETCH_ASSOC);
-			$row = $statement->fetch();
-			if(!is_array($row)) {
-				return [];
-			}
-			if($this->preserveTypes) {
-				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
-				$row = FieldValueConverter::convertValues($row, $columnDefinitions);
-			}
-			if($callback !== null) {
-				$result = $callback($row);
-				if($result !== null) {
-					$row = $result;
-				}
-			}
-			return $row;
-		});
+		return $this->fetch($callback, PDO::FETCH_ASSOC);
 	}
 
 	/**
 	 * @param string $className
 	 * @param Closure $callback
-	 * @return \array[]
+	 * @return object[]
 	 * @throws \Exception
 	 */
 	public function fetchObjects($className, Closure $callback = null) {
-		return $this->createTempStatement(function (QueryStatement $statement) use ($className, $callback) {
-			$statement->setFetchMode(PDO::FETCH_CLASS, $className);
-			$data = $statement->fetchAll();
-			if($this->preserveTypes) {
-				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
-				foreach($data as &$row) {
-					$row = FieldValueConverter::convertValues($row, $columnDefinitions);
-				}
-			}
-			if($callback !== null) {
-				return call_user_func(function ($resultData = []) use ($data, $callback) {
-					foreach($data as $row) {
-						$result = $callback($row);
-						if($result !== null && !($result instanceof DBIgnoreRow)) {
-							$resultData[] = $result;
-						} else {
-							$resultData[] = $row;
-						}
-					}
-					return $resultData;
-				});
-			}
-			return $data;
-		});
+		return $this->fetchAll($callback, PDO::FETCH_CLASS, $className);
 	}
 
 	/**
 	 * @param string $className
 	 * @param Closure $callback
-	 * @return array[]|Generator
+	 * @return object[]|Generator
 	 */
 	public function fetchObjectsLazy($className, Closure $callback = null) {
-		if(version_compare(PHP_VERSION, '5.5', '<')) {
-			return new YieldPolyfillIterator($callback, $this->preserveTypes, function () use ($className) {
-				$statement = $this->createStatement();
-				$statement->setFetchMode(PDO::FETCH_CLASS, $className);
-				return $statement;
-			});
-		}
-		$statement = $this->createStatement();
-		$statement->setFetchMode(PDO::FETCH_CLASS, $className);
-		$generator = new LazyRowGenerator($this->preserveTypes);
-		return $generator->generate($statement, $callback);
+		return $this->fetchLazy($callback, PDO::FETCH_CLASS, $className);
 	}
 
 	/**
 	 * @param string $className
 	 * @param Closure|null $callback
-	 * @return string[]
+	 * @return object[]
 	 * @throws \Exception
 	 */
 	public function fetchObject($className, Closure $callback = null) {
-		return $this->createTempStatement(function (QueryStatement $statement) use ($className, $callback) {
-			$statement->setFetchMode(PDO::FETCH_CLASS, $className);
-			$row = $statement->fetch();
-			if(!is_array($row)) {
-				return [];
-			}
-			if($this->preserveTypes) {
-				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
-				$row = FieldValueConverter::convertValues($row, $columnDefinitions);
-			}
-			if($callback !== null) {
-				$result = $callback($row);
-				if($result !== null) {
-					$row = $result;
-				}
-			}
-			return $row;
-		});
+		return $this->fetch($callback, PDO::FETCH_CLASS, $className);
 	}
 
 	/**
@@ -319,5 +219,87 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 */
 	public function getIterator() {
 		return $this->fetchRowsLazy();
+	}
+
+	/**
+	 * @param callable $callback
+	 * @param int $mode
+	 * @param mixed $arg0
+	 * @return mixed
+	 * @throws \Exception
+	 */
+	private function fetchAll($callback, $mode, $arg0 = null) {
+		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0) {
+			$statement->setFetchMode($mode, $arg0);
+			$data = $statement->fetchAll();
+			if($this->preserveTypes) {
+				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
+				foreach($data as &$row) {
+					$row = FieldValueConverter::convertValues($row, $columnDefinitions);
+				}
+			}
+			if($callback !== null) {
+				return call_user_func(function ($resultData = []) use ($data, $callback) {
+					foreach($data as $row) {
+						$result = $callback($row);
+						if($result !== null && !($result instanceof DBIgnoreRow)) {
+							$resultData[] = $result;
+						} else {
+							$resultData[] = $row;
+						}
+					}
+					return $resultData;
+				});
+			}
+			return $data;
+		});
+	}
+
+	/**
+	 * @param callable $callback
+	 * @param int $mode
+	 * @param mixed $arg0
+	 * @return Generator|YieldPolyfillIterator|mixed[]
+	 */
+	private function fetchLazy($callback, $mode, $arg0 = null) {
+		if(version_compare(PHP_VERSION, '5.5', '<')) {
+			return new YieldPolyfillIterator($callback, $this->preserveTypes, function () use ($mode, $arg0) {
+				$statement = $this->createStatement();
+				$statement->setFetchMode($mode, $arg0);
+				return $statement;
+			});
+		}
+		$statement = $this->createStatement();
+		$statement->setFetchMode($mode, $arg0);
+		$generator = new LazyRowGenerator($this->preserveTypes);
+		return $generator->generate($statement, $callback);
+	}
+
+	/**
+	 * @param callable $callback
+	 * @param int $mode
+	 * @param mixed $arg0
+	 * @return mixed
+	 * @throws \Exception
+	 */
+	private function fetch($callback, $mode, $arg0 = null) {
+		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0) {
+			$statement->setFetchMode($mode, $arg0);
+			$row = $statement->fetch();
+			if(!is_array($row)) {
+				return [];
+			}
+			if($this->preserveTypes) {
+				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
+				$row = FieldValueConverter::convertValues($row, $columnDefinitions);
+			}
+			if($callback !== null) {
+				$result = $callback($row);
+				if($result !== null) {
+					$row = $result;
+				}
+			}
+			return $row;
+		});
 	}
 }
