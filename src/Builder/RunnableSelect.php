@@ -2,12 +2,14 @@
 namespace Kir\MySQL\Builder;
 
 use Closure;
+use Generator;
 use IteratorAggregate;
 use Kir\MySQL\Builder\Helpers\DBIgnoreRow;
 use Kir\MySQL\Builder\Helpers\FieldTypeProvider;
 use Kir\MySQL\Builder\Helpers\FieldValueConverter;
 use Kir\MySQL\Builder\Helpers\LazyRowGenerator;
 use Kir\MySQL\Builder\Helpers\YieldPolyfillIterator;
+use PDO;
 use Traversable;
 
 /**
@@ -62,7 +64,8 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 */
 	public function fetchRows(Closure $callback = null) {
 		return $this->createTempStatement(function (QueryStatement $statement) use ($callback) {
-			$data = $statement->fetchAll(\PDO::FETCH_ASSOC);
+			$statement->setFetchMode(PDO::FETCH_ASSOC);
+			$data = $statement->fetchAll();
 			if($this->preserveTypes) {
 				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
 				foreach($data as &$row) {
@@ -93,10 +96,13 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	public function fetchRowsLazy(Closure $callback = null) {
 		if(version_compare(PHP_VERSION, '5.5', '<')) {
 			return new YieldPolyfillIterator($callback, $this->preserveTypes, function () {
-				return $this->createStatement();
+				$statement = $this->createStatement();
+				$statement->setFetchMode(PDO::FETCH_ASSOC);
+				return $statement;
 			});
 		}
 		$statement = $this->createStatement();
+		$statement->setFetchMode(PDO::FETCH_ASSOC);
 		$generator = new LazyRowGenerator($this->preserveTypes);
 		return $generator->generate($statement, $callback);
 	}
@@ -108,7 +114,87 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 */
 	public function fetchRow(Closure $callback = null) {
 		return $this->createTempStatement(function (QueryStatement $statement) use ($callback) {
-			$row = $statement->fetch(\PDO::FETCH_ASSOC);
+			$statement->setFetchMode(PDO::FETCH_ASSOC);
+			$row = $statement->fetch();
+			if(!is_array($row)) {
+				return [];
+			}
+			if($this->preserveTypes) {
+				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
+				$row = FieldValueConverter::convertValues($row, $columnDefinitions);
+			}
+			if($callback !== null) {
+				$result = $callback($row);
+				if($result !== null) {
+					$row = $result;
+				}
+			}
+			return $row;
+		});
+	}
+
+	/**
+	 * @param string $className
+	 * @param Closure $callback
+	 * @return \array[]
+	 * @throws \Exception
+	 */
+	public function fetchObjects($className, Closure $callback = null) {
+		return $this->createTempStatement(function (QueryStatement $statement) use ($className, $callback) {
+			$statement->setFetchMode(PDO::FETCH_CLASS, $className);
+			$data = $statement->fetchAll();
+			if($this->preserveTypes) {
+				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
+				foreach($data as &$row) {
+					$row = FieldValueConverter::convertValues($row, $columnDefinitions);
+				}
+			}
+			if($callback !== null) {
+				return call_user_func(function ($resultData = []) use ($data, $callback) {
+					foreach($data as $row) {
+						$result = $callback($row);
+						if($result !== null && !($result instanceof DBIgnoreRow)) {
+							$resultData[] = $result;
+						} else {
+							$resultData[] = $row;
+						}
+					}
+					return $resultData;
+				});
+			}
+			return $data;
+		});
+	}
+
+	/**
+	 * @param string $className
+	 * @param Closure $callback
+	 * @return array[]|Generator
+	 */
+	public function fetchObjectsLazy($className, Closure $callback = null) {
+		if(version_compare(PHP_VERSION, '5.5', '<')) {
+			return new YieldPolyfillIterator($callback, $this->preserveTypes, function () use ($className) {
+				$statement = $this->createStatement();
+				$statement->setFetchMode(PDO::FETCH_CLASS, $className);
+				return $statement;
+			});
+		}
+		$statement = $this->createStatement();
+		$statement->setFetchMode(PDO::FETCH_CLASS, $className);
+		$generator = new LazyRowGenerator($this->preserveTypes);
+		return $generator->generate($statement, $callback);
+	}
+
+	/**
+	 * @param string $className
+	 * @param Closure|null $callback
+	 * @return string[]
+	 * @throws \Exception
+	 */
+	public function fetchObject($className, Closure $callback = null) {
+		return $this->createTempStatement(function (QueryStatement $statement) use ($className, $callback) {
+			$statement->setFetchMode(PDO::FETCH_CLASS, $className);
+			$row = $statement->fetch();
 			if(!is_array($row)) {
 				return [];
 			}

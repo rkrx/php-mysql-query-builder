@@ -40,6 +40,27 @@ class QueryStatement implements DatabaseStatement {
 	}
 
 	/**
+	 * @param int $mode
+	 * @param mixed $arg0
+	 * @param array $arg1
+	 * @return $this
+	 */
+	public function setFetchMode($mode, $arg0 = null, array $arg1 = null) {
+		if($arg1 !== null) {
+			/** @noinspection PhpMethodParametersCountMismatchInspection */
+			$this->statement->setFetchMode($mode, $arg0, $arg1);
+			return $this;
+		}
+		if($arg0 !== null) {
+			/** @noinspection PhpMethodParametersCountMismatchInspection */
+			$this->statement->setFetchMode($mode, $arg0);
+			return $this;
+		}
+		$this->statement->setFetchMode($mode);
+		return $this;
+	}
+
+	/**
 	 * @param array $params
 	 * @throws SqlException
 	 * @return $this
@@ -62,7 +83,7 @@ class QueryStatement implements DatabaseStatement {
 	 * @param array $ctorArgs
 	 * @return array
 	 */
-	public function fetchAll($fetchStyle = PDO::FETCH_ASSOC, $fetchArgument = null, array $ctorArgs = []) {
+	public function fetchAll($fetchStyle = null, $fetchArgument = null, array $ctorArgs = []) {
 		return $this->exceptionHandler(function() use ($fetchStyle, $fetchArgument, $ctorArgs) {
 			if($fetchArgument !== null) {
 				return $this->statement->fetchAll($fetchStyle, $fetchArgument, $ctorArgs);
@@ -77,7 +98,7 @@ class QueryStatement implements DatabaseStatement {
 	 * @param int $cursorOffset
 	 * @return mixed
 	 */
-	public function fetch($fetchStyle = PDO::FETCH_ASSOC, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0) {
+	public function fetch($fetchStyle = null, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0) {
 		return $this->exceptionHandler(function() use ($fetchStyle, $cursorOrientation, $cursorOffset) {
 			return $this->statement->fetch($fetchStyle, $cursorOrientation, $cursorOffset);
 		});

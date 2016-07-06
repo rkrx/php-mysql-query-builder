@@ -64,7 +64,7 @@ class YieldPolyfillIterator implements Iterator {
 	 */
 	public function next() {
 		$this->idx++;
-		$this->currentItem = $this->getStmt()->fetch(PDO::FETCH_ASSOC);
+		$this->currentItem = $this->getStmt()->fetch();
 	}
 
 	/**
