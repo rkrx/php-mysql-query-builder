@@ -222,7 +222,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	}
 
 	/**
-	 * @param callable $callback
+	 * @param callable|null $callback
 	 * @param int $mode
 	 * @param mixed $arg0
 	 * @return mixed
@@ -256,7 +256,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	}
 
 	/**
-	 * @param callable $callback
+	 * @param callable|null $callback
 	 * @param int $mode
 	 * @param mixed $arg0
 	 * @return Generator|YieldPolyfillIterator|mixed[]
@@ -276,7 +276,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	}
 
 	/**
-	 * @param callable $callback
+	 * @param callable|null $callback
 	 * @param int $mode
 	 * @param mixed $arg0
 	 * @return mixed
