@@ -222,13 +222,13 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	}
 
 	/**
-	 * @param callable|null $callback
+	 * @param Closure $callback
 	 * @param int $mode
 	 * @param mixed $arg0
 	 * @return mixed
 	 * @throws \Exception
 	 */
-	private function fetchAll($callback, $mode, $arg0 = null) {
+	private function fetchAll(Closure $callback = null, $mode, $arg0 = null) {
 		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0) {
 			$statement->setFetchMode($mode, $arg0);
 			$data = $statement->fetchAll();
@@ -256,12 +256,12 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	}
 
 	/**
-	 * @param callable|null $callback
+	 * @param Closure $callback
 	 * @param int $mode
 	 * @param mixed $arg0
 	 * @return Generator|YieldPolyfillIterator|mixed[]
 	 */
-	private function fetchLazy($callback, $mode, $arg0 = null) {
+	private function fetchLazy(Closure $callback = null, $mode, $arg0 = null) {
 		if(version_compare(PHP_VERSION, '5.5', '<')) {
 			return new YieldPolyfillIterator($callback, $this->preserveTypes, function () use ($mode, $arg0) {
 				$statement = $this->createStatement();
@@ -276,13 +276,13 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	}
 
 	/**
-	 * @param callable|null $callback
+	 * @param Closure $callback
 	 * @param int $mode
 	 * @param mixed $arg0
 	 * @return mixed
 	 * @throws \Exception
 	 */
-	private function fetch($callback, $mode, $arg0 = null) {
+	private function fetch(Closure $callback = null, $mode, $arg0 = null) {
 		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0) {
 			$statement->setFetchMode($mode, $arg0);
 			$row = $statement->fetch();
