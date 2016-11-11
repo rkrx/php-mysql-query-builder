@@ -152,5 +152,6 @@ class QueryStatement implements DatabaseStatement {
 		} catch (PDOException $e) {
 			$this->exceptionInterpreter->throwMoreConcreteException($e);
 		}
+		return null;
 	}
 }

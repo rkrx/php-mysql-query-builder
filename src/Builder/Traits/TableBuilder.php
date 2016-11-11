@@ -36,7 +36,7 @@ trait TableBuilder {
 	}
 
 	/**
-	 * @return string[]
+	 * @return array[]
 	 */
 	protected function getTables() {
 		return $this->tables;

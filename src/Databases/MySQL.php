@@ -377,6 +377,7 @@ class MySQL implements Database {
 		} catch (PDOException $e) {
 			$this->exceptionInterpreter->throwMoreConcreteException($e);
 		}
+		return null;
 	}
 
 	/**

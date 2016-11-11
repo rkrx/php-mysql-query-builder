@@ -250,6 +250,7 @@ class Insert extends InsertUpdateStatement {
 		foreach ($data as $field => $value) {
 			call_user_func($fn, $field, $value);
 		}
+		return $this;
 	}
 
 	/**

@@ -22,6 +22,16 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\n", $str);
 	}
 
+	public function testFromArray() {
+		$str = TestSelect::create()
+		->field('a.a')
+		->field('b.b')
+		->from('a', [['a' => 1, 'b' => 3], ['a' => 2, 'b' => 2], ['a' => 3, 'b' => 1]])
+		->joinInner('b', [['a' => 1, 'b' => 3], ['a' => 2, 'b' => 2], ['a' => 3, 'b' => 1]])
+		->asString();
+		$this->assertEquals("SELECT\n\ta.a,\n\tb.b\nFROM\n\t(SELECT '1' AS `a`, '3' AS `b`\n\tUNION\n\tSELECT '2' AS `a`, '2' AS `b`\n\tUNION\n\tSELECT '3' AS `a`, '1' AS `b`) a\nINNER JOIN\n\t(SELECT '1' AS `a`, '3' AS `b`\n\tUNION\n\tSELECT '2' AS `a`, '2' AS `b`\n\tUNION\n\tSELECT '3' AS `a`, '1' AS `b`) b\n", $str);
+	}
+
 	public function testMultipleFrom() {
 		$str = TestSelect::create()
 		->field('a')
