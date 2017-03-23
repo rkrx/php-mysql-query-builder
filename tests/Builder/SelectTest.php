@@ -2,6 +2,7 @@
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\Expr\DBExprFilter;
+use Kir\MySQL\Builder\Expr\DBExprOrderBySpec;
 use Kir\MySQL\Builder\Expr\OptionalDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredValueNotFoundException;
@@ -307,7 +308,7 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals("SELECT\n\tt.field\nFROM\n\ttest t\n", $query);
 	}
 
-	public function testRequired() {
+	public function testRequiredExpression() {
 		$filter = ['filter' => ['name' => 'aaa']];
 		$req = new RequiredDBFilterMap($filter);
 
@@ -326,5 +327,15 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		->from('t', 'test')
 		->where($req('t.field=?', 'filter.id'))
 		->asString();
+	}
+
+	public function testSortSpecification() {
+		$query = TestSelect::create()
+		->field('t.field')
+		->from('t', 'test')
+		->orderBy(new DBExprOrderBySpec(['field1', 'field2'], [['field2', 'ASC'], ['field1', 'DESC'], ['field3' => 'ASC']]))
+		->asString();
+
+		$this->assertEquals("SELECT\n\tt.field\nFROM\n\ttest t\nORDER BY\n\tfield2 ASC,\n\tfield1 DESC\n", $query);
 	}
 }
