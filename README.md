@@ -14,6 +14,7 @@ The main motive for this library is an environment where a lot of things are aut
 Here a few things to keep in mind:
 
 * The charset is up to you. No special binding to UTF8, although UTF8 is the default.
+* You're allowed to nest most queries to build big and powerful queries.
 * The order of method-calls of each statement-builder is irrelevant. The resulting query will always render the right order.
 * No animals were harmed due to the production of this library.
 * The order of method-calls doesn't matter.
