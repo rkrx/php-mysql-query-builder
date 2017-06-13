@@ -11,7 +11,7 @@ trait HavingBuilder {
 	private $having = array();
 
 	/**
-	 * @param string $expression
+	 * @param string|array $expression
 	 * @param mixed ...$param
 	 * @return $this
 	 */

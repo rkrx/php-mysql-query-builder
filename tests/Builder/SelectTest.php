@@ -78,7 +78,9 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		->where('a < ?', 1000)
 		->asString();
 		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(a < '1000')\n", $str);
+	}
 
+	public function testWhereAsArray() {
 		$str = TestSelect::create()
 		->field('a')
 		->from('t', 'test')
@@ -331,11 +333,12 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 
 	public function testSortSpecification() {
 		$query = TestSelect::create()
-		->field('t.field')
+		->field('t.field1')
+		->field('t.field2')
 		->from('t', 'test')
-		->orderBy(new DBExprOrderBySpec(['field1', 'field2'], [['field2', 'ASC'], ['field1', 'DESC'], ['field3' => 'ASC']]))
+		->orderBy(new DBExprOrderBySpec(['field1', 'field2' => 'REVERSE(t.field2)'], [['field2', 'ASC'], ['field1', 'DESC'], ['field3' => 'ASC']]))
 		->asString();
 
-		$this->assertEquals("SELECT\n\tt.field\nFROM\n\ttest t\nORDER BY\n\tfield2 ASC,\n\tfield1 DESC\n", $query);
+		$this->assertEquals("SELECT\n\tt.field1,\n\tt.field2\nFROM\n\ttest t\nORDER BY\n\tREVERSE(t.field2) ASC,\n\tfield1 DESC\n", $query);
 	}
 }
