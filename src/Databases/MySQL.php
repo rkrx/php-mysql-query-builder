@@ -29,11 +29,14 @@ class MySQL implements Database {
 	private $queryLoggers = 0;
 	/** @var MySQLExceptionInterpreter */
 	private $exceptionInterpreter = 0;
-
+	/** @var array */
+	private $options;
+	
 	/**
 	 * @param PDO $pdo
+	 * @param array $options
 	 */
-	public function __construct(PDO $pdo) {
+	public function __construct(PDO $pdo, array $options = []) {
 		if($pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_SILENT) {
 			$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		}
@@ -41,6 +44,13 @@ class MySQL implements Database {
 		$this->aliasRegistry = new AliasRegistry();
 		$this->queryLoggers = new QueryLoggers();
 		$this->exceptionInterpreter = new MySQLExceptionInterpreter();
+		$defaultOptions = [
+			'select-options' => [],
+			'insert-options' => [],
+			'update-options' => [],
+			'delete-options' => [],
+		];
+		$this->options = array_merge($defaultOptions, $options);
 	}
 
 	/**
@@ -182,7 +192,9 @@ class MySQL implements Database {
 	 * @return Builder\RunnableSelect
 	 */
 	public function select(array $fields = null) {
-		$select = new Builder\RunnableSelect($this);
+		$select = array_key_exists('select-factory', $this->options)
+			? call_user_func($this->options['select-factory'], $this, $this->options['select-options'])
+			: new Builder\RunnableSelect($this, $this->options['select-options']);
 		if($fields !== null) {
 			$select->fields($fields);
 		}
@@ -194,7 +206,9 @@ class MySQL implements Database {
 	 * @return Builder\RunnableInsert
 	 */
 	public function insert(array $fields = null) {
-		$insert = new Builder\RunnableInsert($this);
+		$insert = array_key_exists('insert-factory', $this->options)
+			? call_user_func($this->options['insert-factory'], $this, $this->options['insert-options'])
+			: new Builder\RunnableInsert($this, $this->options['insert-options']);
 		if($fields !== null) {
 			$insert->addAll($fields);
 		}
@@ -206,7 +220,9 @@ class MySQL implements Database {
 	 * @return Builder\RunnableUpdate
 	 */
 	public function update(array $fields = null) {
-		$update = new Builder\RunnableUpdate($this);
+		$update = array_key_exists('update-factory', $this->options)
+			? call_user_func($this->options['update-factory'], $this, $this->options['update-options'])
+			: new Builder\RunnableUpdate($this, $this->options['update-options']);
 		if($fields !== null) {
 			$update->setAll($fields);
 		}
@@ -217,7 +233,9 @@ class MySQL implements Database {
 	 * @return Builder\RunnableDelete
 	 */
 	public function delete() {
-		return new Builder\RunnableDelete($this);
+		return array_key_exists('delete-factory', $this->options)
+			? call_user_func($this->options['delete-factory'], $this, $this->options['delete-options'])
+			: new Builder\RunnableDelete($this, $this->options['delete-options']);
 	}
 
 	/**

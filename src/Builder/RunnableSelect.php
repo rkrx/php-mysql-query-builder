@@ -9,6 +9,7 @@ use Kir\MySQL\Builder\Helpers\FieldTypeProvider;
 use Kir\MySQL\Builder\Helpers\FieldValueConverter;
 use Kir\MySQL\Builder\Helpers\LazyRowGenerator;
 use Kir\MySQL\Builder\Helpers\YieldPolyfillIterator;
+use Kir\MySQL\Databases\MySQL;
 use PDO;
 use Traversable;
 
@@ -19,9 +20,21 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	private $values = array();
 	/** @var bool */
 	private $preserveTypes = false;
+	/** @var string */
+	private $defaultClassName = false;
 	/** @var int */
 	private $foundRows = 0;
-
+	
+	/**
+	 * @param MySQL $db
+	 * @param array $options
+	 */
+	public function __construct(MySQL $db, array $options = []) {
+		parent::__construct($db);
+		$this->preserveTypes = array_key_exists('preserve-types-default', $options) ? $options['preserve-types-default'] : false;
+		$this->defaultClassName = array_key_exists('fetch-object-class-default', $options) ? $options['fetch-object-class-default'] : 'stdClass';
+	}
+	
 	/**
 	 * @param array $values
 	 * @return $this
@@ -91,8 +104,8 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @return object[]
 	 * @throws \Exception
 	 */
-	public function fetchObjects($className = 'stdClass', Closure $callback = null) {
-		return $this->fetchAll($callback, PDO::FETCH_CLASS, $className);
+	public function fetchObjects($className = null, Closure $callback = null) {
+		return $this->fetchAll($callback, PDO::FETCH_CLASS, $className ?: $this->defaultClassName);
 	}
 
 	/**
@@ -100,8 +113,8 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @param Closure $callback
 	 * @return object[]|Generator
 	 */
-	public function fetchObjectsLazy($className = 'stdClass', Closure $callback = null) {
-		return $this->fetchLazy($callback, PDO::FETCH_CLASS, $className);
+	public function fetchObjectsLazy($className = null, Closure $callback = null) {
+		return $this->fetchLazy($callback, PDO::FETCH_CLASS, $className ?: $this->defaultClassName);
 	}
 
 	/**
@@ -110,8 +123,8 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @return object[]
 	 * @throws \Exception
 	 */
-	public function fetchObject($className = 'stdClass', Closure $callback = null) {
-		return $this->fetch($callback, PDO::FETCH_CLASS, $className, function ($row) {
+	public function fetchObject($className = null, Closure $callback = null) {
+		return $this->fetch($callback, PDO::FETCH_CLASS, $className ?: $this->defaultClassName, function ($row) {
 			return ['valid' => is_object($row), 'default' => null];
 		});
 	}
