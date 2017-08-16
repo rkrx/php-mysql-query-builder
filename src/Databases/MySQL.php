@@ -4,7 +4,6 @@ namespace Kir\MySQL\Databases;
 use PDO;
 use PDOException;
 use UnexpectedValueException;
-use Kir\MySQL\Builder\RunnableSelect;
 use Kir\MySQL\Builder;
 use Kir\MySQL\Builder\Exception;
 use Kir\MySQL\Builder\QueryStatement;
@@ -180,10 +179,10 @@ class MySQL implements Database {
 
 	/**
 	 * @param array $fields
-	 * @return RunnableSelect
+	 * @return Builder\RunnableSelect
 	 */
 	public function select(array $fields = null) {
-		$select = new RunnableSelect($this);
+		$select = new Builder\RunnableSelect($this);
 		if($fields !== null) {
 			$select->fields($fields);
 		}
