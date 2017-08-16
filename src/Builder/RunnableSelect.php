@@ -91,7 +91,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @return object[]
 	 * @throws \Exception
 	 */
-	public function fetchObjects($className, Closure $callback = null) {
+	public function fetchObjects($className = 'stdClass', Closure $callback = null) {
 		return $this->fetchAll($callback, PDO::FETCH_CLASS, $className);
 	}
 
@@ -100,7 +100,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @param Closure $callback
 	 * @return object[]|Generator
 	 */
-	public function fetchObjectsLazy($className, Closure $callback = null) {
+	public function fetchObjectsLazy($className = 'stdClass', Closure $callback = null) {
 		return $this->fetchLazy($callback, PDO::FETCH_CLASS, $className);
 	}
 
@@ -110,7 +110,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @return object[]
 	 * @throws \Exception
 	 */
-	public function fetchObject($className, Closure $callback = null) {
+	public function fetchObject($className = 'stdClass', Closure $callback = null) {
 		return $this->fetch($callback, PDO::FETCH_CLASS, $className, function ($row) {
 			return ['valid' => is_object($row), 'default' => null];
 		});
