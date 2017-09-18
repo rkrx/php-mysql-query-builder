@@ -12,10 +12,10 @@ trait WhereBuilder {
 
 	/**
 	 * @param string|array $expression
-	 * @param mixed ...$param
+	 * @param mixed ...$_
 	 * @return $this
 	 */
-	public function where($expression) {
+	public function where($expression, $_) {
 		if($expression instanceof OptionalExpression) {
 			if($expression->isValid()) {
 				$this->where[] = [$expression->getExpression(), $expression->getValue()];

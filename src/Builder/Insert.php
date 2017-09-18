@@ -84,10 +84,10 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $str
-	 * @param string ...$params
+	 * @param string ...$_
 	 * @return $this
 	 */
-	public function addExpr($str) {
+	public function addExpr($str, $_) {
 		if(count(func_get_args()) > 1) {
 			$this->fields[] = func_get_args();
 		} else {
@@ -98,10 +98,10 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $str
-	 * @param string ...$params
+	 * @param string ...$_
 	 * @return $this
 	 */
-	public function updateExpr($str) {
+	public function updateExpr($str, $_) {
 		if(count(func_get_args()) > 1) {
 			$this->update[] = func_get_args();
 		} else {

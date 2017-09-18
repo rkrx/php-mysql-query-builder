@@ -4,6 +4,7 @@ namespace Kir\MySQL\Builder\Helpers;
 use Closure;
 use Iterator;
 use Kir\MySQL\Builder\QueryStatement;
+use RuntimeException;
 
 class YieldPolyfillIterator implements Iterator {
 	/** @var Closure|null */
@@ -88,7 +89,7 @@ class YieldPolyfillIterator implements Iterator {
 	 */
 	public function rewind() {
 		if($this->stmt !== null) {
-			throw new \Exception("It's not possible to rewind this iterator");
+			throw new RuntimeException("It's not possible to rewind this iterator");
 		}
 		$this->stmt = call_user_func($this->statementFactory);
 		$this->idx = -1;

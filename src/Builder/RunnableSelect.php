@@ -11,6 +11,7 @@ use Kir\MySQL\Builder\Helpers\LazyRowGenerator;
 use Kir\MySQL\Builder\Helpers\YieldPolyfillIterator;
 use Kir\MySQL\Databases\MySQL;
 use PDO;
+use RuntimeException;
 use Traversable;
 
 /**
@@ -193,7 +194,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	}
 
 	/**
-	 * @return bool
+	 * @return int
 	 */
 	public function getFoundRows() {
 		return $this->foundRows;
@@ -202,14 +203,14 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	/**
 	 * @param callback $fn
 	 * @return mixed
-	 * @throws \Exception
+	 * @throws RuntimeException
 	 */
 	private function createTempStatement($fn) {
 		$stmt = $this->createStatement();
 		$res = null;
 		try {
 			$res = call_user_func($fn, $stmt);
-		} catch (\Exception $e) { // PHP 5.4 compatibility
+		} catch (RuntimeException $e) { // PHP 5.4 compatibility
 			$stmt->closeCursor();
 			throw $e;
 		}
@@ -221,6 +222,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @return QueryStatement
 	 */
 	private function createStatement() {
+		/** @var MySQL $db */
 		$db = $this->db();
 		$query = $this->__toString();
 		$statement = $db->prepare($query);
@@ -243,7 +245,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @param int $mode
 	 * @param mixed $arg0
 	 * @return mixed
-	 * @throws \Exception
+	 * @throws RuntimeException
 	 */
 	private function fetchAll(Closure $callback = null, $mode, $arg0 = null) {
 		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0) {
@@ -276,7 +278,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @param Closure $callback
 	 * @param int $mode
 	 * @param mixed $arg0
-	 * @return Generator|YieldPolyfillIterator|mixed[]
+	 * @return Traversable|YieldPolyfillIterator|mixed[]
 	 */
 	private function fetchLazy(Closure $callback = null, $mode, $arg0 = null) {
 		if(version_compare(PHP_VERSION, '5.5', '<')) {

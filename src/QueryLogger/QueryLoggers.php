@@ -2,9 +2,7 @@
 namespace Kir\MySQL\QueryLogger;
 
 class QueryLoggers {
-	/**
-	 * @var QueryLogger[]
-	 */
+	/** @var QueryLogger[] */
 	private $queryLoggers = [];
 
 	/**

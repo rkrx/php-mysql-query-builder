@@ -4,7 +4,7 @@ namespace Kir\MySQL\Builder\Expr;
 use Exception;
 
 class DBExprFilter implements OptionalExpression {
-	/** @var */
+	/** @var mixed */
 	private $expression;
 	/** @var mixed */
 	private $value;

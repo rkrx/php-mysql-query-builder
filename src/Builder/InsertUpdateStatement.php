@@ -26,7 +26,7 @@ abstract class InsertUpdateStatement extends Statement {
 	/**
 	 * @param array $fields
 	 * @param array $query
-	 * @return string
+	 * @return string[]
 	 */
 	protected function buildFieldList(array $fields, array $query = array()) {
 		foreach ($fields as $fieldName => $fieldValue) {

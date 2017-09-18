@@ -1,11 +1,11 @@
 <?php
 namespace Kir\MySQL\Tools;
 
+use RuntimeException;
+
 class AliasRegistry {
-	/**
-	 * @var string[]
-	 */
-	private $aliases = array();
+	/** @var string[] */
+	private $aliases = [];
 
 	/**
 	 * @param string $alias
@@ -19,12 +19,12 @@ class AliasRegistry {
 
 	/**
 	 * @param string $alias
-	 * @throws \Exception
+	 * @throws RuntimeException
 	 * @return string
 	 */
 	public function get($alias) {
 		if (!array_key_exists($alias, $this->aliases)) {
-			throw new \Exception("Alias not found: {$alias}");
+			throw new RuntimeException("Alias not found: {$alias}");
 		}
 		return $this->aliases[$alias];
 	}

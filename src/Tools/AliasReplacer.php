@@ -2,9 +2,7 @@
 namespace Kir\MySQL\Tools;
 
 class AliasReplacer {
-	/**
-	 * @var AliasRegistry
-	 */
+	/** @var AliasRegistry */
 	private $aliasRegistry;
 
 	/**

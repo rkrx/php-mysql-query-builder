@@ -59,10 +59,10 @@ class Update extends InsertUpdateStatement {
 
 	/**
 	 * @param string $expr
-	 * @param string[] ...$value
+	 * @param string[] ...$_
 	 * @return $this
 	 */
-	public function setExpr($expr) {
+	public function setExpr($expr, $_) {
 		$this->fields[] = func_get_args();
 		return $this;
 	}
