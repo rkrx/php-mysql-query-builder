@@ -1,21 +1,21 @@
 <?php
 namespace Kir\MySQL;
 
-use Kir\MySQL\Builder\Exception;
 use Kir\MySQL\Database\DatabaseStatement;
+use RuntimeException;
 
 interface Database {
 	/**
 	 * @param string $query
-	 * @throws Exception
 	 * @return DatabaseStatement
+	 * @throws RuntimeException
 	 */
 	public function query($query);
 
 	/**
 	 * @param string $query
-	 * @throws Exception
 	 * @return DatabaseStatement
+	 * @throws RuntimeException
 	 */
 	public function prepare($query);
 
@@ -23,6 +23,7 @@ interface Database {
 	 * @param string $query
 	 * @param array $params
 	 * @return int
+	 * @throws RuntimeException
 	 */
 	public function exec($query, array $params = array());
 
@@ -81,16 +82,19 @@ interface Database {
 
 	/**
 	 * @return $this
+	 * @throws RuntimeException
 	 */
 	public function transactionStart();
 
 	/**
 	 * @return $this
+	 * @throws RuntimeException
 	 */
 	public function transactionCommit();
 
 	/**
 	 * @return $this
+	 * @throws RuntimeException
 	 */
 	public function transactionRollback();
 
@@ -98,14 +102,14 @@ interface Database {
 	 * @param int|callable $tries
 	 * @param callable|null $callback
 	 * @return mixed
-	 * @throws \Exception
+	 * @throws RuntimeException
 	 */
 	public function transaction($tries = 1, $callback = null);
 
 	/**
 	 * @param callable|null $callback
 	 * @return mixed
-	 * @throws \Exception
+	 * @throws RuntimeException
 	 */
 	public function dryRun($callback = null);
 }

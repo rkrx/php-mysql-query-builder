@@ -15,7 +15,7 @@ trait HavingBuilder {
 	 * @param mixed ...$_
 	 * @return $this
 	 */
-	public function having($expression, $_) {
+	public function having($expression, $_ = null) {
 		if($expression instanceof OptionalExpression) {
 			if($expression->isValid()) {
 				$this->having[] = [$expression->getExpression(), $expression->getValue()];

@@ -3,6 +3,7 @@ namespace Kir\MySQL\Databases;
 
 use PDO;
 use PDOException;
+use RuntimeException;
 use UnexpectedValueException;
 use Kir\MySQL\Builder;
 use Kir\MySQL\Builder\Exception;
@@ -277,6 +278,7 @@ class MySQL implements Database {
 	 * @param callable|null $callback
 	 * @return mixed
 	 * @throws \Exception
+	 * @throws \Error
 	 * @throws null
 	 */
 	public function dryRun($callback = null) {
@@ -286,78 +288,92 @@ class MySQL implements Database {
 			$this->transactionStart();
 			try {
 				$result = call_user_func($callback, $this);
+				$this->transactionRollback();
 			} catch (\Exception $e) {
-				$exception = $e;
-			}
-			$this->transactionRollback();
-			if($exception !== null) {
-				throw $exception;
+				$this->transactionRollback();
+				throw $e;
+			} catch (\Error $e) {
+				$this->transactionRollback();
+				throw $e;
 			}
 		} else {
 			$uniqueId = $this->genUniqueId();
 			$this->exec("SAVEPOINT {$uniqueId}");
 			try {
 				$result = call_user_func($callback, $this);
+				$this->exec("ROLLBACK TO {$uniqueId}");
 			} catch (\Exception $e) {
-				$exception = $e;
-			}
-			$this->exec("ROLLBACK TO {$uniqueId}");
-			if($exception !== null) {
-				throw $exception;
+				$this->exec("ROLLBACK TO {$uniqueId}");
+				throw $e;
+			} catch (\Error $e) {
+				$this->exec("ROLLBACK TO {$uniqueId}");
+				throw $e;
 			}
 		}
 		return $result;
 	}
-
+	
 	/**
 	 * @param int|callable $tries
 	 * @param callable|null $callback
 	 * @return mixed
 	 * @throws \Exception
-	 * @throws null
+	 * @throws \Error
 	 */
 	public function transaction($tries = 1, $callback = null) {
 		if(is_callable($tries)) {
 			$callback = $tries;
 			$tries = 1;
 		} elseif(!is_callable($callback)) {
-			throw new \Exception('$callback must be a callable');
+			throw new RuntimeException('$callback must be a callable');
 		}
-		$e = null;
-		if(!$this->pdo->inTransaction()) {
-			for(; $tries--;) {
+		$result = null;
+		$exception = null;
+		for(; $tries--;) {
+			if(!$this->pdo->inTransaction()) {
+				$this->transactionStart();
 				try {
-					$this->transactionStart();
 					$result = call_user_func($callback, $this);
+					$exception = null;
 					$this->transactionCommit();
-					return $result;
 				} catch (\Exception $e) {
 					$this->transactionRollback();
+					$exception = $e;
+				} catch (\Error $e) {
+					$this->transactionRollback();
+					$exception = $e;
+				}
+			} else {
+				$uniqueId = $this->genUniqueId();
+				$this->exec("SAVEPOINT {$uniqueId}");
+				try {
+					$result = call_user_func($callback, $this);
+					$exception = null;
+					$this->exec("RELEASE SAVEPOINT {$uniqueId}");
+				} catch (\Exception $e) {
+					$this->exec("ROLLBACK TO {$uniqueId}");
+					$exception = $e;
+				} catch (\Error $e) {
+					$this->exec("ROLLBACK TO {$uniqueId}");
+					$exception = $e;
 				}
 			}
-		} else {
-			$uniqueId = $this->genUniqueId();
-			try {
-				$this->exec("SAVEPOINT {$uniqueId}");
-				$result = call_user_func($callback, $this);
-				$this->exec("RELEASE SAVEPOINT {$uniqueId}");
-				return $result;
-			} catch (\Exception $e) {
-				$this->exec("ROLLBACK TO {$uniqueId}");
-			}
 		}
-		throw $e;
+		if($exception !== null) {
+			throw $exception;
+		}
+		return $result;
 	}
 
 	/**
 	 * @param callable $fn
 	 * @return $this
-	 * @throws \Exception
+	 * @throws RuntimeException
 	 */
 	private function transactionEnd($fn) {
 		$this->transactionLevel--;
 		if($this->transactionLevel < 0) {
-			throw new \Exception("Transaction-Nesting-Problem: Trying to invoke commit on a already closed transaction");
+			throw new RuntimeException("Transaction-Nesting-Problem: Trying to invoke commit on a already closed transaction");
 		}
 		if((int) $this->transactionLevel === 0) {
 			if($this->outerTransaction) {
@@ -373,12 +389,12 @@ class MySQL implements Database {
 	 * @param string $query
 	 * @param callable $fn
 	 * @return QueryStatement
-	 * @throws Exception
+	 * @throws RuntimeException
 	 */
 	private function buildQueryStatement($query, $fn) {
 		$stmt = call_user_func($fn, $query);
 		if(!$stmt) {
-			throw new Exception("Could not execute statement:\n{$query}");
+			throw new RuntimeException("Could not execute statement:\n{$query}");
 		}
 		$stmtWrapper = new QueryStatement($stmt, $query, $this->exceptionInterpreter, $this->queryLoggers);
 		return $stmtWrapper;

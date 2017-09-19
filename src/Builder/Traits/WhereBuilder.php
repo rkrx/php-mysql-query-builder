@@ -15,7 +15,7 @@ trait WhereBuilder {
 	 * @param mixed ...$_
 	 * @return $this
 	 */
-	public function where($expression, $_) {
+	public function where($expression, $_ = null) {
 		if($expression instanceof OptionalExpression) {
 			if($expression->isValid()) {
 				$this->where[] = [$expression->getExpression(), $expression->getValue()];

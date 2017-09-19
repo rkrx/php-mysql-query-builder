@@ -87,7 +87,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param string ...$_
 	 * @return $this
 	 */
-	public function addExpr($str, $_) {
+	public function addExpr($str, $_ = null) {
 		if(count(func_get_args()) > 1) {
 			$this->fields[] = func_get_args();
 		} else {
@@ -101,7 +101,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param string ...$_
 	 * @return $this
 	 */
-	public function updateExpr($str, $_) {
+	public function updateExpr($str, $_ = null) {
 		if(count(func_get_args()) > 1) {
 			$this->update[] = func_get_args();
 		} else {
