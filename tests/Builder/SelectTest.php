@@ -347,13 +347,13 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		->field('a.field1')
 		->from('a', 'tableA');
 		
-		$vt2 = TestSelect::create()
-		->field('a.field1')
-		->from('a', 'tableA');
-		
 		$db = new TestDB();
 		$db->getVirtualTables()->add('virt_table1', $vt1);
-		$db->getVirtualTables()->add('virt_table2', $vt2);
+		$db->getVirtualTables()->add('virt_table2', function () {
+			return TestSelect::create()
+			->field('a.field1')
+			->from('a', 'tableA');
+		});
 		
 		$query = TestSelect::create($db)
 		->field('t.field1')

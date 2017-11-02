@@ -9,10 +9,10 @@ class VirtualTables {
 	
 	/**
 	 * @param string $tableName
-	 * @param Select $select
+	 * @param Select|\Closure $select
 	 * @return $this
 	 */
-	public function add($tableName, Select $select) {
+	public function add($tableName, $select) {
 		$this->virtualTables[$tableName] = $select;
 		return $this;
 	}
@@ -31,7 +31,11 @@ class VirtualTables {
 	 */
 	public function get($tableName) {
 		if($this->has($tableName)) {
-			return $this->virtualTables[$tableName];
+			$table = $this->virtualTables[$tableName];
+			if($table instanceof \Closure) {
+				return call_user_func($table);
+			}
+			return $table;
 		}
 		return null;
 	}

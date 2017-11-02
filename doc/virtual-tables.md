@@ -11,12 +11,14 @@ $vt1 = $db->select()
 ->field('a.field1')
 ->from('a', 'tableA');
 
-$vt2 = $db->select()
-->field('a.field1')
-->from('a', 'tableA');
-
 $db->getVirtualTables()->add('virt_table1', $vt1);
-$db->getVirtualTables()->add('virt_table2', $vt2);
+
+// Lazy evaluated
+$db->getVirtualTables()->add('virt_table2', function () {
+	return $db->select()
+	->field('a.field1')
+	->from('a', 'tableA');
+});
 ```
 
 Then use it as needed:
