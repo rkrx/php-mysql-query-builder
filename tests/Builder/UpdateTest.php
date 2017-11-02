@@ -74,10 +74,12 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 	public function testSetAll2() {
 		$db = Phake::mock('Kir\\MySQL\\Databases\\MySQL');
 		$reg = Phake::mock('Kir\\MySQL\\Tools\\AliasRegistry');
+		$vt = Phake::mock('Kir\\MySQL\\Tools\\VirtualTables');
 		Phake::when($db)->__call('getTableFields', ['test1'])->thenReturn(['field1', 'field2']);
 		Phake::when($db)->__call('quoteField', [Phake::anyParameters()])->thenGetReturnByLambda(function ($fieldName) { return "`{$fieldName}`"; });
 		Phake::when($db)->__call('quote', [Phake::anyParameters()])->thenGetReturnByLambda(function ($value) { return "'{$value}'"; });
 		Phake::when($db)->__call('getAliasRegistry', [])->thenReturn($reg);
+		Phake::when($db)->__call('getVirtualTables', [])->thenReturn($vt);
 		$sql = (new TestUpdate($db))
 		->table('test1')
 		->setAll(['field1' => 1, 'field2' => 2, 'field3' => 3])

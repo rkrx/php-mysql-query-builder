@@ -341,4 +341,28 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 
 		$this->assertEquals("SELECT\n\tt.field1,\n\tt.field2\nFROM\n\ttest t\nORDER BY\n\tREVERSE(t.field2) ASC,\n\tfield1 DESC\n", $query);
 	}
+
+	public function testVirtualTables() {
+		$vt1 = TestSelect::create()
+		->field('a.field1')
+		->from('a', 'tableA');
+		
+		$vt2 = TestSelect::create()
+		->field('a.field1')
+		->from('a', 'tableA');
+		
+		$db = new TestDB();
+		$db->getVirtualTables()->add('virt_table1', $vt1);
+		$db->getVirtualTables()->add('virt_table2', $vt2);
+		
+		$query = TestSelect::create($db)
+		->field('t.field1')
+		->field('t.field2')
+		->from('t', 'test')
+		->joinInner('vt1', 'virt_table1', 'vt1.field1=t.field1')
+		->joinInner('vt2', 'virt_table2', 'vt2.field2=t.field2')
+		->asString();
+
+		$this->assertEquals("SELECT\n\tt.field1,\n\tt.field2\nFROM\n\ttest t\nINNER JOIN\n\t(SELECT\n\t\ta.field1\n\tFROM\n\t\ttableA a) vt1 ON vt1.field1=t.field1\nINNER JOIN\n\t(SELECT\n\t\ta.field1\n\tFROM\n\t\ttableA a) vt2 ON vt2.field2=t.field2\n", $query);
+	}
 }

@@ -9,13 +9,7 @@ class TestUpdate extends Update {
 	 * @return $this
 	 */
 	public static function create() {
-		$functions = array(
-			'getTableFields' => function ($tableName) {
-				return array();
-			}
-		);
-
-		$db = new TestDB($functions);
+		$db = new TestDB();
 		return new static($db);
 	}
 
