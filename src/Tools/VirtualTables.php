@@ -33,11 +33,11 @@ class VirtualTables {
 		if($this->has($tableName)) {
 			$table = $this->virtualTables[(string) $tableName];
 			if($table instanceof \Closure) {
-				$params = [];
 				if($tableName instanceof VirtualTable) {
 					$params = $tableName->getParams();
+					return call_user_func($table, $params);
 				}
-				return call_user_func($table, $params);
+				return call_user_func($table);
 			}
 			return $table;
 		}
