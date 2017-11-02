@@ -2,6 +2,7 @@
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Databases\MySQL;
+use Kir\MySQL\Tools\VirtualTable;
 
 trait TableNameBuilder {
 	use AbstractAliasReplacer;
@@ -12,7 +13,7 @@ trait TableNameBuilder {
 	 * @return string
 	 */
 	protected function buildTableName($alias, $name) {
-		if(is_object($name)) {
+		if(is_object($name) && !($name instanceof VirtualTable)) {
 			$name = (string) $name;
 			$lines = explode("\n", $name);
 			foreach($lines as &$line) {
@@ -33,7 +34,7 @@ trait TableNameBuilder {
 			$name = '(' . join("\n\tUNION\n\t", $parts) . ')';
 		}
 		if($this->db()->getVirtualTables()->has($name)) {
-			$select = (string )$this->db()->getVirtualTables()->get($name);
+			$select = (string) $this->db()->getVirtualTables()->get($name);
 			$name = sprintf('(%s)', join("\n\t", explode("\n", trim($select))));
 		}
 		$name = $this->aliasReplacer()->replace($name);

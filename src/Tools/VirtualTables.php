@@ -18,11 +18,11 @@ class VirtualTables {
 	}
 	
 	/**
-	 * @param string $tableName
+	 * @param string|VirtualTable $tableName
 	 * @return bool
 	 */
 	public function has($tableName) {
-		return array_key_exists($tableName, $this->virtualTables);
+		return array_key_exists((string) $tableName, $this->virtualTables);
 	}
 	
 	/**
@@ -31,9 +31,13 @@ class VirtualTables {
 	 */
 	public function get($tableName) {
 		if($this->has($tableName)) {
-			$table = $this->virtualTables[$tableName];
+			$table = $this->virtualTables[(string) $tableName];
 			if($table instanceof \Closure) {
-				return call_user_func($table);
+				$params = [];
+				if($tableName instanceof VirtualTable) {
+					$params = $tableName->getParams();
+				}
+				return call_user_func($table, $params);
 			}
 			return $table;
 		}

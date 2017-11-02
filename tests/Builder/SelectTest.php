@@ -8,6 +8,7 @@ use Kir\MySQL\Builder\Expr\RequiredDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredValueNotFoundException;
 use Kir\MySQL\Builder\SelectTest\TestSelect;
 use Kir\MySQL\Databases\TestDB;
+use Kir\MySQL\Tools\VirtualTable;
 
 class SelectTestX extends \PHPUnit_Framework_TestCase {
 	public function testAddition() {
@@ -364,5 +365,30 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		->asString();
 
 		$this->assertEquals("SELECT\n\tt.field1,\n\tt.field2\nFROM\n\ttest t\nINNER JOIN\n\t(SELECT\n\t\ta.field1\n\tFROM\n\t\ttableA a) vt1 ON vt1.field1=t.field1\nINNER JOIN\n\t(SELECT\n\t\ta.field1\n\tFROM\n\t\ttableA a) vt2 ON vt2.field2=t.field2\n", $query);
+	}
+
+	public function testParametrizedVirtualTables() {
+		$vt1 = TestSelect::create()
+		->field('a.field1')
+		->from('a', 'tableA');
+		
+		$db = new TestDB();
+		$db->getVirtualTables()->add('virt_table1', $vt1);
+		$db->getVirtualTables()->add('virt_table2', function (array $args) {
+			return TestSelect::create()
+			->field('a.field1')
+			->from('a', 'tableA')
+			->where(new DBExprFilter('a.active=?', $args, 'active'));
+		});
+		
+		$query = TestSelect::create($db)
+		->field('t.field1')
+		->field('t.field2')
+		->from('t', 'test')
+		->joinInner('vt1', 'virt_table1', 'vt1.field1=t.field1')
+		->joinInner('vt2', new VirtualTable('virt_table2', ['active' => true]), 'vt2.field2=t.field2')
+		->asString();
+
+		$this->assertEquals("SELECT\n\tt.field1,\n\tt.field2\nFROM\n\ttest t\nINNER JOIN\n\t(SELECT\n\t\ta.field1\n\tFROM\n\t\ttableA a) vt1 ON vt1.field1=t.field1\nINNER JOIN\n\t(SELECT\n\t\ta.field1\n\tFROM\n\t\ttableA a\n\tWHERE\n\t\t(a.active='1')) vt2 ON vt2.field2=t.field2\n", $query);
 	}
 }
