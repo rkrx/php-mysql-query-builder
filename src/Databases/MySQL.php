@@ -12,6 +12,7 @@ use Kir\MySQL\Database;
 use Kir\MySQL\Databases\MySQL\MySQLExceptionInterpreter;
 use Kir\MySQL\QueryLogger\QueryLoggers;
 use Kir\MySQL\Tools\AliasRegistry;
+use Kir\MySQL\Tools\VirtualTables;
 
 /**
  */
@@ -28,6 +29,8 @@ class MySQL implements Database {
 	private $transactionLevel = 0;
 	/** @var QueryLoggers */
 	private $queryLoggers = 0;
+	/** @var VirtualTables */
+	private $virtualTables = null;
 	/** @var MySQLExceptionInterpreter */
 	private $exceptionInterpreter = 0;
 	/** @var array */
@@ -66,6 +69,16 @@ class MySQL implements Database {
 	 */
 	public function getAliasRegistry() {
 		return $this->aliasRegistry;
+	}
+
+	/**
+	 * @return VirtualTables
+	 */
+	public function getVirtualTables() {
+		if($this->virtualTables === null) {
+			$this->virtualTables = new VirtualTables();
+		}
+		return $this->virtualTables;
 	}
 
 	/**
@@ -279,11 +292,9 @@ class MySQL implements Database {
 	 * @return mixed
 	 * @throws \Exception
 	 * @throws \Error
-	 * @throws null
 	 */
 	public function dryRun($callback = null) {
 		$result = null;
-		$exception = null;
 		if(!$this->pdo->inTransaction()) {
 			$this->transactionStart();
 			try {

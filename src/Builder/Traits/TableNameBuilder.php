@@ -1,7 +1,7 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
-use Kir\MySQL\Database;
+use Kir\MySQL\Databases\MySQL;
 
 trait TableNameBuilder {
 	use AbstractAliasReplacer;
@@ -32,6 +32,10 @@ trait TableNameBuilder {
 			}
 			$name = '(' . join("\n\tUNION\n\t", $parts) . ')';
 		}
+		if($this->db()->getVirtualTables()->has($name)) {
+			$select = (string )$this->db()->getVirtualTables()->get($name);
+			$name = sprintf('(%s)', join("\n\t", explode("\n", trim($select))));
+		}
 		$name = $this->aliasReplacer()->replace($name);
 		if($alias !== null) {
 			return sprintf("%s %s", $name, $alias);
@@ -40,7 +44,7 @@ trait TableNameBuilder {
 	}
 	
 	/**
-	 * @return Database
+	 * @return MySQL
 	 */
 	abstract protected function db();
 }

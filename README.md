@@ -29,6 +29,7 @@ Here a few things to keep in mind:
 * [Update](doc/update.md)
 * [Delete](doc/delete.md)
 * [Nested transactions](doc/nested-transactions.md)
+* [Virtual tables](doc/virtual-tables.md)
 
 ## Some extended examples
 
