@@ -24,12 +24,16 @@ trait TableNameBuilder {
 		}
 		if(is_array($name)) {
 			$parts = [];
-			foreach($name as $bucket) {
-				$values = [];
-				foreach($bucket as $field => $value) {
-					$values[] = sprintf('%s AS %s', $this->db()->quote($value), $this->db()->quoteField($field));
+			foreach($name as $index => $bucket) {
+				if(ctype_digit((string) $index) && is_scalar($bucket)) {
+					$parts[] = "SELECT {$this->db()->quote($bucket)}";
+				} else {
+					$values = [];
+					foreach($bucket as $field => $value) {
+						$values[] = sprintf('%s AS %s', $this->db()->quote($value), $this->db()->quoteField($field));
+					}
+					$parts[] = sprintf("SELECT %s", join(', ', $values));
 				}
-				$parts[] = sprintf("SELECT %s", join(', ', $values));
 			}
 			$name = '(' . join("\n\tUNION\n\t", $parts) . ')';
 		}
