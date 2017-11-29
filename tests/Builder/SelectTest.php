@@ -395,7 +395,7 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 	public function testArrayTables() {
 		$vt1 = TestSelect::create()
 		->field('a.field1')
-		->from('a', range(1, 9))
+		->from('a', range(1, 9))->debug()
 		->asString();
 		
 		$this->assertEquals("SELECT\n\ta.field1\nFROM\n\t(SELECT '1'\n\tUNION\n\tSELECT '2'\n\tUNION\n\tSELECT '3'\n\tUNION\n\tSELECT '4'\n\tUNION\n\tSELECT '5'\n\tUNION\n\tSELECT '6'\n\tUNION\n\tSELECT '7'\n\tUNION\n\tSELECT '8'\n\tUNION\n\tSELECT '9') a\n", $vt1);

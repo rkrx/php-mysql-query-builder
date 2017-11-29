@@ -26,7 +26,7 @@ trait TableNameBuilder {
 			$parts = [];
 			foreach($name as $index => $bucket) {
 				if(ctype_digit((string) $index) && is_scalar($bucket)) {
-					$parts[] = "SELECT {$this->db()->quote($bucket)}";
+					$parts[] = "SELECT {$this->db()->quote($bucket)} AS {$this->db()->quoteField('value')}";
 				} else {
 					$values = [];
 					foreach($bucket as $field => $value) {
