@@ -8,7 +8,7 @@ $db->getAliasRegistry()->add('shop', 'shop__');
 ```
 
 ```PHP
-class ProductAmountQuery {
+class ProductPriceQuery {
 	/** @var Database */
 	private $db;
 
@@ -43,16 +43,16 @@ class ProductAmountQuery {
 class ProductRepository {
 	/** @var Database */
 	private $db;
-	/** @var ProductAmountQuery */
-	private $amountQuery;
+	/** @var ProductPriceQuery */
+	private $priceQuery;
 
 	/**
 	 * @param Database $db
-	 * @param ProductAmountQuery $amountQuery
+	 * @param ProductPriceQuery $priceQuery
 	 */
-	public function __construct(Database $db, ProductAmountQuery $amountQuery) {
+	public function __construct(Database $db, ProductAmountQuery $priceQuery) {
 		$this->db = $db;
-		$this->amountQuery = $amountQuery;
+		$this->priceQuery = $priceQuery;
 	}
 
 	/**
@@ -70,7 +70,7 @@ class ProductRepository {
 		->field('spl.description')
 		->from('sp', 'shop#products')
 		->joinInner('spl', 'shop#product_descriptions', 'spl.product_id = sp.id')
-		->joinLeft('p', $this->amountQuery->getAll($criteria), 'sp.product_id = p.product_id')
+		->joinLeft('p', $this->priceQuery->getAll($criteria), 'sp.product_id = p.product_id')
 		->where('sp.active=?', true)
 		->where($req('spl.lang_id=?', 'language.id'))
 		->where($opt('sp.reference=?', 'product.reference'))
@@ -107,7 +107,7 @@ class ProductRepository {
 ```
 
 ```PHP
-$pr = new ProductRepository($db, new ProductAmountQuery($db));
+$pr = new ProductRepository($db, new ProductPriceQuery($db));
 $pr->find([
 	'language' => [
 		'id' => 'en',
