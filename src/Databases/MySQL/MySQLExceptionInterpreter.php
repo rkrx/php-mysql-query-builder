@@ -2,6 +2,7 @@
 namespace Kir\MySQL\Databases\MySQL;
 
 use Kir\MySQL\Exceptions\DatabaseHasGoneAwayException;
+use Kir\MySQL\Exceptions\IntegrityConstraintViolationException;
 use Kir\MySQL\Exceptions\SqlException;
 use PDOException;
 use Kir\MySQL\Exceptions\SqlDeadLockException;
@@ -24,6 +25,8 @@ class MySQLExceptionInterpreter {
 			case 1062:
 			case 1169:
 			case 1586: throw new DuplicateUniqueKeyException($message, $code, $exception);
+			case 1216:
+			case 1217: throw new IntegrityConstraintViolationException($message, (int) $code, $exception);
 		}
 		/** @link http://php.net/manual/en/class.exception.php#Hcom115813 (cHao's comment) */
 		if(!is_string($message) || !is_int($code)) {
