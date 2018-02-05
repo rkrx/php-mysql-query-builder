@@ -20,7 +20,10 @@ class MySQLExceptionInterpreter {
 			case 2006: throw new DatabaseHasGoneAwayException($message, $code, $exception);
 			case 1213: throw new SqlDeadLockException($message, $code, $exception);
 			case 1205: throw new LockWaitTimeoutExceededException($message, $code, $exception);
-			case 1062: throw new DuplicateUniqueKeyException($message, $code, $exception);
+			case 1022:
+			case 1062:
+			case 1169:
+			case 1586: throw new DuplicateUniqueKeyException($message, $code, $exception);
 		}
 		/** @link http://php.net/manual/en/class.exception.php#Hcom115813 (cHao's comment) */
 		if(!is_string($message) || !is_int($code)) {
