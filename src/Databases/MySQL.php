@@ -269,7 +269,6 @@ class MySQL implements Database {
 
 	/**
 	 * @return $this
-	 * @throws \Exception
 	 */
 	public function transactionCommit() {
 		return $this->transactionEnd(function () {
@@ -279,7 +278,6 @@ class MySQL implements Database {
 
 	/**
 	 * @return $this
-	 * @throws \Exception
 	 */
 	public function transactionRollback() {
 		return $this->transactionEnd(function () {
@@ -290,8 +288,6 @@ class MySQL implements Database {
 	/**
 	 * @param callable|null $callback
 	 * @return mixed
-	 * @throws \Exception
-	 * @throws \Error
 	 */
 	public function dryRun($callback = null) {
 		$result = null;
@@ -302,10 +298,10 @@ class MySQL implements Database {
 				$this->transactionRollback();
 			} catch (\Exception $e) {
 				$this->transactionRollback();
-				throw $e;
+				throw new RuntimeException($e->getMessage(), (int) $e->getCode(), $e);
 			} catch (\Error $e) {
 				$this->transactionRollback();
-				throw $e;
+				throw new RuntimeException($e->getMessage(), (int) $e->getCode(), $e);
 			}
 		} else {
 			$uniqueId = $this->genUniqueId();
@@ -315,10 +311,10 @@ class MySQL implements Database {
 				$this->exec("ROLLBACK TO {$uniqueId}");
 			} catch (\Exception $e) {
 				$this->exec("ROLLBACK TO {$uniqueId}");
-				throw $e;
+				throw new RuntimeException($e->getMessage(), (int) $e->getCode(), $e);
 			} catch (\Error $e) {
 				$this->exec("ROLLBACK TO {$uniqueId}");
-				throw $e;
+				throw new RuntimeException($e->getMessage(), (int) $e->getCode(), $e);
 			}
 		}
 		return $result;
@@ -328,8 +324,6 @@ class MySQL implements Database {
 	 * @param int|callable $tries
 	 * @param callable|null $callback
 	 * @return mixed
-	 * @throws \Exception
-	 * @throws \Error
 	 */
 	public function transaction($tries = 1, $callback = null) {
 		if(is_callable($tries)) {
@@ -371,7 +365,7 @@ class MySQL implements Database {
 			}
 		}
 		if($exception !== null) {
-			throw $exception;
+			throw new RuntimeException($exception->getMessage(), (int) $exception->getCode(), $exception);
 		}
 		return $result;
 	}

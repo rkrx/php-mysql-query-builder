@@ -11,6 +11,7 @@ use Kir\MySQL\Builder\Traits\LimitBuilder;
 use Kir\MySQL\Builder\Traits\TableNameBuilder;
 use Kir\MySQL\Builder\Traits\UnionBuilder;
 use Kir\MySQL\Builder\Traits\WhereBuilder;
+use RuntimeException;
 
 class Select extends Statement {
 	use TableNameBuilder;
@@ -102,12 +103,11 @@ class Select extends Statement {
 
 	/**
 	 * @param bool $calcFoundRows
-	 * @throws \Exception
 	 * @return $this
 	 */
 	public function setCalcFoundRows($calcFoundRows = true) {
 		if (ini_get("mysql.trace_mode")) {
-			throw new \Exception('This function cant operate with mysql.trace_mode is set.');
+			throw new RuntimeException('This function cant operate with mysql.trace_mode is set.');
 		}
 		$this->calcFoundRows = $calcFoundRows;
 		return $this;
