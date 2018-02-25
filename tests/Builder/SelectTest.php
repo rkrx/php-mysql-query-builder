@@ -123,6 +123,16 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(a < '1000')\n", $str);
 	}
 
+	public function testDBExprFilter() {
+		$str = TestSelect::create()
+		->field('a')
+		->from('t', 'test')
+		->where(new DBExprFilter('a=? AND b=?', ['x' => ['y' => 1]], 'x.y'))
+		->having(new DBExprFilter('a=? AND b=?', ['x' => ['y' => 1]], 'x.y'))
+		->asString();
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(a='1' AND b='1')\nHAVING\n\t(a='1' AND b='1')\n", $str);
+	}
+
 	public function testOrder() {
 		$str = TestSelect::create()
 		->field('a')
