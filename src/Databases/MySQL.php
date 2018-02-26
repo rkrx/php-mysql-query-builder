@@ -331,17 +331,20 @@ class MySQL implements Database {
 		} else {
 			$uniqueId = $this->genUniqueId();
 			$this->exec("SAVEPOINT {$uniqueId}");
-			$finally = function () use ($uniqueId) {
-				$this->exec("ROLLBACK TO {$uniqueId}");
-			};
+			$rollback = false;
 			try {
 				$result = call_user_func($callback, $this);
-				$finally = function () use ($uniqueId) {
-					$this->exec("RELEASE SAVEPOINT {$uniqueId}");
-				};
 				return $result;
+			} catch (\Exception $e) {
+				$rollback = true;
+			} catch (\Error $e) {
+				$rollback = true;
 			} finally {
-				$finally();
+				if($rollback) {
+					$this->exec("ROLLBACK TO {$uniqueId}");
+				} else {
+					$this->exec("RELEASE SAVEPOINT {$uniqueId}");
+				}
 			}
 		}
 	}
