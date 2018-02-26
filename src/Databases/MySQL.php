@@ -321,8 +321,8 @@ class MySQL implements Database {
 			$this->transactionStart();
 			try {
 				$result = call_user_func($callback, $this);
-				$exception = null;
 				$this->transactionCommit();
+				return $result;
 			} finally {
 				if($this->pdo->inTransaction()) {
 					$this->transactionRollback();
@@ -339,11 +339,11 @@ class MySQL implements Database {
 				$finally = function () use ($uniqueId) {
 					$this->exec("RELEASE SAVEPOINT {$uniqueId}");
 				};
+				return $result;
 			} finally {
 				$finally();
 			}
 		}
-		return $result;
 	}
 
 	/**
