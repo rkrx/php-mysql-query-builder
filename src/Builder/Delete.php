@@ -19,7 +19,7 @@ class Delete extends Statement {
 	use OffsetBuilder;
 
 	/** @var string[] */
-	private $aliases = array();
+	private $aliases = [];
 
 	/**
 	 * Name der Tabelle
@@ -38,7 +38,6 @@ class Delete extends Statement {
 
 	/**
 	 * @return string
-	 * @throws Exception
 	 */
 	public function __toString() {
 		$query = "DELETE ";

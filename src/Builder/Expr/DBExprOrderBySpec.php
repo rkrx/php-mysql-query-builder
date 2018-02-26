@@ -6,8 +6,8 @@ class DBExprOrderBySpec implements OrderBySpecification {
 	private $fields = [];
 	
 	/**
-	 * @param $spec
-	 * @param $sortFieldsSpec
+	 * @param array $spec
+	 * @param array $sortFieldsSpec
 	 */
 	public function __construct($spec, $sortFieldsSpec) {
 		$expressions = [];

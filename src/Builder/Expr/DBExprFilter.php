@@ -2,6 +2,7 @@
 namespace Kir\MySQL\Builder\Expr;
 
 use Exception;
+use RuntimeException;
 
 class DBExprFilter implements OptionalExpression {
 	/** @var mixed */
@@ -72,14 +73,14 @@ class DBExprFilter implements OptionalExpression {
 	/**
 	 * @param string|string[] $keyPath
 	 * @return string
-	 * @throws Exception
+	 * @throws RuntimeException
 	 */
 	private function buildKey($keyPath) {
 		if(is_string($keyPath)) {
 			$keyPath = explode('.', $keyPath);
 		}
 		if(!is_array($keyPath)) {
-			throw new Exception('Invalid key');
+			throw new RuntimeException('Invalid key');
 		}
 		return $keyPath;
 	}

@@ -2,13 +2,14 @@
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Tools\AliasReplacer;
+use RuntimeException;
 use UnexpectedValueException;
 
 class Insert extends InsertUpdateStatement {
 	/** @var array */
-	private $fields = array();
+	private $fields = [];
 	/** @var array */
-	private $update = array();
+	private $update = [];
 	/** @var string */
 	private $table = null;
 	/** @var string */
@@ -175,17 +176,17 @@ class Insert extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @throws Exception
+	 * @throws RuntimeException
 	 * @return string
 	 */
 	public function __toString() {
 		if ($this->table === null) {
-			throw new Exception('Specify a table-name');
+			throw new RuntimeException('Specify a table-name');
 		}
 
 		$tableName = (new AliasReplacer($this->db()->getAliasRegistry()))->replace($this->table);
 
-		$queryArr = array();
+		$queryArr = [];
 		$ignoreStr = $this->ignore ? ' IGNORE' : '';
 		$queryArr[] = "INSERT{$ignoreStr} INTO\n\t{$tableName}\n";
 
@@ -197,7 +198,7 @@ class Insert extends InsertUpdateStatement {
 			$fields = $this->fields;
 			$insertData = $this->buildFieldList($fields);
 			if (!count($insertData)) {
-				throw new Exception('No field-data found');
+				throw new RuntimeException('No field-data found');
 			}
 			$queryArr[] = sprintf("SET\n%s\n", join(",\n", $insertData));
 		}
@@ -257,10 +258,10 @@ class Insert extends InsertUpdateStatement {
 	 * @return string
 	 */
 	private function buildUpdate() {
-		$queryArr = array();
+		$queryArr = [];
 		if(!empty($this->update)) {
 			$queryArr[] = "ON DUPLICATE KEY UPDATE\n";
-			$updateArr = array();
+			$updateArr = [];
 			if($this->keyField !== null) {
 				$updateArr[] = "\t`{$this->keyField}` = LAST_INSERT_ID({$this->keyField})";
 			}
@@ -282,7 +283,6 @@ class Insert extends InsertUpdateStatement {
 	/**
 	 * @param array $values
 	 * @return array
-	 * @throws Exception
 	 */
 	private function clearValues(array $values) {
 		if(!count($values)) {
@@ -291,7 +291,7 @@ class Insert extends InsertUpdateStatement {
 
 		$tableName = (new AliasReplacer($this->db()->getAliasRegistry()))->replace($this->table);
 		$fields = $this->db()->getTableFields($tableName);
-		$result = array();
+		$result = [];
 
 		foreach ($values as $fieldName => $fieldValue) {
 			if(in_array($fieldName, $fields)) {

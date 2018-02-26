@@ -9,7 +9,7 @@ abstract class FieldTypeProvider {
 	 * @return array
 	 */
 	public static function getFieldTypes(QueryStatement $statement) {
-		$fieldTypes = array();
+		$fieldTypes = [];
 		for($i = 0; $column = $statement->getColumnMeta($i); $i++) {
 			$fieldTypes[$column['name']] = self::getTypeFromNativeType($column['native_type']);
 		}

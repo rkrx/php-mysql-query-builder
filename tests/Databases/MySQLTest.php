@@ -19,36 +19,6 @@ class MySQLTest extends \PHPUnit_Framework_TestCase {
 		$this->db->uninstall();
 	}
 
-	/**
-	 * Check if exceptions are thrown after a certain amount of tries
-	 */
-	public function testTransactionTries1() {
-		$this->setExpectedException('Exception', '5');
-
-		$this->db->transaction(5, function () {
-			static $i;
-			$i++;
-			throw new \Exception($i);
-		});
-	}
-
-	/**
-	 * Check if the number of tries exactly corresponds to the actual amount of tries needed
-	 */
-	public function testTransactionTries2() {
-		$result = $this->db->transaction(5, function () {
-			static $i;
-			$i++;
-			// Fail four times, succeed at the fifth time
-			if($i < 5) {
-				throw new \Exception($i);
-			}
-			return $i;
-		});
-
-		$this->assertEquals(5, $result);
-	}
-
 	public function testGetTableFields() {
 		$eventHandler = new RegistryEventHandler();
 

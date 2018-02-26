@@ -5,7 +5,7 @@ trait TableBuilder {
 	use AbstractTableNameBuilder;
 
 	/** @var array[] */
-	private $tables = array();
+	private $tables = [];
 
 	/**
 	 * @param string $alias
@@ -16,7 +16,7 @@ trait TableBuilder {
 		if($table === null) {
 			list($alias, $table) = [$table, $alias];
 		}
-		$this->tables[] = array('alias' => $alias, 'name' => $table);
+		$this->tables[] = ['alias' => $alias, 'name' => $table];
 		return $this;
 	}
 
@@ -25,7 +25,7 @@ trait TableBuilder {
 	 * @return string
 	 */
 	protected function buildTables($query) {
-		$arr = array();
+		$arr = [];
 		foreach($this->tables as $table) {
 			$arr[] = "\t".$this->buildTableName($table['alias'], $table['name']);
 		}

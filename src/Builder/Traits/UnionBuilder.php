@@ -12,7 +12,7 @@ trait UnionBuilder {
 	 * @return $this
 	 */
 	public function union($query) {
-		$this->unions[] = array('', $query);
+		$this->unions[] = ['', $query];
 		return $this;
 	}
 
@@ -21,7 +21,7 @@ trait UnionBuilder {
 	 * @return $this
 	 */
 	public function unionAll($query) {
-		$this->unions[] = array('ALL', $query);
+		$this->unions[] = ['ALL', $query];
 		return $this;
 	}
 

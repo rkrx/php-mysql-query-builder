@@ -8,17 +8,15 @@ use Kir\MySQL\Builder\Helpers\DBIgnoreRow;
 use Kir\MySQL\Builder\Helpers\FieldTypeProvider;
 use Kir\MySQL\Builder\Helpers\FieldValueConverter;
 use Kir\MySQL\Builder\Helpers\LazyRowGenerator;
-use Kir\MySQL\Builder\Helpers\YieldPolyfillIterator;
 use Kir\MySQL\Databases\MySQL;
 use PDO;
-use RuntimeException;
 use Traversable;
 
 /**
  */
 class RunnableSelect extends Select implements IteratorAggregate {
 	/** @var array */
-	private $values = array();
+	private $values = [];
 	/** @var bool */
 	private $preserveTypes = false;
 	/** @var string */
@@ -59,7 +57,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @return $this
 	 */
 	public function clearValues() {
-		$this->values = array();
+		$this->values = [];
 		return $this;
 	}
 
@@ -82,7 +80,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 
 	/**
 	 * @param Closure $callback
-	 * @return array[]|\Generator
+	 * @return array[]|Generator
 	 */
 	public function fetchRowsLazy(Closure $callback = null) {
 		return $this->fetchLazy($callback, PDO::FETCH_ASSOC);
@@ -91,7 +89,6 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	/**
 	 * @param Closure|null $callback
 	 * @return mixed[]
-	 * @throws \Exception
 	 */
 	public function fetchRow(Closure $callback = null) {
 		return $this->fetch($callback, PDO::FETCH_ASSOC, null, function ($row) {
@@ -103,7 +100,6 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @param string $className
 	 * @param Closure $callback
 	 * @return object[]
-	 * @throws \Exception
 	 */
 	public function fetchObjects($className = null, Closure $callback = null) {
 		return $this->fetchAll($callback, PDO::FETCH_CLASS, $className ?: $this->defaultClassName);
@@ -122,7 +118,6 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @param string $className
 	 * @param Closure|null $callback
 	 * @return object[]
-	 * @throws \Exception
 	 */
 	public function fetchObject($className = null, Closure $callback = null) {
 		return $this->fetch($callback, PDO::FETCH_CLASS, $className ?: $this->defaultClassName, function ($row) {
@@ -138,7 +133,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 		return $this->createTempStatement(function (QueryStatement $statement) use ($treatValueAsArray) {
 			if($treatValueAsArray) {
 				$rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
-				$result = array();
+				$result = [];
 				foreach($rows as $row) {
 					list($key) = array_values($row);
 					$result[$key] = $row;
@@ -155,7 +150,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 */
 	public function fetchGroups(array $fields) {
 		$rows = $this->fetchRows();
-		$result = array();
+		$result = [];
 		foreach($rows as $row) {
 			$tmp = &$result;
 			foreach($fields as $field) {
@@ -203,18 +198,15 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	/**
 	 * @param callback $fn
 	 * @return mixed
-	 * @throws RuntimeException
 	 */
 	private function createTempStatement($fn) {
 		$stmt = $this->createStatement();
 		$res = null;
 		try {
 			$res = call_user_func($fn, $stmt);
-		} catch (RuntimeException $e) { // PHP 5.4 compatibility
+		} finally {
 			$stmt->closeCursor();
-			throw $e;
 		}
-		$stmt->closeCursor();
 		return $res;
 	}
 
@@ -234,7 +226,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	}
 
 	/**
-	 * @return Traversable|array[]|\Generator
+	 * @return Traversable|Generator|array[]
 	 */
 	public function getIterator() {
 		return $this->fetchRowsLazy();
@@ -245,7 +237,6 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @param int $mode
 	 * @param mixed $arg0
 	 * @return mixed
-	 * @throws RuntimeException
 	 */
 	private function fetchAll(Closure $callback = null, $mode, $arg0 = null) {
 		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0) {
@@ -278,16 +269,9 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @param Closure $callback
 	 * @param int $mode
 	 * @param mixed $arg0
-	 * @return Traversable|YieldPolyfillIterator|mixed[]
+	 * @return Traversable|mixed[]
 	 */
 	private function fetchLazy(Closure $callback = null, $mode, $arg0 = null) {
-		if(version_compare(PHP_VERSION, '5.5', '<')) {
-			return new YieldPolyfillIterator($callback, $this->preserveTypes, function () use ($mode, $arg0) {
-				$statement = $this->createStatement();
-				$statement->setFetchMode($mode, $arg0);
-				return $statement;
-			});
-		}
 		$statement = $this->createStatement();
 		$statement->setFetchMode($mode, $arg0);
 		$generator = new LazyRowGenerator($this->preserveTypes);
@@ -300,7 +284,6 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @param mixed $arg0
 	 * @param Closure $resultValidator
 	 * @return mixed
-	 * @throws \Exception
 	 */
 	private function fetch(Closure $callback = null, $mode, $arg0 = null, Closure $resultValidator = null) {
 		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0, $resultValidator) {

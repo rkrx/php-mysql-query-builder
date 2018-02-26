@@ -8,7 +8,7 @@ trait HavingBuilder {
 	use AbstractDB;
 
 	/** @var array */
-	private $having = array();
+	private $having = [];
 
 	/**
 	 * @param string|array $expression

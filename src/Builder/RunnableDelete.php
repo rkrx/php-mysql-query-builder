@@ -21,7 +21,7 @@ class RunnableDelete extends Delete implements DDLPreparable {
 	 * @param array $params
 	 * @return int
 	 */
-	public function run(array $params = array()) {
+	public function run(array $params = []) {
 		return $this->prepare()->run($params);
 	}
 

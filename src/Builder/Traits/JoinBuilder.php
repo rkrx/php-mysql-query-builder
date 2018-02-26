@@ -6,7 +6,7 @@ trait JoinBuilder {
 	use AbstractTableNameBuilder;
 
 	/** @var array[] */
-	private $joinTables = array();
+	private $joinTables = [];
 
 	/**
 	 * @param string $alias
@@ -46,7 +46,7 @@ trait JoinBuilder {
 	 * @return string
 	 */
 	protected function buildJoins($query) {
-		$arr = array();
+		$arr = [];
 		foreach($this->joinTables as $table) {
 			$join = $table['type']." JOIN\n";
 			$join .= "\t" . $this->buildTableName($table['alias'], $table['name']);
@@ -69,14 +69,14 @@ trait JoinBuilder {
 	 * @param array $arguments
 	 * @return $this
 	 */
-	private function addJoin($type, $alias, $name, $expression = null, array $arguments = array()) {
-		$this->joinTables[] = array(
+	private function addJoin($type, $alias, $name, $expression = null, array $arguments = []) {
+		$this->joinTables[] = [
 			'type' => $type,
 			'alias' => $alias,
 			'name' => $name,
 			'expression' => $expression,
 			'arguments' => $arguments
-		);
+		];
 		return $this;
 	}
 }

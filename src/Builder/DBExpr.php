@@ -7,7 +7,7 @@ class DBExpr {
 	private $expression;
 
 	/**
-	 * @param $expression
+	 * @param string $expression
 	 */
 	public function __construct($expression) {
 		$this->expression = $expression;

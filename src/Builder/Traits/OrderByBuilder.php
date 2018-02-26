@@ -7,7 +7,7 @@ trait OrderByBuilder {
 	use AbstractDB;
 
 	/** @var array */
-	private $orderBy = array();
+	private $orderBy = [];
 
 	/**
 	 * @param string|OrderBySpecification $expression
@@ -33,9 +33,9 @@ trait OrderByBuilder {
 	public function orderByValues($fieldName, array $values) {
 		$expr = [];
 		foreach(array_values($values) as $idx => $value) {
-			$expr[] = $this->db()->quoteExpression("WHEN ? THEN ?", array($value, $idx));
+			$expr[] = $this->db()->quoteExpression("WHEN ? THEN ?", [$value, $idx]);
 		}
-		$this->orderBy[] = array(sprintf("CASE %s\n\t\t%s\n\tEND", $this->db()->quoteField($fieldName), join("\n\t\t", $expr)), 'ASC');
+		$this->orderBy[] = [sprintf("CASE %s\n\t\t%s\n\tEND", $this->db()->quoteField($fieldName), join("\n\t\t", $expr)), 'ASC'];
 		return $this;
 	}
 
@@ -48,7 +48,7 @@ trait OrderByBuilder {
 			return $query;
 		}
 		$query .= "ORDER BY\n";
-		$arr = array();
+		$arr = [];
 		foreach($this->orderBy as $order) {
 			list($expression, $direction) = $order;
 			$arr[] = sprintf("\t%s %s", $expression, strtoupper($direction));
@@ -66,13 +66,13 @@ trait OrderByBuilder {
 			if(!count($expression)) {
 				return;
 			}
-			$arguments = array(
+			$arguments = [
 				$expression[0],
 				array_slice($expression, 1)
-			);
-			$expression = call_user_func_array(array($this->db(), 'quoteExpression'), $arguments);
+			];
+			$expression = call_user_func_array([$this->db(), 'quoteExpression'], $arguments);
 		}
-		$this->orderBy[] = array($expression, $direction);
+		$this->orderBy[] = [$expression, $direction];
 	}
 	
 	/**

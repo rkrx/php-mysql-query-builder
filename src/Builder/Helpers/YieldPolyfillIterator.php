@@ -6,6 +6,9 @@ use Iterator;
 use Kir\MySQL\Builder\QueryStatement;
 use RuntimeException;
 
+/**
+ * @deprecated
+ */
 class YieldPolyfillIterator implements Iterator {
 	/** @var Closure|null */
 	private $callback;

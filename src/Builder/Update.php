@@ -9,6 +9,7 @@ use Kir\MySQL\Builder\Traits\OrderByBuilder;
 use Kir\MySQL\Builder\Traits\TableBuilder;
 use Kir\MySQL\Builder\Traits\TableNameBuilder;
 use Kir\MySQL\Builder\Traits\WhereBuilder;
+use RuntimeException;
 
 class Update extends InsertUpdateStatement {
 	use TableNameBuilder;
@@ -22,7 +23,7 @@ class Update extends InsertUpdateStatement {
 	/**
 	 * @var array
 	 */
-	private $fields = array();
+	private $fields = [];
 
 	/**
 	 * @param string $alias
@@ -109,12 +110,12 @@ class Update extends InsertUpdateStatement {
 	/**
 	 * @param string $query
 	 * @return string
-	 * @throws Exception
+	 * @throws RuntimeException
 	 */
 	private function buildAssignments($query) {
 		$sqlFields = $this->buildFieldList($this->fields);
 		if (!count($sqlFields)) {
-			throw new Exception('No field-data found');
+			throw new RuntimeException('No field-data found');
 		}
 		return sprintf("%s%s\n", $query, join(",\n", $sqlFields));
 	}
@@ -122,7 +123,7 @@ class Update extends InsertUpdateStatement {
 	/**
 	 * @param array $values
 	 * @return array
-	 * @throws Exception
+	 * @throws RuntimeException
 	 */
 	private function clearValues(array $values) {
 		if (!count($values)) {
@@ -130,16 +131,16 @@ class Update extends InsertUpdateStatement {
 		}
 		$tables = $this->getTables();
 		if (!count($tables)) {
-			throw new Exception('Table name is missing');
+			throw new RuntimeException('Table name is missing');
 		}
 		if (count($tables) > 1) {
-			throw new Exception('Batch values only work with max. one table');
+			throw new RuntimeException('Batch values only work with max. one table');
 		}
 		list($table) = $tables;
 		$tableName = $table['name'];
 
 		$fields = $this->db()->getTableFields($tableName);
-		$result = array();
+		$result = [];
 
 		foreach ($values as $fieldName => $fieldValue) {
 			if (in_array($fieldName, $fields)) {

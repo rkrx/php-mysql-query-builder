@@ -8,14 +8,12 @@ interface Database {
 	/**
 	 * @param string $query
 	 * @return DatabaseStatement
-	 * @throws RuntimeException
 	 */
 	public function query($query);
 
 	/**
 	 * @param string $query
 	 * @return DatabaseStatement
-	 * @throws RuntimeException
 	 */
 	public function prepare($query);
 
@@ -23,9 +21,8 @@ interface Database {
 	 * @param string $query
 	 * @param array $params
 	 * @return int
-	 * @throws RuntimeException
 	 */
-	public function exec($query, array $params = array());
+	public function exec($query, array $params = []);
 
 	/**
 	 * @return string
@@ -43,7 +40,7 @@ interface Database {
 	 * @param array $arguments
 	 * @return string
 	 */
-	public function quoteExpression($expression, array $arguments = array());
+	public function quoteExpression($expression, array $arguments = []);
 
 	/**
 	 * @param mixed $value
@@ -82,34 +79,28 @@ interface Database {
 
 	/**
 	 * @return $this
-	 * @throws RuntimeException
 	 */
 	public function transactionStart();
 
 	/**
 	 * @return $this
-	 * @throws RuntimeException
 	 */
 	public function transactionCommit();
 
 	/**
 	 * @return $this
-	 * @throws RuntimeException
 	 */
 	public function transactionRollback();
-
+	
 	/**
-	 * @param int|callable $tries
 	 * @param callable|null $callback
 	 * @return mixed
-	 * @throws RuntimeException
 	 */
-	public function transaction($tries = 1, $callback = null);
+	public function transaction(callable $callback = null);
 
 	/**
 	 * @param callable|null $callback
 	 * @return mixed
-	 * @throws RuntimeException
 	 */
 	public function dryRun($callback = null);
 }

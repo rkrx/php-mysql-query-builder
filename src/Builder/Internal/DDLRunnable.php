@@ -22,7 +22,7 @@ class DDLRunnable {
 	 * @param array $params
 	 * @return mixed
 	 */
-	public function run(array $params = array()) {
+	public function run(array $params = []) {
 		$this->query->execute($params);
 		$response = $this->query->getStatement()->rowCount();
 		if($this->callbackFn !== null) {

@@ -18,7 +18,7 @@ use Kir\MySQL\Tools\VirtualTables;
  */
 class MySQL implements Database {
 	/** @var array */
-	private static $tableFields = array();
+	private static $tableFields = [];
 	/** @var PDO */
 	private $pdo;
 	/** @var bool */
@@ -110,7 +110,7 @@ class MySQL implements Database {
 	 * @param array $params
 	 * @return int
 	 */
-	public function exec($query, array $params = array()) {
+	public function exec($query, array $params = []) {
 		return $this->exceptionHandler(function () use ($query, $params) {
 			$stmt = $this->pdo->prepare($query);
 			$timer = microtime(true);
@@ -150,7 +150,7 @@ class MySQL implements Database {
 	 * @param array $arguments
 	 * @return string
 	 */
-	public function quoteExpression($expression, array $arguments = array()) {
+	public function quoteExpression($expression, array $arguments = []) {
 		$func = function () use ($arguments) {
 			static $idx = -1;
 			$idx++;
@@ -269,7 +269,6 @@ class MySQL implements Database {
 
 	/**
 	 * @return $this
-	 * @throws \Exception
 	 */
 	public function transactionCommit() {
 		return $this->transactionEnd(function () {
@@ -279,99 +278,67 @@ class MySQL implements Database {
 
 	/**
 	 * @return $this
-	 * @throws \Exception
 	 */
 	public function transactionRollback() {
 		return $this->transactionEnd(function () {
 			$this->pdo->rollBack();
 		});
 	}
-
+	
 	/**
 	 * @param callable|null $callback
 	 * @return mixed
-	 * @throws \Exception
-	 * @throws \Error
 	 */
 	public function dryRun($callback = null) {
-		$result = null;
 		if(!$this->pdo->inTransaction()) {
 			$this->transactionStart();
 			try {
-				$result = call_user_func($callback, $this);
+				return call_user_func($callback, $this);
+			} finally {
 				$this->transactionRollback();
-			} catch (\Exception $e) {
-				$this->transactionRollback();
-				throw $e;
-			} catch (\Error $e) {
-				$this->transactionRollback();
-				throw $e;
 			}
 		} else {
 			$uniqueId = $this->genUniqueId();
 			$this->exec("SAVEPOINT {$uniqueId}");
 			try {
-				$result = call_user_func($callback, $this);
+				return call_user_func($callback, $this);
+			} finally {
 				$this->exec("ROLLBACK TO {$uniqueId}");
-			} catch (\Exception $e) {
-				$this->exec("ROLLBACK TO {$uniqueId}");
-				throw $e;
-			} catch (\Error $e) {
-				$this->exec("ROLLBACK TO {$uniqueId}");
-				throw $e;
 			}
 		}
-		return $result;
 	}
 	
 	/**
-	 * @param int|callable $tries
 	 * @param callable|null $callback
 	 * @return mixed
-	 * @throws \Exception
-	 * @throws \Error
 	 */
-	public function transaction($tries = 1, $callback = null) {
-		if(is_callable($tries)) {
-			$callback = $tries;
-			$tries = 1;
-		} elseif(!is_callable($callback)) {
-			throw new RuntimeException('$callback must be a callable');
-		}
+	public function transaction(callable $callback = null) {
 		$result = null;
-		$exception = null;
-		for(; $tries--;) {
-			if(!$this->pdo->inTransaction()) {
-				$this->transactionStart();
-				try {
-					$result = call_user_func($callback, $this);
-					$exception = null;
-					$this->transactionCommit();
-				} catch (\Exception $e) {
+		if(!$this->pdo->inTransaction()) {
+			$this->transactionStart();
+			try {
+				$result = call_user_func($callback, $this);
+				$exception = null;
+				$this->transactionCommit();
+			} finally {
+				if($this->pdo->inTransaction()) {
 					$this->transactionRollback();
-					$exception = $e;
-				} catch (\Error $e) {
-					$this->transactionRollback();
-					$exception = $e;
-				}
-			} else {
-				$uniqueId = $this->genUniqueId();
-				$this->exec("SAVEPOINT {$uniqueId}");
-				try {
-					$result = call_user_func($callback, $this);
-					$exception = null;
-					$this->exec("RELEASE SAVEPOINT {$uniqueId}");
-				} catch (\Exception $e) {
-					$this->exec("ROLLBACK TO {$uniqueId}");
-					$exception = $e;
-				} catch (\Error $e) {
-					$this->exec("ROLLBACK TO {$uniqueId}");
-					$exception = $e;
 				}
 			}
-		}
-		if($exception !== null) {
-			throw $exception;
+		} else {
+			$uniqueId = $this->genUniqueId();
+			$this->exec("SAVEPOINT {$uniqueId}");
+			$finally = function () use ($uniqueId) {
+				$this->exec("ROLLBACK TO {$uniqueId}");
+			};
+			try {
+				$result = call_user_func($callback, $this);
+				$finally = function () use ($uniqueId) {
+					$this->exec("RELEASE SAVEPOINT {$uniqueId}");
+				};
+			} finally {
+				$finally();
+			}
 		}
 		return $result;
 	}

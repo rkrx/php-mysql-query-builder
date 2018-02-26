@@ -8,7 +8,7 @@ trait WhereBuilder {
 	use AbstractDB;
 
 	/** @var array */
-	private $where = array();
+	private $where = [];
 
 	/**
 	 * @param string|array $expression

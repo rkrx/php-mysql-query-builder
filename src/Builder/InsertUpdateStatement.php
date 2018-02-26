@@ -28,7 +28,7 @@ abstract class InsertUpdateStatement extends Statement {
 	 * @param array $query
 	 * @return string[]
 	 */
-	protected function buildFieldList(array $fields, array $query = array()) {
+	protected function buildFieldList(array $fields, array $query = []) {
 		foreach ($fields as $fieldName => $fieldValue) {
 			if ($fieldValue instanceof DefaultValue) {
 				$fieldValue = 'DEFAULT';

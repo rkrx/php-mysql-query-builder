@@ -5,7 +5,7 @@ trait GroupByBuilder {
 	use AbstractDB;
 
 	/** @var array */
-	private $groupBy = array();
+	private $groupBy = [];
 
 	/**
 	 * @return $this
@@ -16,10 +16,10 @@ trait GroupByBuilder {
 				if(!count($expression)) {
 					continue;
 				}
-				$arguments = array(
+				$arguments = [
 					$expression[0],
 					array_slice($expression, 1)
-				);
+				];
 				$expression = $this->quoteExpr($arguments);
 			}
 			$this->groupBy[] = $expression;
@@ -36,7 +36,7 @@ trait GroupByBuilder {
 			return $query;
 		}
 		$query .= "GROUP BY\n";
-		$arr = array();
+		$arr = [];
 		foreach($this->groupBy as $expression) {
 			$arr[] = "\t{$expression}";
 		}
@@ -48,6 +48,6 @@ trait GroupByBuilder {
 	 * @return mixed
 	 */
 	protected function quoteExpr(array $arguments) {
-		return call_user_func_array(array($this->db(), 'quoteExpression'), $arguments);
+		return call_user_func_array([$this->db(), 'quoteExpression'], $arguments);
 	}
 }
