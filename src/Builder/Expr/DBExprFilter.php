@@ -1,7 +1,6 @@
 <?php
 namespace Kir\MySQL\Builder\Expr;
 
-use Exception;
 use RuntimeException;
 
 class DBExprFilter implements OptionalExpression {
@@ -22,7 +21,6 @@ class DBExprFilter implements OptionalExpression {
 	 * @param string|string[] $keyPath
 	 * @param callable|null $validator
 	 * @param callable|null $validationResultHandler
-	 * @throws Exception
 	 */
 	public function __construct($expression, array $data, $keyPath, $validator = null, $validationResultHandler = null) {
 		$this->expression = $expression;
@@ -73,7 +71,6 @@ class DBExprFilter implements OptionalExpression {
 	/**
 	 * @param string|string[] $keyPath
 	 * @return string
-	 * @throws RuntimeException
 	 */
 	private function buildKey($keyPath) {
 		if(is_string($keyPath)) {

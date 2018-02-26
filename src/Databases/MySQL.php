@@ -150,14 +150,17 @@ class MySQL implements Database {
 	 * @param array $arguments
 	 * @return string
 	 */
-	public function quoteExpression($expression, array $arguments = []) {
-		$func = function () use ($arguments) {
-			static $idx = -1;
-			$idx++;
-			$index = $idx;
+	public function quoteExpression($expression, array $arguments = array()) {
+		$index = -1;
+		$func = function () use ($arguments, &$index) {
+			$index++;
 			if(array_key_exists($index, $arguments)) {
 				$argument = $arguments[$index];
 				$value = $this->quote($argument);
+			} elseif(count($arguments) > 0) {
+				$args = $arguments;
+				$value = array_pop($args);
+				$value = $this->quote($value);
 			} else {
 				$value = 'NULL';
 			}
