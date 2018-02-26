@@ -80,7 +80,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 
 	/**
 	 * @param Closure $callback
-	 * @return Traversable
+	 * @return Traversable|mixed[]
 	 */
 	public function fetchRowsLazy(Closure $callback = null) {
 		return $this->fetchLazy($callback, PDO::FETCH_ASSOC);
@@ -108,7 +108,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	/**
 	 * @param string $className
 	 * @param Closure $callback
-	 * @return object[]|Generator
+	 * @return Traversable|object[]
 	 */
 	public function fetchObjectsLazy($className = null, Closure $callback = null) {
 		return $this->fetchLazy($callback, PDO::FETCH_CLASS, $className ?: $this->defaultClassName);

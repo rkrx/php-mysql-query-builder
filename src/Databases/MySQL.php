@@ -331,14 +331,11 @@ class MySQL implements Database {
 		} else {
 			$uniqueId = $this->genUniqueId();
 			$this->exec("SAVEPOINT {$uniqueId}");
-			$rollback = false;
+			$rollback = true;
 			try {
 				$result = call_user_func($callback, $this);
+				$rollback = false;
 				return $result;
-			} catch (\Exception $e) {
-				$rollback = true;
-			} catch (\Error $e) {
-				$rollback = true;
 			} finally {
 				if($rollback) {
 					$this->exec("ROLLBACK TO {$uniqueId}");

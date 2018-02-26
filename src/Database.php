@@ -2,7 +2,6 @@
 namespace Kir\MySQL;
 
 use Kir\MySQL\Database\DatabaseStatement;
-use RuntimeException;
 
 interface Database {
 	/**
