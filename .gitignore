@@ -6,6 +6,7 @@
 !/.gitattributes
 !/.gitignore
 !/.travis.yml
+!/.scrutinizer.yml
 !/composer.json
 !/README.md
 !/tests.xml
