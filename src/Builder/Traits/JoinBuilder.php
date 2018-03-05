@@ -7,38 +7,38 @@ trait JoinBuilder {
 
 	/** @var array[] */
 	private $joinTables = [];
-
+	
 	/**
 	 * @param string $alias
 	 * @param string $table
 	 * @param string $expression
+	 * @param array $args
 	 * @return $this
 	 */
-	public function joinInner($alias, $table, $expression = null) {
-		$arguments = array_slice(func_get_args(), 3);
-		return $this->addJoin('INNER', $alias, $table, $expression, $arguments);
+	public function joinInner($alias, $table, $expression = null, ...$args) {
+		return $this->addJoin('INNER', $alias, $table, $expression, $args);
 	}
-
+	
 	/**
 	 * @param string $alias
 	 * @param string $table
 	 * @param string $expression
+	 * @param array $args
 	 * @return $this
 	 */
-	public function joinLeft($alias, $table, $expression) {
-		$arguments = array_slice(func_get_args(), 3);
-		return $this->addJoin('LEFT', $alias, $table, $expression, $arguments);
+	public function joinLeft($alias, $table, $expression, ...$args) {
+		return $this->addJoin('LEFT', $alias, $table, $expression, $args);
 	}
-
+	
 	/**
 	 * @param string $alias
 	 * @param string $table
 	 * @param string $expression
+	 * @param array $args
 	 * @return $this
 	 */
-	public function joinRight($alias, $table, $expression) {
-		$arguments = array_slice(func_get_args(), 3);
-		return $this->addJoin('RIGHT', $alias, $table, $expression, $arguments);
+	public function joinRight($alias, $table, $expression, ...$args) {
+		return $this->addJoin('RIGHT', $alias, $table, $expression, $args);
 	}
 
 	/**

@@ -28,11 +28,11 @@ class MySQL implements Database {
 	/** @var int */
 	private $transactionLevel = 0;
 	/** @var QueryLoggers */
-	private $queryLoggers = 0;
+	private $queryLoggers = null;
 	/** @var VirtualTables */
 	private $virtualTables = null;
 	/** @var MySQLExceptionInterpreter */
-	private $exceptionInterpreter = 0;
+	private $exceptionInterpreter = null;
 	/** @var array */
 	private $options;
 	
@@ -94,7 +94,7 @@ class MySQL implements Database {
 	}
 
 	/**
-	 * @param string $query
+	 * @param string|object $query
 	 * @throws Exception
 	 * @return QueryStatement
 	 */
@@ -259,7 +259,7 @@ class MySQL implements Database {
 	 * @return $this
 	 */
 	public function transactionStart() {
-		if((int) $this->transactionLevel === 0) {
+		if($this->transactionLevel === 0) {
 			if($this->pdo->inTransaction()) {
 				$this->outerTransaction = true;
 			} else {
@@ -355,8 +355,7 @@ class MySQL implements Database {
 		$this->transactionLevel--;
 		if($this->transactionLevel < 0) {
 			throw new RuntimeException("Transaction-Nesting-Problem: Trying to invoke commit on a already closed transaction");
-		}
-		if((int) $this->transactionLevel === 0) {
+		} elseif($this->transactionLevel < 1) {
 			if($this->outerTransaction) {
 				$this->outerTransaction = false;
 			} else {

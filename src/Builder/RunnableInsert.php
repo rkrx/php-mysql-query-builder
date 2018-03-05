@@ -16,7 +16,7 @@ class RunnableInsert extends Insert implements DDLPreparable {
 	 * @param array $options
 	 */
 	public function __construct(MySQL $db, array $options = []) {
-		parent::__construct($db);
+		parent::__construct($db, $options);
 	}
 
 	/**

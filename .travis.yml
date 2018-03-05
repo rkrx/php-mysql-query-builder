@@ -15,4 +15,5 @@ before_script:
 
 script:
   - phpunit -c tests.xml
+  - vendor/bin/phpstan -l 4 src
 

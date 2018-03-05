@@ -6,17 +6,21 @@ use Kir\MySQL\Databases\MySQL;
 use Kir\MySQL\Tools\AliasReplacer;
 
 abstract class Statement {
-	/** @var Database */
+	/** @var MySQL */
 	private $db;
 	/** @var AliasReplacer */
 	private $aliasReplacer;
-
+	/** @var array */
+	private $options;
+	
 	/**
 	 * @param MySQL $db
+	 * @param array $options
 	 */
-	public function __construct(MySQL $db) {
+	public function __construct(MySQL $db, array $options = []) {
 		$this->db = $db;
 		$this->aliasReplacer = new AliasReplacer($db->getAliasRegistry());
+		$this->options = $options;
 	}
 
 	/**
@@ -24,7 +28,7 @@ abstract class Statement {
 	 * @return $this
 	 */
 	public function debug($stop = true) {
-		if (php_sapi_name() == 'cli') {
+		if (php_sapi_name() === 'cli') {
 			echo "\n{$this->__toString()}\n";
 		} else {
 			echo "<pre>{$this->__toString()}</pre>";

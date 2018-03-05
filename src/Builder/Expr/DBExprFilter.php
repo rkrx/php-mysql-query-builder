@@ -70,7 +70,7 @@ class DBExprFilter implements OptionalExpression {
 
 	/**
 	 * @param string|string[] $keyPath
-	 * @return string
+	 * @return string[]
 	 */
 	private function buildKey($keyPath) {
 		if(is_string($keyPath)) {

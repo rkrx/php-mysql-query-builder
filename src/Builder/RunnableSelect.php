@@ -20,7 +20,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	/** @var bool */
 	private $preserveTypes = false;
 	/** @var string */
-	private $defaultClassName = false;
+	private $defaultClassName = \stdClass::class;
 	/** @var int */
 	private $foundRows = 0;
 	
@@ -31,7 +31,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	public function __construct(MySQL $db, array $options = []) {
 		parent::__construct($db);
 		$this->preserveTypes = array_key_exists('preserve-types-default', $options) ? $options['preserve-types-default'] : false;
-		$this->defaultClassName = array_key_exists('fetch-object-class-default', $options) ? $options['fetch-object-class-default'] : 'stdClass';
+		$this->defaultClassName = array_key_exists('fetch-object-class-default', $options) ? $options['fetch-object-class-default'] : \stdClass::class;
 	}
 	
 	/**
@@ -111,7 +111,9 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @return Traversable|object[]
 	 */
 	public function fetchObjectsLazy($className = null, Closure $callback = null) {
-		return $this->fetchLazy($callback, PDO::FETCH_CLASS, $className ?: $this->defaultClassName);
+		/** @var Traversable|object[] $result */
+		$result = $this->fetchLazy($callback, PDO::FETCH_CLASS, $className ?: $this->defaultClassName);
+		return $result;
 	}
 
 	/**
@@ -196,7 +198,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	}
 
 	/**
-	 * @param callback $fn
+	 * @param callable $fn
 	 * @return mixed
 	 */
 	private function createTempStatement($fn) {
@@ -224,10 +226,12 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	}
 
 	/**
-	 * @return Traversable|Generator|array[]
+	 * @return Traversable|array[]
 	 */
 	public function getIterator() {
-		return $this->fetchRowsLazy();
+		/** @var Traversable|array[] $result */
+		$result = $this->fetchRowsLazy();
+		return $result;
 	}
 
 	/**

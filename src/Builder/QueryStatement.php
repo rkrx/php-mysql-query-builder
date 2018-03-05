@@ -46,17 +46,14 @@ class QueryStatement implements DatabaseStatement {
 	 * @return $this
 	 */
 	public function setFetchMode($mode, $arg0 = null, array $arg1 = null) {
-		if($arg1 !== null) {
-			/** @noinspection PhpMethodParametersCountMismatchInspection */
-			$this->statement->setFetchMode($mode, $arg0, $arg1);
-			return $this;
-		}
+		$args = [$mode];
 		if($arg0 !== null) {
-			/** @noinspection PhpMethodParametersCountMismatchInspection */
-			$this->statement->setFetchMode($mode, $arg0);
-			return $this;
+			$args[] = $arg0;
 		}
-		$this->statement->setFetchMode($mode);
+		if($arg1 !== null) {
+			$args[] = $arg1;
+		}
+		$this->statement->setFetchMode(...$args);
 		return $this;
 	}
 

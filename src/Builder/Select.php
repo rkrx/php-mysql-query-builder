@@ -44,7 +44,7 @@ class Select extends Statement {
 	}
 
 	/**
-	 * @param string $expression
+	 * @param string|Select $expression
 	 * @param string $alias
 	 * @return $this
 	 */

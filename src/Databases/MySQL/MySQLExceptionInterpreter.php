@@ -16,6 +16,7 @@ class MySQLExceptionInterpreter {
 	 */
 	public function throwMoreConcreteException(PDOException $exception) {
 		$errorInfo = $exception->errorInfo;
+		/** @link http://php.net/manual/en/class.exception.php#Hcom115813 (cHao's comment) */
 		$code = is_array($errorInfo) && isset($errorInfo[1]) ? ((int) $errorInfo[1]) : ((int) $exception->getCode());
 		$message = (string) $exception->getMessage();
 		switch($code) {
@@ -28,12 +29,8 @@ class MySQLExceptionInterpreter {
 			case 1586: throw new DuplicateUniqueKeyException($message, $code, $exception);
 			case 1216:
 			case 1217:
-			case 1452: throw new IntegrityConstraintViolationException($message, (int) $code, $exception);
+			case 1452: throw new IntegrityConstraintViolationException($message, $code, $exception);
 		}
-		/** @link http://php.net/manual/en/class.exception.php#Hcom115813 (cHao's comment) */
-		if(!is_string($message) || !is_int($code)) {
-			throw new SqlException((string) $message, (int) $code, $exception);
-		}
-		throw $exception;
+		throw new SqlException($message, $code, $exception);
 	}
 }
