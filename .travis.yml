@@ -11,9 +11,9 @@ services:
 
 before_script:
   - composer self-update
-  - composer update
+  - composer --ignore-platform-reqs update
 
 script:
   - phpunit -c tests.xml
-  - vendor/bin/phpstan -l 4 src
+  - if [ $(phpenv version-name) != "5.6" ]; then vendor/bin/phpstan -l 4 src; fi
 
