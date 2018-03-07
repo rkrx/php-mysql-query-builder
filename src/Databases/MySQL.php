@@ -83,7 +83,6 @@ class MySQL implements Database {
 
 	/**
 	 * @param string $query
-	 * @throws Exception
 	 * @return QueryStatement
 	 */
 	public function query($query) {
@@ -95,7 +94,6 @@ class MySQL implements Database {
 
 	/**
 	 * @param string|object $query
-	 * @throws Exception
 	 * @return QueryStatement
 	 */
 	public function prepare($query) {
@@ -349,7 +347,6 @@ class MySQL implements Database {
 	/**
 	 * @param callable $fn
 	 * @return $this
-	 * @throws RuntimeException
 	 */
 	private function transactionEnd($fn) {
 		$this->transactionLevel--;
@@ -369,7 +366,6 @@ class MySQL implements Database {
 	 * @param string $query
 	 * @param callable $fn
 	 * @return QueryStatement
-	 * @throws RuntimeException
 	 */
 	private function buildQueryStatement($query, $fn) {
 		$stmt = call_user_func($fn, $query);

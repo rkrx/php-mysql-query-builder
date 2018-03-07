@@ -103,7 +103,6 @@ class Select extends Statement {
 
 	/**
 	 * @param bool $calcFoundRows
-	 * @throws RuntimeException
 	 * @return $this
 	 */
 	public function setCalcFoundRows($calcFoundRows = true) {

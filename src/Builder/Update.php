@@ -20,9 +20,7 @@ class Update extends InsertUpdateStatement {
 	use LimitBuilder;
 	use OffsetBuilder;
 
-	/**
-	 * @var array
-	 */
+	/** @var mixed[] */
 	private $fields = [];
 
 	/**
@@ -38,7 +36,6 @@ class Update extends InsertUpdateStatement {
 	/**
 	 * @param string $fieldName
 	 * @param string $value
-	 * @throws \UnexpectedValueException
 	 * @return $this
 	 */
 	public function set($fieldName, $value) {
@@ -60,11 +57,15 @@ class Update extends InsertUpdateStatement {
 
 	/**
 	 * @param string $expr
-	 * @param string[] ...$_
+	 * @param mixed ...$args
 	 * @return $this
 	 */
-	public function setExpr($expr, $_ = null) {
-		$this->fields[] = func_get_args();
+	public function setExpr($expr, ...$args) {
+		if(count($args) > 0) {
+			$this->fields[] = func_get_args();
+		} else {
+			$this->fields[] = $expr;
+		}
 		return $this;
 	}
 
@@ -72,7 +73,6 @@ class Update extends InsertUpdateStatement {
 	 * @param array $data
 	 * @param array $allowedFields
 	 * @return $this
-	 * @throws Exception
 	 */
 	public function setAll(array $data, array $allowedFields = null) {
 		if ($allowedFields !== null) {
@@ -91,7 +91,6 @@ class Update extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @throws Exception
 	 * @return string
 	 */
 	public function __toString() {
@@ -110,7 +109,6 @@ class Update extends InsertUpdateStatement {
 	/**
 	 * @param string $query
 	 * @return string
-	 * @throws RuntimeException
 	 */
 	private function buildAssignments($query) {
 		$sqlFields = $this->buildFieldList($this->fields);
@@ -123,7 +121,6 @@ class Update extends InsertUpdateStatement {
 	/**
 	 * @param array $values
 	 * @return array
-	 * @throws RuntimeException
 	 */
 	private function clearValues(array $values) {
 		if (!count($values)) {

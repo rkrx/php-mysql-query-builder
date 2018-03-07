@@ -52,7 +52,6 @@ class Insert extends InsertUpdateStatement {
 	/**
 	 * @param string $field
 	 * @param bool|int|float|string $value
-	 * @throws UnexpectedValueException
 	 * @return $this
 	 */
 	public function add($field, $value) {
@@ -63,7 +62,6 @@ class Insert extends InsertUpdateStatement {
 	/**
 	 * @param string $field
 	 * @param bool|int|float|string $value
-	 * @throws UnexpectedValueException
 	 * @return $this
 	 */
 	public function update($field, $value) {
@@ -74,7 +72,6 @@ class Insert extends InsertUpdateStatement {
 	/**
 	 * @param string $field
 	 * @param bool|int|float|string $value
-	 * @throws UnexpectedValueException
 	 * @return $this
 	 */
 	public function addOrUpdate($field, $value) {
@@ -85,11 +82,11 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $str
-	 * @param string ...$_
+	 * @param mixed ...$args
 	 * @return $this
 	 */
-	public function addExpr($str, $_ = null) {
-		if(count(func_get_args()) > 1) {
+	public function addExpr($str, ...$args) {
+		if(count($args) > 0) {
 			$this->fields[] = func_get_args();
 		} else {
 			$this->fields[] = $str;
@@ -99,29 +96,30 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $str
-	 * @param string ...$_
+	 * @param mixed ...$args
 	 * @return $this
 	 */
-	public function updateExpr($str, $_ = null) {
-		if(count(func_get_args()) > 1) {
+	public function updateExpr($str, ...$args) {
+		if(count($args) > 0) {
 			$this->update[] = func_get_args();
 		} else {
 			$this->update[] = $str;
 		}
 		return $this;
 	}
-
+	
 	/**
-	 * @param string $str
+	 * @param string $expr
+	 * @param mixed ...$args
 	 * @return $this
 	 */
-	public function addOrUpdateExpr($str) {
-		if(count(func_get_args()) > 1) {
+	public function addOrUpdateExpr($expr, ...$args) {
+		if(count($args) > 0) {
 			$this->fields[] = func_get_args();
 			$this->update[] = func_get_args();
 		} else {
-			$this->fields[] = $str;
-			$this->update[] = $str;
+			$this->fields[] = $expr;
+			$this->update[] = $expr;
 		}
 		return $this;
 	}
@@ -176,7 +174,6 @@ class Insert extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @throws RuntimeException
 	 * @return string
 	 */
 	public function __toString() {

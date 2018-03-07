@@ -19,7 +19,6 @@ class AliasRegistry {
 
 	/**
 	 * @param string $alias
-	 * @throws RuntimeException
 	 * @return string
 	 */
 	public function get($alias) {

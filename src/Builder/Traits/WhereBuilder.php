@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
+use Kir\MySQL\Builder\DBExpr;
 use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Builder\Internal\ConditionBuilder;
 
@@ -9,19 +10,19 @@ trait WhereBuilder {
 
 	/** @var array */
 	private $where = [];
-
+	
 	/**
 	 * @param string|array $expression
-	 * @param mixed ...$_
+	 * @param mixed[] $args
 	 * @return $this
 	 */
-	public function where($expression, $_ = null) {
+	public function where($expression, ...$args) {
 		if($expression instanceof OptionalExpression) {
 			if($expression->isValid()) {
 				$this->where[] = [$expression->getExpression(), $expression->getValue()];
 			}
 		} else {
-			$this->where[] = [$expression, array_slice(func_get_args(), 1)];
+			$this->where[] = [$expression, $args];
 		}
 		return $this;
 	}

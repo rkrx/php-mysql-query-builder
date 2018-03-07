@@ -12,10 +12,10 @@ trait HavingBuilder {
 
 	/**
 	 * @param string|array $expression
-	 * @param mixed ...$_
+	 * @param mixed[] $args
 	 * @return $this
 	 */
-	public function having($expression, $_ = null) {
+	public function having($expression, ...$args) {
 		if($expression instanceof OptionalExpression) {
 			if($expression->isValid()) {
 				$this->having[] = [$expression->getExpression(), $expression->getValue()];

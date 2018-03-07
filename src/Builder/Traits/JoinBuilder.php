@@ -12,7 +12,7 @@ trait JoinBuilder {
 	 * @param string $alias
 	 * @param string $table
 	 * @param string $expression
-	 * @param array $args
+	 * @param mixed[] $args
 	 * @return $this
 	 */
 	public function joinInner($alias, $table, $expression = null, ...$args) {
@@ -23,7 +23,7 @@ trait JoinBuilder {
 	 * @param string $alias
 	 * @param string $table
 	 * @param string $expression
-	 * @param array $args
+	 * @param mixed[] $args
 	 * @return $this
 	 */
 	public function joinLeft($alias, $table, $expression, ...$args) {
@@ -34,7 +34,7 @@ trait JoinBuilder {
 	 * @param string $alias
 	 * @param string $table
 	 * @param string $expression
-	 * @param array $args
+	 * @param mixed[] $args
 	 * @return $this
 	 */
 	public function joinRight($alias, $table, $expression, ...$args) {
@@ -66,7 +66,7 @@ trait JoinBuilder {
 	 * @param string $alias
 	 * @param string $name
 	 * @param string $expression
-	 * @param array $arguments
+	 * @param mixed[] $arguments
 	 * @return $this
 	 */
 	private function addJoin($type, $alias, $name, $expression = null, array $arguments = []) {

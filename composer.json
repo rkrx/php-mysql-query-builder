@@ -26,5 +26,9 @@
 		"psr-4": {
 			"Kir\\MySQL\\": ["src/", "tests/"]
 		}
+	},
+	"scripts": {
+		"phpstan": "phpstan analyse --level 4 src",
+		"phploc": "phploc --names *.php,*.phtml src"
 	}
 }

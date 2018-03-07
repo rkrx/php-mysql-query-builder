@@ -6,12 +6,13 @@ trait GroupByBuilder {
 
 	/** @var array */
 	private $groupBy = [];
-
+	
 	/**
+	 * @param mixed ...$args
 	 * @return $this
 	 */
-	public function groupBy() {
-		foreach(func_get_args() as $expression) {
+	public function groupBy(...$args) {
+		foreach($args as $expression) {
 			if(is_array($expression)) {
 				if(!count($expression)) {
 					continue;
