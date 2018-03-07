@@ -12,7 +12,7 @@ trait WhereBuilder {
 	private $where = [];
 	
 	/**
-	 * @param string|array $expression
+	 * @param string|array|OptionalExpression $expression
 	 * @param mixed[] $args
 	 * @return $this
 	 */

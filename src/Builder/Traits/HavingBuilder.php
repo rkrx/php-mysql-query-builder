@@ -11,7 +11,7 @@ trait HavingBuilder {
 	private $having = [];
 
 	/**
-	 * @param string|array $expression
+	 * @param string|array|OptionalExpression $expression
 	 * @param mixed[] $args
 	 * @return $this
 	 */
