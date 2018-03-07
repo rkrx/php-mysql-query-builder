@@ -28,7 +28,6 @@
 		}
 	},
 	"scripts": {
-		"phpstan": "phpstan analyse --level 4 src",
-		"phploc": "phploc --names *.php,*.phtml src"
+		"phpstan": "phpstan analyse --level 4 src"
 	}
 }
