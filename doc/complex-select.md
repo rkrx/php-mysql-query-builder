@@ -25,6 +25,8 @@ $tableC = $db->select()
 echo $db->select()
 ->from('t',
 	$db->select()
+	->field('a.field1')
+	->field('COALESCE(b.field2, a.field2)', 'field2')
 	->from('a', $tableA)
 	->joinLeft('b', $tableB, 'b.id=a.id')
 	->where('NOT ISNULL(a.field1)')
