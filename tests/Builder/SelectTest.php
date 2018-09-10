@@ -85,9 +85,9 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		$str = TestSelect::create()
 		->field('a')
 		->from('t', 'test')
-		->where(['field1' => 1, 'field2' => 'aaa'])
+		->where(['field1' => 1, 'field2' => 'aaa', 'field3' => null])
 		->asString();
-		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(`field1`='1')\n\tAND\n\t(`field2`='aaa')\n", $str);
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(`field1`='1')\n\tAND\n\t(`field2`='aaa')\n\tAND\n\t(ISNULL(`field3`))\n", $str);
 	}
 
 	public function testHaving() {
@@ -101,9 +101,9 @@ class SelectTestX extends \PHPUnit_Framework_TestCase {
 		$str = TestSelect::create()
 		->field('a')
 		->from('t', 'test')
-		->having(['field1' => 1, 'field2' => 'aaa'])
+		->having(['field1' => 1, 'field2' => 'aaa', 'field3' => null])
 		->asString();
-		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nHAVING\n\t(`field1`='1')\n\tAND\n\t(`field2`='aaa')\n", $str);
+		$this->assertEquals("SELECT\n\ta\nFROM\n\ttest t\nHAVING\n\t(`field1`='1')\n\tAND\n\t(`field2`='aaa')\n\tAND\n\t(ISNULL(`field3`))\n", $str);
 	}
 
 	public function testDBExpr() {

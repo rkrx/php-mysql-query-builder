@@ -21,7 +21,11 @@ final class ConditionBuilder {
 			list($expression, $arguments) = $condition;
 			if(is_array($expression)) {
 				foreach($expression as $key => $value) {
-					$arr = self::buildCondition($arr, "`{$key}`=?", [$value], $db);
+					if($value === null) {
+						$arr = self::buildCondition($arr, "ISNULL(`{$key}`)", [$value], $db);
+					} else {
+						$arr = self::buildCondition($arr, "`{$key}`=?", [$value], $db);
+					}
 				}
 			} else {
 				$arr = self::buildCondition($arr, $expression, $arguments, $db);
