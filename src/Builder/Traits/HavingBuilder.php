@@ -12,7 +12,7 @@ trait HavingBuilder {
 
 	/**
 	 * @param string|array|OptionalExpression $expression
-	 * @param mixed[] $args
+	 * @param array<int, mixed> $args
 	 * @return $this
 	 */
 	public function having($expression, ...$args) {

@@ -5,7 +5,7 @@ use Closure;
 use Kir\MySQL\Builder\Select;
 
 class VirtualTables {
-	/** @var Select|Closure[] */
+	/** @var array<string, Closure|Select> */
 	private $virtualTables = [];
 	
 	/**

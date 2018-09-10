@@ -196,7 +196,7 @@ class MySQL implements Database {
 			throw new UnexpectedValueException('Field name is invalid');
 		}
 		if(strpos($field, '`') !== false) {
-			return (string) $field;
+			return $field;
 		}
 		$parts = explode('.', $field);
 		return '`'.join('`.`', $parts).'`';

@@ -25,7 +25,7 @@ class Select extends Statement {
 	use OffsetBuilder;
 	use UnionBuilder;
 
-	/** @var string[] */
+	/** @var array<int|string, string> */
 	private $fields = [];
 	/** @var bool */
 	private $calcFoundRows = false;

@@ -9,11 +9,11 @@ trait TableNameBuilder {
 
 	/**
 	 * @param string $alias
-	 * @param string $name
+	 * @param string|array|object $name
 	 * @return string
 	 */
 	protected function buildTableName($alias, $name) {
-		if(is_object($name) && !($name instanceof VirtualTable)) {
+		if(is_object($name) && !($name instanceof VirtualTable) && method_exists($name, '__toString')) {
 			$name = (string) $name;
 			$lines = explode("\n", $name);
 			foreach($lines as &$line) {

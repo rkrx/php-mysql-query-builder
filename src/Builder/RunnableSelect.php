@@ -156,7 +156,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 		foreach($rows as $row) {
 			$tmp = &$result;
 			foreach($fields as $field) {
-				$value = $row[$field];
+				$value = (string) $row[$field];
 				if(!array_key_exists($value, $tmp)) {
 					$tmp[$value] = [];
 				}

@@ -20,7 +20,7 @@ class RunnableInsert extends Insert implements DDLPreparable {
 	}
 
 	/**
-	 * @param array|Traversable $rows
+	 * @param array|Traversable|mixed $rows
 	 * @return int[] Insert IDs
 	 */
 	public function insertRows($rows) {

@@ -7,7 +7,7 @@ use Kir\MySQL\Database\DatabaseStatement;
 trait CreateDDLRunnable {
 	/**
 	 * @param DatabaseStatement $query
-	 * @param callback $callbackFn
+	 * @param callable|null $callbackFn
 	 * @return DDLRunnable
 	 */
 	public function createPreparable(DatabaseStatement $query, callable $callbackFn = null) {

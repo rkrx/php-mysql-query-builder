@@ -18,7 +18,7 @@ class MySQLExceptionInterpreter {
 		$errorInfo = $exception->errorInfo;
 		/** @link http://php.net/manual/en/class.exception.php#Hcom115813 (cHao's comment) */
 		$code = is_array($errorInfo) && isset($errorInfo[1]) ? ((int) $errorInfo[1]) : ((int) $exception->getCode());
-		$message = (string) $exception->getMessage();
+		$message = $exception->getMessage();
 		switch($code) {
 			case 2006: throw new DatabaseHasGoneAwayException($message, $code, $exception);
 			case 1213: throw new SqlDeadLockException($message, $code, $exception);

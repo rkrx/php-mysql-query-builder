@@ -8,12 +8,12 @@ use Kir\MySQL\Builder\Internal\ConditionBuilder;
 trait WhereBuilder {
 	use AbstractDB;
 
-	/** @var array */
+	/** @var array<int, mixed> */
 	private $where = [];
 	
 	/**
 	 * @param string|array|OptionalExpression $expression
-	 * @param mixed[] $args
+	 * @param array<int, mixed> $args
 	 * @return $this
 	 */
 	public function where($expression, ...$args) {

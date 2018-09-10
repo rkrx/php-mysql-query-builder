@@ -57,7 +57,7 @@ trait OrderByBuilder {
 	}
 	
 	/**
-	 * @param string $expression
+	 * @param string|array $expression
 	 * @param string $direction
 	 */
 	private function addOrder($expression, $direction) {

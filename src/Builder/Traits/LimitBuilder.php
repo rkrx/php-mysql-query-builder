@@ -2,18 +2,18 @@
 namespace Kir\MySQL\Builder\Traits;
 
 trait LimitBuilder {
-	/** @var int */
+	/** @var int|null */
 	private $limit = null;
 
 	/**
-	 * @return int
+	 * @return int|null
 	 */
 	protected function getLimit() {
 		return $this->limit;
 	}
 
 	/**
-	 * @param int $limit
+	 * @param int|null $limit
 	 * @return $this
 	 */
 	public function limit($limit) {
@@ -23,7 +23,7 @@ trait LimitBuilder {
 
 	/**
 	 * @param string $query
-	 * @param null $offset
+	 * @param int|null $offset
 	 * @return string
 	 */
 	protected function buildLimit($query, $offset = null) {
