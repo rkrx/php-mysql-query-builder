@@ -6,7 +6,7 @@ trait GroupByBuilder {
 
 	/** @var array */
 	private $groupBy = [];
-	
+
 	/**
 	 * @param mixed ...$args
 	 * @return $this
@@ -41,7 +41,7 @@ trait GroupByBuilder {
 		foreach($this->groupBy as $expression) {
 			$arr[] = "\t{$expression}";
 		}
-		return $query.join(",\n", $arr)."\n";
+		return $query.implode(",\n", $arr)."\n";
 	}
 
 	/**

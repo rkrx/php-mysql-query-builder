@@ -115,7 +115,7 @@ class Update extends InsertUpdateStatement {
 		if (!count($sqlFields)) {
 			throw new RuntimeException('No field-data found');
 		}
-		return sprintf("%s%s\n", $query, join(",\n", $sqlFields));
+		return sprintf("%s%s\n", $query, implode(",\n", $sqlFields));
 	}
 
 	/**

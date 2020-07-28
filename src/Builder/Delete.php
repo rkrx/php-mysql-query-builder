@@ -41,7 +41,7 @@ class Delete extends Statement {
 	 */
 	public function __toString() {
 		$query = "DELETE ";
-		$query .= join(', ', $this->aliases);
+		$query .= implode(', ', $this->aliases);
 		$query = trim($query) . " FROM\n";
 		$query = $this->buildTables($query);
 		$query = $this->buildJoins($query);

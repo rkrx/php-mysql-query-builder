@@ -7,14 +7,6 @@ use Kir\MySQL\Databases\MySQL;
 
 class RunnableUpdate extends Update implements DDLPreparable {
 	use CreateDDLRunnable;
-	
-	/**
-	 * @param MySQL $db
-	 * @param array $options
-	 */
-	public function __construct(MySQL $db, array $options = []) {
-		parent::__construct($db, $options);
-	}
 
 	/**
 	 * @param array $params

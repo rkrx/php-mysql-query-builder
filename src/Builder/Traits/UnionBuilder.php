@@ -1,14 +1,16 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
+use Kir\MySQL\Builder\Select;
+
 trait UnionBuilder {
 	use AbstractDB;
 
-	/** @var array<int, array<int, string|Kir\MySQL\Builder\Select>> */
+	/** @var array */
 	private $unions = [];
 
 	/**
-	 * @param array<int, string|Kir\MySQL\Builder\Select> $queries
+	 * @param array<int, string|Select> $queries
 	 * @return $this
 	 */
 	public function union(...$queries) {
@@ -19,7 +21,7 @@ trait UnionBuilder {
 	}
 
 	/**
-	 * @param array<int, string|Kir\MySQL\Builder\Select> $queries
+	 * @param array<int, string|Select> $queries
 	 * @return $this
 	 */
 	public function unionAll(...$queries) {
@@ -34,9 +36,9 @@ trait UnionBuilder {
 	 * @return string
 	 */
 	protected function buildUnions($query) {
-		$wrap = function ($query) {
+		$wrap = static function ($query) {
 			$query = trim($query);
-			$query = join("\n\t", explode("\n", $query));
+			$query = implode("\n\t", explode("\n", $query));
 			return sprintf("(\n\t%s\n)", $query);
 		};
 		$queries = [$wrap($query)];
@@ -49,7 +51,7 @@ trait UnionBuilder {
 			$queries[] = $wrap($unionQuery[1]);
 		}
 		if(count($queries) > 1) {
-			return join(" ", $queries);
+			return implode(' ', $queries);
 		}
 		return $query;
 	}

@@ -12,7 +12,7 @@ abstract class Statement {
 	private $aliasReplacer;
 	/** @var array */
 	private $options;
-	
+
 	/**
 	 * @param MySQL $db
 	 * @param array $options
@@ -28,7 +28,7 @@ abstract class Statement {
 	 * @return $this
 	 */
 	public function debug($stop = true) {
-		if (php_sapi_name() === 'cli') {
+		if (PHP_SAPI === 'cli') {
 			echo "\n{$this->__toString()}\n";
 		} else {
 			echo "<pre>{$this->__toString()}</pre>";

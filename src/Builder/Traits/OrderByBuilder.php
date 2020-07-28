@@ -24,7 +24,7 @@ trait OrderByBuilder {
 		$this->addOrder($expression, $direction);
 		return $this;
 	}
-	
+
 	/**
 	 * @param string $fieldName
 	 * @param array $values
@@ -35,7 +35,7 @@ trait OrderByBuilder {
 		foreach(array_values($values) as $idx => $value) {
 			$expr[] = $this->db()->quoteExpression("WHEN ? THEN ?", [$value, $idx]);
 		}
-		$this->orderBy[] = [sprintf("CASE %s\n\t\t%s\n\tEND", $this->db()->quoteField($fieldName), join("\n\t\t", $expr)), 'ASC'];
+		$this->orderBy[] = [sprintf("CASE %s\n\t\t%s\n\tEND", $this->db()->quoteField($fieldName), implode("\n\t\t", $expr)), 'ASC'];
 		return $this;
 	}
 
@@ -49,13 +49,12 @@ trait OrderByBuilder {
 		}
 		$query .= "ORDER BY\n";
 		$arr = [];
-		foreach($this->orderBy as $order) {
-			list($expression, $direction) = $order;
+		foreach($this->orderBy as list($expression, $direction)) {
 			$arr[] = sprintf("\t%s %s", $expression, strtoupper($direction));
 		}
-		return $query.join(",\n", $arr)."\n";
+		return $query.implode(",\n", $arr)."\n";
 	}
-	
+
 	/**
 	 * @param string|array $expression
 	 * @param string $direction
@@ -74,7 +73,7 @@ trait OrderByBuilder {
 		}
 		$this->orderBy[] = [$expression, $direction];
 	}
-	
+
 	/**
 	 * @param string $direction
 	 * @return string

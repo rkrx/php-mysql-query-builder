@@ -11,13 +11,13 @@ class Insert extends InsertUpdateStatement {
 	/** @var array */
 	private $update = [];
 	/** @var string */
-	private $table = null;
+	private $table;
 	/** @var string */
-	private $keyField = null;
+	private $keyField;
 	/** @var bool */
 	private $ignore = false;
 	/** @var Select */
-	private $from = null;
+	private $from;
 
 	/**
 	 * @param string $table
@@ -107,7 +107,7 @@ class Insert extends InsertUpdateStatement {
 		}
 		return $this;
 	}
-	
+
 	/**
 	 * @param string $expr
 	 * @param mixed ...$args
@@ -189,7 +189,7 @@ class Insert extends InsertUpdateStatement {
 
 		if($this->from !== null) {
 			$fields = $this->from->getFields();
-			$queryArr[] = sprintf("\t(%s)\n", join(', ', array_keys($fields)));
+			$queryArr[] = sprintf("\t(%s)\n", implode(', ', array_keys($fields)));
 			$queryArr[] = $this->from;
 		} else {
 			$fields = $this->fields;
@@ -197,7 +197,7 @@ class Insert extends InsertUpdateStatement {
 			if (!count($insertData)) {
 				throw new RuntimeException('No field-data found');
 			}
-			$queryArr[] = sprintf("SET\n%s\n", join(",\n", $insertData));
+			$queryArr[] = sprintf("SET\n%s\n", implode(",\n", $insertData));
 		}
 
 		$updateData = $this->buildUpdate();
@@ -205,9 +205,7 @@ class Insert extends InsertUpdateStatement {
 			$queryArr[] = "{$updateData}\n";
 		}
 
-		$query = join('', $queryArr);
-
-		return $query;
+		return implode('', $queryArr);
 	}
 
 	/**
@@ -246,7 +244,7 @@ class Insert extends InsertUpdateStatement {
 		}
 		$data = $this->clearValues($data);
 		foreach ($data as $field => $value) {
-			call_user_func($fn, $field, $value);
+			$fn($field, $value);
 		}
 		return $this;
 	}
@@ -264,9 +262,9 @@ class Insert extends InsertUpdateStatement {
 			}
 			$updateArr = $this->buildFieldList($this->update, $updateArr);
 
-			$queryArr[] = join(",\n", $updateArr);
+			$queryArr[] = implode(",\n", $updateArr);
 		}
-		return join('', $queryArr);
+		return implode('', $queryArr);
 	}
 
 	/**

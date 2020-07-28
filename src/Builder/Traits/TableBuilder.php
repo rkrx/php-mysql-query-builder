@@ -30,7 +30,7 @@ trait TableBuilder {
 			$arr[] = "\t".$this->buildTableName($table['alias'], $table['name']);
 		}
 		if(count($arr)) {
-			$query .= join(",\n", $arr)."\n";
+			$query .= implode(",\n", $arr)."\n";
 		}
 		return $query;
 	}

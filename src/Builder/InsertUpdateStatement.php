@@ -5,7 +5,7 @@ use Kir\MySQL\Builder\Internal\DefaultValue;
 
 abstract class InsertUpdateStatement extends Statement {
 	/** @var array */
-	private $mask = null;
+	private $mask;
 
 	/**
 	 * @return array|null

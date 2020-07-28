@@ -1,4 +1,4 @@
-mysql query builder (php 5.6+)
+mysql query builder (php 7.0+)
 ==============================
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/a57881f2-af75-48b7-9f5f-e821cdb75d0c/mini.png)](https://insight.sensiolabs.com/projects/a57881f2-af75-48b7-9f5f-e821cdb75d0c)

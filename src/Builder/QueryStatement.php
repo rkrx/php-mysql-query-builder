@@ -145,7 +145,7 @@ class QueryStatement implements DatabaseStatement {
 	 */
 	private function exceptionHandler($fn) {
 		try {
-			return call_user_func($fn);
+			return $fn();
 		} catch (PDOException $e) {
 			$this->exceptionInterpreter->throwMoreConcreteException($e);
 		}

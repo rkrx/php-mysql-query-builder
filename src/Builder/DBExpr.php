@@ -1,5 +1,4 @@
 <?php
-
 namespace Kir\MySQL\Builder;
 
 class DBExpr {

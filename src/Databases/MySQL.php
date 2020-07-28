@@ -4,9 +4,9 @@ namespace Kir\MySQL\Databases;
 use PDO;
 use PDOException;
 use RuntimeException;
+use Throwable;
 use UnexpectedValueException;
 use Kir\MySQL\Builder;
-use Kir\MySQL\Builder\Exception;
 use Kir\MySQL\Builder\QueryStatement;
 use Kir\MySQL\Database;
 use Kir\MySQL\Databases\MySQL\MySQLExceptionInterpreter;
@@ -28,14 +28,14 @@ class MySQL implements Database {
 	/** @var int */
 	private $transactionLevel = 0;
 	/** @var QueryLoggers */
-	private $queryLoggers = null;
+	private $queryLoggers;
 	/** @var VirtualTables */
-	private $virtualTables = null;
+	private $virtualTables;
 	/** @var MySQLExceptionInterpreter */
-	private $exceptionInterpreter = null;
+	private $exceptionInterpreter;
 	/** @var array */
 	private $options;
-	
+
 	/**
 	 * @param PDO $pdo
 	 * @param array $options
@@ -87,8 +87,7 @@ class MySQL implements Database {
 	 */
 	public function query($query) {
 		return $this->buildQueryStatement($query, function ($query) {
-			$stmt = $this->pdo->query($query);
-			return $stmt;
+			return $this->pdo->query($query);
 		});
 	}
 
@@ -98,8 +97,7 @@ class MySQL implements Database {
 	 */
 	public function prepare($query) {
 		return $this->buildQueryStatement((string) $query, function ($query) {
-			$stmt = $this->pdo->prepare($query);
-			return $stmt;
+			return $this->pdo->prepare($query);
 		});
 	}
 
@@ -137,8 +135,8 @@ class MySQL implements Database {
 			return self::$tableFields[$table];
 		}
 		$stmt = $this->pdo->query("DESCRIBE {$table}");
-		$rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-		self::$tableFields[$table] = array_map(function ($row) { return $row['Field']; }, $rows);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+		self::$tableFields[$table] = array_map(static function ($row) { return $row['Field']; }, $rows);
 		$stmt->closeCursor();
 		return self::$tableFields[$table];
 	}
@@ -180,7 +178,7 @@ class MySQL implements Database {
 		} elseif($value instanceof Builder\Select) {
 			$result = sprintf('(%s)', (string) $value);
 		} elseif(is_array($value)) {
-			$result = join(', ', array_map(function ($value) { return $this->quote($value); }, $value));
+			$result = implode(', ', array_map(function ($value) { return $this->quote($value); }, $value));
 		} else {
 			$result = $this->pdo->quote($value);
 		}
@@ -199,7 +197,7 @@ class MySQL implements Database {
 			return $field;
 		}
 		$parts = explode('.', $field);
-		return '`'.join('`.`', $parts).'`';
+		return '`'.implode('`.`', $parts).'`';
 	}
 
 	/**
@@ -285,7 +283,7 @@ class MySQL implements Database {
 			$this->pdo->rollBack();
 		});
 	}
-	
+
 	/**
 	 * @param callable|null $callback
 	 * @return mixed
@@ -294,7 +292,7 @@ class MySQL implements Database {
 		if(!$this->pdo->inTransaction()) {
 			$this->transactionStart();
 			try {
-				return call_user_func($callback, $this);
+				return $callback($this);
 			} finally {
 				$this->transactionRollback();
 			}
@@ -302,13 +300,13 @@ class MySQL implements Database {
 			$uniqueId = $this->genUniqueId();
 			$this->exec("SAVEPOINT {$uniqueId}");
 			try {
-				return call_user_func($callback, $this);
+				return $callback($this);
 			} finally {
 				$this->exec("ROLLBACK TO {$uniqueId}");
 			}
 		}
 	}
-	
+
 	/**
 	 * @param callable|null $callback
 	 * @return mixed
@@ -318,29 +316,25 @@ class MySQL implements Database {
 		if(!$this->pdo->inTransaction()) {
 			$this->transactionStart();
 			try {
-				$result = call_user_func($callback, $this);
+				$result = $callback($this);
 				$this->transactionCommit();
 				return $result;
-			} finally {
+			} catch (Throwable $e) {
 				if($this->pdo->inTransaction()) {
 					$this->transactionRollback();
 				}
+				throw $e;
 			}
-		} else {
-			$uniqueId = $this->genUniqueId();
-			$this->exec("SAVEPOINT {$uniqueId}");
-			$rollback = true;
-			try {
-				$result = call_user_func($callback, $this);
-				$rollback = false;
-				return $result;
-			} finally {
-				if($rollback) {
-					$this->exec("ROLLBACK TO {$uniqueId}");
-				} else {
-					$this->exec("RELEASE SAVEPOINT {$uniqueId}");
-				}
-			}
+		}
+		$uniqueId = $this->genUniqueId();
+		$this->exec("SAVEPOINT {$uniqueId}");
+		try {
+			$result = $callback($this);
+			$this->exec("RELEASE SAVEPOINT {$uniqueId}");
+			return $result;
+		} catch (Throwable $e) {
+			$this->exec("ROLLBACK TO {$uniqueId}");
+			throw $e;
 		}
 	}
 
@@ -352,11 +346,12 @@ class MySQL implements Database {
 		$this->transactionLevel--;
 		if($this->transactionLevel < 0) {
 			throw new RuntimeException("Transaction-Nesting-Problem: Trying to invoke commit on a already closed transaction");
-		} elseif($this->transactionLevel < 1) {
+		}
+		if($this->transactionLevel < 1) {
 			if($this->outerTransaction) {
 				$this->outerTransaction = false;
 			} else {
-				call_user_func($fn);
+				$fn();
 			}
 		}
 		return $this;
@@ -368,12 +363,11 @@ class MySQL implements Database {
 	 * @return QueryStatement
 	 */
 	private function buildQueryStatement($query, $fn) {
-		$stmt = call_user_func($fn, $query);
+		$stmt = $fn($query);
 		if(!$stmt) {
 			throw new RuntimeException("Could not execute statement:\n{$query}");
 		}
-		$stmtWrapper = new QueryStatement($stmt, $query, $this->exceptionInterpreter, $this->queryLoggers);
-		return $stmtWrapper;
+		return new QueryStatement($stmt, $query, $this->exceptionInterpreter, $this->queryLoggers);
 	}
 
 	/**
@@ -382,7 +376,7 @@ class MySQL implements Database {
 	 */
 	private function exceptionHandler($fn) {
 		try {
-			return call_user_func($fn);
+			return $fn();
 		} catch (PDOException $e) {
 			$this->exceptionInterpreter->throwMoreConcreteException($e);
 		}

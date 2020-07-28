@@ -3,7 +3,7 @@ namespace Kir\MySQL\Builder\Traits;
 
 trait OffsetBuilder {
 	/** @var int */
-	private $offset = null;
+	private $offset;
 
 	/**
 	 * @return int

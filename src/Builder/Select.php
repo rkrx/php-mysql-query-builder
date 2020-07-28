@@ -55,8 +55,8 @@ class Select extends Statement {
 			$expression = rtrim($expression, ';');
 			$expression = trim($expression);
 			$lines = explode("\n", $expression);
-			$lines = array_map(function($line) { return "\t\t{$line}"; }, $lines);
-			$expression = join("\n", $lines);
+			$lines = array_map(static function($line) { return "\t\t{$line}"; }, $lines);
+			$expression = implode("\n", $lines);
 			$expression = sprintf("(\n%s\n\t)", $expression);
 		}
 		if ($alias === null) {
@@ -169,7 +169,7 @@ class Select extends Statement {
 		} else {
 			$fields[] = "\t*";
 		}
-		return $query.join(",\n", $fields)."\n";
+		return $query.implode(",\n", $fields)."\n";
 	}
 
 	/**

@@ -8,7 +8,7 @@ class OptionalDBFilterMap {
 	/**
 	 * @param array $map
 	 */
-	public function __construct(array $map) {
+	final public function __construct(array $map) {
 		$this->map = $map;
 	}
 
@@ -18,6 +18,13 @@ class OptionalDBFilterMap {
 	 */
 	public static function from(array $map) {
 		return new static($map);
+	}
+
+	/**
+	 * @return array
+	 */
+	protected function getMap(): array {
+		return $this->map;
 	}
 
 	/**

@@ -36,7 +36,7 @@ class DBExprFilter implements OptionalExpression {
 			};
 		}
 		if($validationResultHandler === null) {
-			$validationResultHandler = function () {};
+			$validationResultHandler = static function () {};
 		}
 		$this->validator = $validator;
 		$this->validationResultHandler = $validationResultHandler;
@@ -56,7 +56,7 @@ class DBExprFilter implements OptionalExpression {
 		$result = call_user_func($this->validator, $this->value);
 		call_user_func($this->validationResultHandler, $result, [
 			'value' => $this->value,
-			'key' => join('.', $this->keyPath),
+			'key' => implode('.', $this->keyPath),
 		]);
 		return $result;
 	}
@@ -107,8 +107,8 @@ class DBExprFilter implements OptionalExpression {
 		if (!$count) {
 			return $default;
 		}
-		for($idx = 0; $idx < $count; $idx++) {
-			$part = $path[$idx];
+		foreach($path as $idxValue) {
+			$part = $idxValue;
 			if(!array_key_exists($part, $array)) {
 				return $default;
 			}

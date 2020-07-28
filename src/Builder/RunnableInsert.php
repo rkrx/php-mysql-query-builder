@@ -10,14 +10,6 @@ use Traversable;
 
 class RunnableInsert extends Insert implements DDLPreparable {
 	use CreateDDLRunnable;
-	
-	/**
-	 * @param MySQL $db
-	 * @param array $options
-	 */
-	public function __construct(MySQL $db, array $options = []) {
-		parent::__construct($db, $options);
-	}
 
 	/**
 	 * @param array|Traversable|mixed $rows

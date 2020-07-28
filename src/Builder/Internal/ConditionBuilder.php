@@ -17,8 +17,7 @@ final class ConditionBuilder {
 		}
 		$query .= "{$token}\n";
 		$arr = [];
-		foreach($conditions as $condition) {
-			list($expression, $arguments) = $condition;
+		foreach($conditions as list($expression, $arguments)) {
 			if(is_array($expression)) {
 				foreach($expression as $key => $value) {
 					if($value === null) {
@@ -31,7 +30,7 @@ final class ConditionBuilder {
 				$arr = self::buildCondition($arr, $expression, $arguments, $db);
 			}
 		}
-		$query .= join("\n\tAND\n", $arr);
+		$query .= implode("\n\tAND\n", $arr);
 		return "{$query}\n";
 	}
 

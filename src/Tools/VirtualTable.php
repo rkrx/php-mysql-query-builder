@@ -5,8 +5,8 @@ class VirtualTable {
 	/** @var string */
 	private $tableName;
 	/** @var array */
-	private $params = [];
-	
+	private $params;
+
 	/**
 	 * @param string $tableName
 	 * @param array $params
@@ -15,21 +15,21 @@ class VirtualTable {
 		$this->tableName = $tableName;
 		$this->params = $params;
 	}
-	
+
 	/**
 	 * @return string
 	 */
 	public function getTableName() {
 		return $this->tableName;
 	}
-	
+
 	/**
 	 * @return array
 	 */
 	public function getParams() {
 		return $this->params;
 	}
-	
+
 	/**
 	 * @return string
 	 */

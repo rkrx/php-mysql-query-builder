@@ -7,7 +7,7 @@ trait JoinBuilder {
 
 	/** @var array[] */
 	private $joinTables = [];
-	
+
 	/**
 	 * @param string $alias
 	 * @param string $table
@@ -18,7 +18,7 @@ trait JoinBuilder {
 	public function joinInner($alias, $table, $expression = null, ...$args) {
 		return $this->addJoin('INNER', $alias, $table, $expression, $args);
 	}
-	
+
 	/**
 	 * @param string $alias
 	 * @param string $table
@@ -29,7 +29,7 @@ trait JoinBuilder {
 	public function joinLeft($alias, $table, $expression, ...$args) {
 		return $this->addJoin('LEFT', $alias, $table, $expression, $args);
 	}
-	
+
 	/**
 	 * @param string $alias
 	 * @param string $table
@@ -56,7 +56,7 @@ trait JoinBuilder {
 			$arr[] = $join;
 		}
 		if(count($arr)) {
-			$query .= join("\n", $arr)."\n";
+			$query .= implode("\n", $arr)."\n";
 		}
 		return $query;
 	}

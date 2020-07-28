@@ -18,8 +18,7 @@ class AliasReplacer {
 	 */
 	public function replace($name) {
 		$fn = function($values) {
-			$alias = $values[1];
-			$part = $values[2];
+			list(, $alias, $part) = $values;
 			$string = $this->aliasRegistry->get($alias);
 			return $string.$part;
 		};

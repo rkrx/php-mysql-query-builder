@@ -2,7 +2,6 @@
 namespace Kir\MySQL\Builder;
 
 use Closure;
-use Generator;
 use IteratorAggregate;
 use Kir\MySQL\Builder\Helpers\DBIgnoreRow;
 use Kir\MySQL\Builder\Helpers\FieldTypeProvider;
@@ -10,6 +9,7 @@ use Kir\MySQL\Builder\Helpers\FieldValueConverter;
 use Kir\MySQL\Builder\Helpers\LazyRowGenerator;
 use Kir\MySQL\Databases\MySQL;
 use PDO;
+use stdClass;
 use Traversable;
 
 /**
@@ -18,12 +18,12 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	/** @var array */
 	private $values = [];
 	/** @var bool */
-	private $preserveTypes = false;
+	private $preserveTypes;
 	/** @var string */
-	private $defaultClassName = \stdClass::class;
+	private $defaultClassName;
 	/** @var int */
 	private $foundRows = 0;
-	
+
 	/**
 	 * @param MySQL $db
 	 * @param array $options
@@ -31,9 +31,9 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	public function __construct(MySQL $db, array $options = []) {
 		parent::__construct($db);
 		$this->preserveTypes = array_key_exists('preserve-types-default', $options) ? $options['preserve-types-default'] : false;
-		$this->defaultClassName = array_key_exists('fetch-object-class-default', $options) ? $options['fetch-object-class-default'] : \stdClass::class;
+		$this->defaultClassName = array_key_exists('fetch-object-class-default', $options) ? $options['fetch-object-class-default'] : stdClass::class;
 	}
-	
+
 	/**
 	 * @param array $values
 	 * @return $this
@@ -91,7 +91,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @return mixed[]
 	 */
 	public function fetchRow(Closure $callback = null) {
-		return $this->fetch($callback, PDO::FETCH_ASSOC, null, function ($row) {
+		return $this->fetch($callback, PDO::FETCH_ASSOC, null, static function ($row) {
 			return ['valid' => is_array($row), 'default' => []];
 		});
 	}
@@ -122,7 +122,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @return object[]
 	 */
 	public function fetchObject($className = null, Closure $callback = null) {
-		return $this->fetch($callback, PDO::FETCH_CLASS, $className ?: $this->defaultClassName, function ($row) {
+		return $this->fetch($callback, PDO::FETCH_CLASS, $className ?: $this->defaultClassName, static function ($row) {
 			return ['valid' => is_object($row), 'default' => null];
 		});
 	}
@@ -132,9 +132,9 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @return mixed[]
 	 */
 	public function fetchKeyValue($treatValueAsArray = false) {
-		return $this->createTempStatement(function (QueryStatement $statement) use ($treatValueAsArray) {
+		return $this->createTempStatement(static function (QueryStatement $statement) use ($treatValueAsArray) {
 			if($treatValueAsArray) {
-				$rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
+				$rows = $statement->fetchAll(PDO::FETCH_ASSOC);
 				$result = [];
 				foreach($rows as $row) {
 					list($key) = array_values($row);
@@ -142,7 +142,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 				}
 				return $result;
 			}
-			return $statement->fetchAll(\PDO::FETCH_KEY_PAIR);
+			return $statement->fetchAll(PDO::FETCH_KEY_PAIR);
 		});
 	}
 
@@ -154,6 +154,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 		$rows = $this->fetchRows();
 		$result = [];
 		foreach($rows as $row) {
+			/** @var array $tmp */
 			$tmp = &$result;
 			foreach($fields as $field) {
 				$value = (string) $row[$field];
@@ -171,8 +172,8 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @return string[]
 	 */
 	public function fetchArray() {
-		return $this->createTempStatement(function (QueryStatement $stmt) {
-			return $stmt->fetchAll(\PDO::FETCH_COLUMN);
+		return $this->createTempStatement(static function (QueryStatement $stmt) {
+			return $stmt->fetchAll(PDO::FETCH_COLUMN);
 		});
 	}
 
@@ -181,8 +182,8 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @return null|bool|string|int|float
 	 */
 	public function fetchValue($default = null) {
-		return $this->createTempStatement(function (QueryStatement $stmt) use ($default) {
-			$result = $stmt->fetch(\PDO::FETCH_NUM);
+		return $this->createTempStatement(static function (QueryStatement $stmt) use ($default) {
+			$result = $stmt->fetch(PDO::FETCH_NUM);
 			if($result !== false) {
 				return $result[0];
 			}
@@ -204,7 +205,7 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	private function createTempStatement($fn) {
 		$stmt = $this->createStatement();
 		try {
-			return call_user_func($fn, $stmt);
+			return $fn($stmt);
 		} finally {
 			$stmt->closeCursor();
 		}
@@ -214,7 +215,6 @@ class RunnableSelect extends Select implements IteratorAggregate {
 	 * @return QueryStatement
 	 */
 	private function createStatement() {
-		/** @var MySQL $db */
 		$db = $this->db();
 		$query = $this->__toString();
 		$statement = $db->prepare($query);
@@ -246,12 +246,10 @@ class RunnableSelect extends Select implements IteratorAggregate {
 			$data = $statement->fetchAll();
 			if($this->preserveTypes) {
 				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
-				foreach($data as &$row) {
-					$row = FieldValueConverter::convertValues($row, $columnDefinitions);
-				}
+				$data = array_map(static function ($row) use ($columnDefinitions) { return FieldValueConverter::convertValues($row, $columnDefinitions); }, $data);
 			}
 			if($callback !== null) {
-				return call_user_func(function ($resultData = []) use ($data, $callback) {
+				return call_user_func(static function ($resultData = []) use ($data, $callback) {
 					foreach($data as $row) {
 						$result = $callback($row);
 						if($result !== null && !($result instanceof DBIgnoreRow)) {
