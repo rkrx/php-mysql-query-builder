@@ -30,6 +30,7 @@
 		}
 	},
 	"scripts": {
-		"phpstan": "phpstan analyse --level 4 src"
+		"phpstan": "phpstan analyse --level 4 src",
+		"phpunit": "phpunit -c tests.xml"
 	}
 }
