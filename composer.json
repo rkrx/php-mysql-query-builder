@@ -1,7 +1,8 @@
 {
 	"name": "rkr/php-mysql-query-builder",
-	"description": "Easy to use query builder for PHP5.3+/PDO",
+	"description": "Easy to use query builder for PHP7.0+/PDO",
 	"license": "MIT",
+	"type": "library",
 	"authors": [{
 		"name": "ron",
 		"email": "ron.kirschler@gmail.com"
@@ -32,5 +33,10 @@
 	"scripts": {
 		"phpstan": "phpstan analyse --level 4 src",
 		"phpunit": "phpunit -c tests.xml"
+	},
+	"config": {
+		"platform": {
+			"php": "7.0.32"
+		}
 	}
 }

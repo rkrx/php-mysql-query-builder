@@ -9,15 +9,15 @@ class TestInsert extends Insert {
 	 * @return static
 	 */
 	public static function create() {
-		$functions = array(
+		$functions = [
 			'getTableFields' => function ($tableName) {
-				return array(
+				return [
 					'id',
 					'name',
 					'last_update'
-				);
+				];
 			}
-		);
+		];
 		$db = new TestDB($functions);
 		return new static($db);
 	}

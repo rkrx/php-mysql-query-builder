@@ -10,7 +10,7 @@ trait JoinBuilder {
 
 	/**
 	 * @param string $alias
-	 * @param string $table
+	 * @param string|array[] $table
 	 * @param string $expression
 	 * @param array<int, mixed> $args
 	 * @return $this
@@ -21,7 +21,7 @@ trait JoinBuilder {
 
 	/**
 	 * @param string $alias
-	 * @param string $table
+	 * @param string|array[] $table
 	 * @param string $expression
 	 * @param array<int, mixed> $args
 	 * @return $this
@@ -32,7 +32,7 @@ trait JoinBuilder {
 
 	/**
 	 * @param string $alias
-	 * @param string $table
+	 * @param string|array[] $table
 	 * @param string $expression
 	 * @param array<int, mixed> $args
 	 * @return $this
@@ -64,12 +64,12 @@ trait JoinBuilder {
 	/**
 	 * @param string $type
 	 * @param string $alias
-	 * @param string $name
+	 * @param string|array[] $name
 	 * @param string $expression
 	 * @param array<int, mixed> $arguments
 	 * @return $this
 	 */
-	private function addJoin($type, $alias, $name, $expression = null, array $arguments = []) {
+	private function addJoin(string $type, $alias, $name, $expression = null, array $arguments = []) {
 		$this->joinTables[] = [
 			'type' => $type,
 			'alias' => $alias,
