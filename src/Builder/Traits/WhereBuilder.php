@@ -2,11 +2,11 @@
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Builder\Expr\OptionalExpression;
+use Kir\MySQL\Builder\Helpers\ConditionAddHelper;
 use Kir\MySQL\Builder\Internal\ConditionBuilder;
 
 trait WhereBuilder {
 	use AbstractDB;
-	use ConditionDefinition;
 
 	/** @var array[] */
 	private $where = [];
@@ -18,14 +18,15 @@ trait WhereBuilder {
 	 */
 	public function where($expression, ...$args) {
 		$fn = function (...$args) { $this->where[] = $args; };
-		return $this->addCondition($fn, $expression, ...$args);
+		ConditionAddHelper::addCondition($fn, $expression, ...$args);
+		return $this;
 	}
 
 	/**
 	 * @param string $query
 	 * @return string
 	 */
-	protected function buildWhereConditions($query) {
+	protected function buildWhereConditions(string $query) {
 		return ConditionBuilder::build($this->db(), $query, $this->where, 'WHERE');
 	}
 }

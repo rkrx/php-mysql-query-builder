@@ -1,29 +1,27 @@
 <?php
-namespace Kir\MySQL\Builder\Traits;
+namespace Kir\MySQL\Builder\Helpers;
 
 use Closure;
 use Kir\MySQL\Builder\Expr\OptionalExpression;
 
-trait ConditionDefinition {
+abstract class ConditionAddHelper {
 	/**
 	 * @param Closure $addFn
 	 * @param string|array|object|OptionalExpression $expression
 	 * @param mixed[] $args
-	 * @return $this
 	 */
-	protected function addCondition(Closure $addFn, $expression, ...$args) {
+	public static function addCondition(Closure $addFn, $expression, ...$args) {
 		if($expression instanceof OptionalExpression) {
 			if($expression->isValid()) {
 				$addFn($expression->getExpression(), $expression->getValue());
 			}
 		} elseif(is_object($expression)) {
-			$this->addAsArray($addFn, (array) $expression, $args);
+			self::addAsArray($addFn, (array) $expression, $args);
 		} elseif(is_array($expression)) {
-			$this->addAsArray($addFn, $expression, $args);
+			self::addAsArray($addFn, $expression, $args);
 		} else {
 			$addFn($expression, $args);
 		}
-		return $this;
 	}
 
 	/**
@@ -31,7 +29,7 @@ trait ConditionDefinition {
 	 * @param array $expression
 	 * @param array $args
 	 */
-	private function addAsArray(Closure $addFn, array $expression, array $args) {
+	private static function addAsArray(Closure $addFn, array $expression, array $args) {
 		if(count($expression) > 0) {
 			$addFn($expression, $args);
 		}
