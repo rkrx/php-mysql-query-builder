@@ -29,13 +29,13 @@ class DBTestCase extends TestCase {
 		TestDB::use($fn);
 	}
 
-	protected function setUp() {
+	protected function setUp(): void {
 		parent::setUp();
 		$this->db = new TestDB();
 		$this->db->exec('USE travis_test');
 	}
 
-	protected function tearDown() {
+	protected function tearDown(): void {
 		parent::tearDown();
 		$this->db->close();
 		$this->db = null;

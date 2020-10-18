@@ -18,7 +18,7 @@ services:
 install:
   - |
       # Install PHPUnit v9 on PHP 8
-      if dpkg --compare-versions "${TRAVIS_PHP_VERSION}" ge 8.0; then
+      if [ "${TRAVIS_PHP_VERSION}" == nightly ] || [ dpkg --compare-versions "${TRAVIS_PHP_VERSION}" ge 8.0 ]; then
           travis_retry composer require --no-interaction --prefer-dist --dev --ignore-platform-reqs "phpunit/phpunit" 9.*
       # Enable test on PHP 7.1+
       else
