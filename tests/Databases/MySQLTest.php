@@ -1,93 +1,42 @@
 <?php
 namespace Kir\MySQL\Databases;
 
-use Kir\FakePDO\EventHandlers\RegistryEventHandler;
-use Kir\FakePDO\FakePDO;
 use Kir\MySQL\Builder\SelectTest\TestSelect;
-use Traversable;
+use Kir\MySQL\Common\DBTestCase;
+use RuntimeException;
 
-class MySQLTest extends \PHPUnit_Framework_TestCase {
-	/** @var TestDB */
-	private $db = null;
-
-	protected function setUp() {
-		$this->db = new TestDB();
-		$this->db->install();
-	}
-
-	protected function tearDown() {
-		$this->db->uninstall();
-	}
-
+class MySQLTest extends DBTestCase {
 	public function testGetTableFields() {
-		$eventHandler = new RegistryEventHandler();
-
-		$eventHandler->add('PDOStatement::fetchAll', function ($event) {
-			return [['Field' => 'a'], ['Field' => 'b'], ['Field' => 'c']];
-		});
-
-		$pdo = new FakePDO($eventHandler);
-
-		$mysql = new MySQL($pdo);
-		$mysql->getAliasRegistry()->add('test', 'test__');
-		$fields = $mysql->getTableFields('test#table');
-
-		$this->assertEquals(array('a', 'b', 'c'), $fields);
+		$fields = $this->getDB()->getTableFields('test1');
+		self::assertEquals(['id', 'field1', 'field2', 'field3', 'field4'], $fields);
 	}
 
 	/**
 	 * Test if the outer nested transaction detection works as expected
 	 */
 	public function testNestedTransaction() {
-		$eventHandler = new RegistryEventHandler();
-		$pdo = new FakePDO($eventHandler);
-		$mysql = new MySQL($pdo);
-
-		$mysql->transactionStart();
-
-		$eventHandler->add('PDO::beginTransaction', function () {
-			throw new \Exception('Invalid transaction state');
-		});
-
-		$eventHandler->add('PDO::rollback', function () {
-			throw new \Exception('Invalid transaction state');
-		});
-
-		$mysql->transactionStart();
-		$mysql->transactionStart();
-		$mysql->transactionRollback();
-		$mysql->transactionRollback();
-
-		$eventHandler->add('PDO::rollback', function () {
-		});
-
-		$mysql->transactionRollback();
+		$this->getDB()->transactionStart();
+		$this->getDB()->transactionStart();
+		$this->getDB()->transactionStart();
+		$this->getDB()->transactionRollback();
+		$this->getDB()->transactionRollback();
+		$this->getDB()->transactionRollback();
+		self::assertTrue(true);
 	}
 
 	/**
 	 * Test if the outer nested transaction detection works as expected
 	 */
 	public function testOuterNestedTransaction() {
-		$eventHandler = new RegistryEventHandler();
-		$pdo = new FakePDO($eventHandler);
-		$mysql = new MySQL($pdo);
+		$this->getDB()->getPDO()->beginTransaction();
+		$this->getDB()->transactionStart();
+		$this->getDB()->transactionStart();
+		$this->getDB()->transactionStart();
+		$this->getDB()->transactionRollback();
+		$this->getDB()->transactionRollback();
+		$this->getDB()->transactionRollback();
 
-		$pdo->beginTransaction();
-
-		$eventHandler->add('PDO::beginTransaction', function () {
-			throw new \Exception('Invalid transaction state');
-		});
-
-		$eventHandler->add('PDO::rollback', function () {
-			throw new \Exception('Invalid transaction state');
-		});
-
-		$mysql->transactionStart();
-		$mysql->transactionStart();
-		$mysql->transactionStart();
-		$mysql->transactionRollback();
-		$mysql->transactionRollback();
-		$mysql->transactionRollback();
+		self::assertTrue(true);
 	}
 
 	public function testFetchRow() {
@@ -99,7 +48,7 @@ class MySQLTest extends \PHPUnit_Framework_TestCase {
 		->fetchRow(function (array &$row) {
 			$row['test'] = 10;
 		});
-		$this->assertEquals(['id' => 1, 'test' => 10], $row);
+		self::assertEquals(['id' => 1, 'test' => 10], $row);
 
 		// Closure with return
 		$row = TestSelect::create()
@@ -110,7 +59,7 @@ class MySQLTest extends \PHPUnit_Framework_TestCase {
 			$row['test'] = 10;
 			return $row;
 		});
-		$this->assertEquals(['id' => 1, 'test' => 10], $row);
+		self::assertEquals(['id' => 1, 'test' => 10], $row);
 	}
 
 	public function testFetchRows() {
@@ -123,7 +72,7 @@ class MySQLTest extends \PHPUnit_Framework_TestCase {
 			$row['test'] = 10;
 		});
 
-		$this->assertEquals([['id' => 1, 'test' => 10]], $rows);
+		self::assertEquals([['id' => 1, 'test' => 10]], $rows);
 
 		// Closure with return
 		$rows = TestSelect::create()
@@ -135,7 +84,7 @@ class MySQLTest extends \PHPUnit_Framework_TestCase {
 			return $row;
 		});
 
-		$this->assertEquals([['id' => 1, 'test' => 10]], $rows);
+		self::assertEquals([['id' => 1, 'test' => 10]], $rows);
 	}
 
 	public function testFetchRowsLazy() {
@@ -148,7 +97,7 @@ class MySQLTest extends \PHPUnit_Framework_TestCase {
 			$row['test'] = 10;
 		});
 		$rows = iterator_to_array($rows);
-		$this->assertEquals([['id' => 1, 'test' => 10]], $rows);
+		self::assertEquals([['id' => 1, 'test' => 10]], $rows);
 
 		// Closure with return
 		$rows = TestSelect::create()
@@ -160,7 +109,7 @@ class MySQLTest extends \PHPUnit_Framework_TestCase {
 			return $row;
 		});
 		$rows = iterator_to_array($rows);
-		$this->assertEquals([['id' => 1, 'test' => 10]], $rows);
+		self::assertEquals([['id' => 1, 'test' => 10]], $rows);
 
 		// IgnoredRow
 		$rows = TestSelect::create()
@@ -172,6 +121,6 @@ class MySQLTest extends \PHPUnit_Framework_TestCase {
 			return $row;
 		});
 		$rows = iterator_to_array($rows);
-		$this->assertEquals([['id' => 1, 'test' => 10]], $rows);
+		self::assertEquals([['id' => 1, 'test' => 10]], $rows);
 	}
 }

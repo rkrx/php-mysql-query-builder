@@ -8,17 +8,15 @@
 		"email": "ron.kirschler@gmail.com"
 	}],
 	"require": {
-		"php": ">= 7.0",
+		"php": ">= 7.1",
 		"ext-pdo": "*",
 		"ext-spl": "*",
 		"ext-ctype": "*",
 		"psr/log": "~1"
 	},
 	"require-dev": {
-		"phpunit/phpunit": "~5.0",
-		"phake/phake": "1.0.5",
-		"phpstan/phpstan": "*@stable",
-		"rkr/fakepdo": "0.1.*"
+		"phpunit/phpunit": "~6",
+		"phpstan/phpstan": "*@stable"
 	},
 	"autoload": {
 		"psr-4": {
@@ -36,7 +34,7 @@
 	},
 	"config": {
 		"platform": {
-			"php": "7.0.32"
+			"php": "7.1.10"
 		}
 	}
 }

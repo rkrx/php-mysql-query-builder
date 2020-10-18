@@ -7,18 +7,18 @@ use Kir\MySQL\Builder\Expr\OptionalDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredValueNotFoundException;
 use Kir\MySQL\Builder\SelectTest\TestSelect;
+use Kir\MySQL\Common\DBTestCase;
 use Kir\MySQL\Databases\TestDB;
 use Kir\MySQL\Tools\VirtualTable;
-use PHPUnit_Framework_TestCase;
 
-class SelectTest extends PHPUnit_Framework_TestCase {
+class SelectTest extends DBTestCase {
 	public function testAddition() {
-		$str = TestSelect::create()->field('1+2')->asString();
+		$str = $this->select()->field('1+2')->asString();
 		self::assertEquals("SELECT\n\t1+2\n", $str);
 	}
 
 	public function testFrom() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->asString();
@@ -26,7 +26,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testFromArray() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a.a')
 		->field('b.b')
 		->from('a', [['a' => 1, 'b' => 3], ['a' => 2, 'b' => 2], ['a' => 3, 'b' => 1]])
@@ -36,7 +36,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testMultipleFrom() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t1', 'test1')
 		->from('t2', 'test2')
@@ -45,15 +45,15 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testJoins() {
-		$testFn = static function ($method, $type) {
-			$sql = TestSelect::create()
+		$testFn = function ($method, $type) {
+			$sql = $this->select()
 			->field('a')
 			->from('t1', 'test1')
 			->{$method}('t2', 'test2', 't2.id=t1.id')
 			->asString();
 			self::assertEquals("SELECT\n\ta\nFROM\n\ttest1 t1\n{$type} JOIN\n\ttest2 t2 ON t2.id=t1.id\n", $sql);
 
-			$sql = TestSelect::create()
+			$sql = $this->select()
 			->field('a')
 			->from('t1', 'test1')
 			->{$method}('t2', 'test2', 't2.id=t1.id AND t2.id < ?', 1000)
@@ -67,14 +67,14 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testWhere() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->where('a+1<2')
 		->asString();
 		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(a+1<2)\n", $str);
 
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->where('a < ?', 1000)
@@ -83,7 +83,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testWhereAsObject() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->where((object) ['field1' => 1, 'field2' => 'aaa', 'field3' => null])
@@ -92,7 +92,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testWhereAsEmptyObject() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->where((object) [])
@@ -101,7 +101,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testWhereAsArray() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->where(['field1' => 1, 'field2' => 'aaa', 'field3' => null])
@@ -110,7 +110,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testWhereAsEmptyArray() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->where([])
@@ -119,7 +119,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testHaving() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->having('a+1<2')
@@ -128,7 +128,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testHavingAsObject() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->having((object) ['field1' => 1, 'field2' => 'aaa', 'field3' => null])
@@ -137,7 +137,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testHavingAsEmptyObject() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->having((object) [])
@@ -146,7 +146,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testHavingAsArray() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->having(['field1' => 1, 'field2' => 'aaa', 'field3' => null])
@@ -155,7 +155,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testHavingAsEmptyArray() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->having([])
@@ -164,7 +164,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testDBExpr() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->where('a=?', new DBExpr('NOW()'))
@@ -172,7 +172,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 		->asString();
 		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(a=NOW())\nHAVING\n\t(b=NOW())\n", $str);
 
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->where('a < ?', 1000)
@@ -181,7 +181,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testDBExprFilter() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->where(new DBExprFilter('a=? AND b=?', ['x' => ['y' => 1]], 'x.y'))
@@ -191,7 +191,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testOrder() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->orderBy('a', 'desc')
@@ -200,7 +200,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGroup() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->groupBy('a', 'b', 'c')
@@ -209,7 +209,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testLimit() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->limit(100)
@@ -218,7 +218,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testOffset() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->limit(100)
@@ -228,7 +228,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testOffsetWithoutLimit() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->offset(50)
@@ -237,7 +237,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testForUpdate() {
-		$str = TestSelect::create()
+		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
 		->forUpdate()
@@ -246,11 +246,11 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testInnerSelect() {
-		$select = TestSelect::create()
+		$select = $this->select()
 		->from('a', 'table')
 		->where('a.id=1');
 
-		$str = (string) TestSelect::create()
+		$str = (string) $this->select()
 		->from('t', $select)
 		->asString();
 
@@ -258,7 +258,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testAlias() {
-		$query = TestSelect::create()
+		$query = $this->select()
 		->from('t', 'travis#test1')
 		->asString();
 
@@ -266,7 +266,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testCount() {
-		$query = TestSelect::create()
+		$query = $this->select()
 		->field('COUNT(*)')
 		->from('t1', 'test1')
 		->joinInner('t2', 'test2', 't1.id=t2.id')
@@ -277,13 +277,13 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testSubselectAsField() {
-		$query = TestSelect::create()
+		$query = $this->select()
 		->field('COUNT(*)')
 		->from('t1', 'test1')
 		->joinInner('t2', 'test2', 't1.id=t2.id')
 		->where('t1.id > 10');
 
-		$query = TestSelect::create()
+		$query = $this->select()
 		->field($query, 'testfield')
 		->from('t1', 'test1')
 		->joinInner('t2', 'test2', 't1.id=t2.id')
@@ -294,13 +294,13 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testSubselectUnion() {
-		$query = TestSelect::create()
+		$query = $this->select()
 		->field('t1.field')
 		->from('t1', 'test1')
 		->joinInner('t2', 'test2', 't1.id=t2.id')
 		->where('t1.id > 10');
 
-		$query = TestSelect::create()
+		$query = $this->select()
 		->union($query)
 		->field('t1.field')
 		->from('t1', 'test1')
@@ -312,7 +312,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testOrderByValues() {
-		$query = TestSelect::create()
+		$query = $this->select()
 		->field('t1.field')
 		->from('t1', 'test1')
 		->joinInner('t2', 'test2', 't1.id=t2.id')
@@ -323,7 +323,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testDistinct() {
-		$query = TestSelect::create()
+		$query = $this->select()
 		->distinct()
 		->field('t1.field1')
 		->field('t1.field2')
@@ -337,7 +337,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 		$filter = ['filter' => ['name' => 'aaa', 'ids' => [1, 2, 3], 'empty' => [null, '', ['']]]];
 		$opt = new OptionalDBFilterMap($filter);
 
-		$query = TestSelect::create()
+		$query = $this->select()
 		->field('t.field')
 		->from('t', 'test')
 		->where($opt('t.field=?', ['filter', 'name']))
@@ -345,7 +345,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 
 		self::assertEquals("SELECT\n\tt.field\nFROM\n\ttest t\nWHERE\n\t(t.field='aaa')\n", $query);
 
-		$query = TestSelect::create()
+		$query = $this->select()
 		->field('t.field')
 		->from('t', 'test')
 		->where($opt('t.field=?', 'filter.name'))
@@ -353,7 +353,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 
 		self::assertEquals("SELECT\n\tt.field\nFROM\n\ttest t\nWHERE\n\t(t.field='aaa')\n", $query);
 
-		$query = TestSelect::create()
+		$query = $this->select()
 		->field('t.field')
 		->from('t', 'test')
 		->where($opt('t.field=?', ['filter', 'age']))
@@ -361,7 +361,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 
 		self::assertEquals("SELECT\n\tt.field\nFROM\n\ttest t\n", $query);
 
-		$query = TestSelect::create()
+		$query = $this->select()
 		->field('t.field')
 		->from('t', 'test')
 		->where($opt('t.field IN (?)', ['filter', 'ids']))
@@ -369,7 +369,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 
 		self::assertEquals("SELECT\n\tt.field\nFROM\n\ttest t\nWHERE\n\t(t.field IN ('1', '2', '3'))\n", $query);
 
-		$query = TestSelect::create()
+		$query = $this->select()
 		->field('t.field')
 		->from('t', 'test')
 		->where($opt('t.field=?', ['filter', 'empty']))
@@ -382,7 +382,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 		$filter = ['filter' => ['name' => 'aaa']];
 		$req = new RequiredDBFilterMap($filter);
 
-		$query = TestSelect::create()
+		$query = $this->select()
 		->field('t.field')
 		->from('t', 'test')
 		->where($req('t.field=?', ['filter', 'name']))
@@ -392,7 +392,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 
 		$this->expectException(RequiredValueNotFoundException::class);
 
-		TestSelect::create()
+		$this->select()
 		->field('t.field')
 		->from('t', 'test')
 		->where($req('t.field=?', 'filter.id'))
@@ -400,7 +400,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testSortSpecification() {
-		$query = TestSelect::create()
+		$query = $this->select()
 		->field('t.field1')
 		->field('t.field2')
 		->from('t', 'test')
@@ -411,14 +411,14 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testVirtualTables() {
-		$vt1 = TestSelect::create()
+		$vt1 = $this->select()
 		->field('a.field1')
 		->from('a', 'tableA');
 
 		$db = new TestDB();
 		$db->getVirtualTables()->add('virt_table1', $vt1);
 		$db->getVirtualTables()->add('virt_table2', function () {
-			return TestSelect::create()
+			return $this->select()
 			->field('a.field1')
 			->from('a', 'tableA');
 		});
@@ -435,14 +435,14 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testParametrizedVirtualTables() {
-		$vt1 = TestSelect::create()
+		$vt1 = $this->select()
 		->field('a.field1')
 		->from('a', 'tableA');
 
 		$db = new TestDB();
 		$db->getVirtualTables()->add('virt_table1', $vt1);
 		$db->getVirtualTables()->add('virt_table2', function (array $args) {
-			return TestSelect::create()
+			return $this->select()
 			->field('a.field1')
 			->from('a', 'tableA')
 			->where(new DBExprFilter('a.active=?', $args, 'active'));
@@ -460,7 +460,7 @@ class SelectTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testArrayTables() {
-		$vt1 = TestSelect::create()
+		$vt1 = $this->select()
 		->field('a.value')
 		->from('a', range(1, 9))
 		->asString();

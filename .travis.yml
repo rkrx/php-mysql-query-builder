@@ -1,18 +1,29 @@
 language: php
 
 php:
+  - nightly
   - 7.4
   - 7.3
   - 7.2
   - 7.1
-  - 7.0
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - php: nightly
 
 services:
   - mysql
 
-before_script:
-  - composer self-update
-  - composer update
+install:
+  - |
+      # Install PHPUnit v9 on PHP 8
+      if dpkg --compare-versions "${TRAVIS_PHP_VERSION}" ge 8.0; then
+          travis_retry composer require --no-interaction --prefer-dist --dev --ignore-platform-reqs "phpunit/phpunit" 9.*
+      # Enable test on PHP 7.1+
+      else
+          travis_retry composer install --no-interaction --prefer-dist
+      fi
 
 script:
   - composer run-script phpunit

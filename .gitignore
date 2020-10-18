@@ -8,5 +8,6 @@
 !/.travis.yml
 !/.scrutinizer.yml
 !/composer.json
+!/composer-nodev.json
 !/README.md
 !/tests.xml

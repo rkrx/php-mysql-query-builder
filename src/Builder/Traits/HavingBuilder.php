@@ -6,31 +6,19 @@ use Kir\MySQL\Builder\Internal\ConditionBuilder;
 
 trait HavingBuilder {
 	use AbstractDB;
+	use ConditionDefinition;
 
-	/** @var array */
+	/** @var array[] */
 	private $having = [];
 
 	/**
-	 * @param string|array|OptionalExpression $expression
-	 * @param array<int, mixed> $args
+	 * @param string|array|object|OptionalExpression $expression
+	 * @param mixed[] $args
 	 * @return $this
 	 */
 	public function having($expression, ...$args) {
-		if($expression instanceof OptionalExpression) {
-			if($expression->isValid()) {
-				$this->having[] = [$expression->getExpression(), $expression->getValue()];
-			}
-		} elseif(is_array($expression) || is_object($expression)) {
-			if(is_object($expression)) {
-				$expression = (array) $expression;
-			}
-			if(count($expression) > 0) {
-				$this->having[] = [$expression, array_slice(func_get_args(), 1)];
-			}
-		} else {
-			$this->having[] = [$expression, array_slice(func_get_args(), 1)];
-		}
-		return $this;
+		$fn = function (...$args) { $this->having[] = $args; };
+		return $this->addCondition($fn, $expression, ...$args);
 	}
 
 	/**

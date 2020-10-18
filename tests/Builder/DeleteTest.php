@@ -1,11 +1,11 @@
 <?php
 namespace Kir\MySQL\Builder;
 
-use Kir\MySQL\Builder\DeleteTest\TestDelete;
+use Kir\MySQL\Common\DBTestCase;
 
-class DeleteTest extends \PHPUnit_Framework_TestCase {
+class DeleteTest extends DBTestCase {
 	public function testAlias() {
-		$query = TestDelete::create()
+		$query = $this->delete()
 		->from('t', 'travis#test1')
 		->where('t.a = 1')
 		->asString();
@@ -13,7 +13,7 @@ class DeleteTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testMultipleTables() {
-		$sql = TestDelete::create()
+		$sql = $this->delete()
 		->from('t1', 'travis#test1')
 		->from('t2', 'travis#test2')
 		->where('t1.a = 1')
@@ -22,7 +22,7 @@ class DeleteTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testJoins() {
-		$sql = TestDelete::create()
+		$sql = $this->delete()
 		->from('t1', 'travis#test1')
 		->joinInner('t2', 'travis#test2', 't1.id = t2.id')
 		->asString();
@@ -30,7 +30,7 @@ class DeleteTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testWhere() {
-		$sql = TestDelete::create()
+		$sql = $this->delete()
 		->from('travis#test1')
 		->where('field1=?', 1)
 		->where('field2 != field1')
@@ -39,7 +39,7 @@ class DeleteTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testWhereViaArray() {
-		$sql = TestDelete::create()
+		$sql = $this->delete()
 		->from('travis#test1')
 		->where(['field1' => 1, 'field2' => 'aaa'])
 		->asString();
@@ -47,7 +47,7 @@ class DeleteTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testDBExpr() {
-		$sql = TestDelete::create()
+		$sql = $this->delete()
 		->from('travis#test1')
 		->where('field1=?', new DBExpr('NOW()'))
 		->asString();
@@ -55,7 +55,7 @@ class DeleteTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testOrderBy() {
-		$sql = TestDelete::create()
+		$sql = $this->delete()
 		->from('travis#test1')
 		->orderBy('field1', 'DESC')
 		->asString();
@@ -63,7 +63,7 @@ class DeleteTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testLimit() {
-		$sql = TestDelete::create()
+		$sql = $this->delete()
 		->from('travis#test1')
 		->limit(10)
 		->asString();
@@ -71,7 +71,7 @@ class DeleteTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testOffset() {
-		$sql = TestDelete::create()
+		$sql = $this->delete()
 		->from('travis#test1')
 		->offset(10)
 		->asString();

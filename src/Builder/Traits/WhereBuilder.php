@@ -1,14 +1,14 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
-use Kir\MySQL\Builder\DBExpr;
 use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Builder\Internal\ConditionBuilder;
 
 trait WhereBuilder {
 	use AbstractDB;
+	use ConditionDefinition;
 
-	/** @var array<int, mixed> */
+	/** @var array[] */
 	private $where = [];
 
 	/**
@@ -17,21 +17,8 @@ trait WhereBuilder {
 	 * @return $this
 	 */
 	public function where($expression, ...$args) {
-		if($expression instanceof OptionalExpression) {
-			if($expression->isValid()) {
-				$this->where[] = [$expression->getExpression(), $expression->getValue()];
-			}
-		} elseif(is_array($expression) || is_object($expression)) {
-			if(is_object($expression)) {
-				$expression = (array) $expression;
-			}
-			if(count($expression) > 0) {
-				$this->where[] = [$expression, $args];
-			}
-		} else {
-			$this->where[] = [$expression, $args];
-		}
-		return $this;
+		$fn = function (...$args) { $this->where[] = $args; };
+		return $this->addCondition($fn, $expression, ...$args);
 	}
 
 	/**

@@ -2,14 +2,11 @@
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\UpdateTest\TestUpdate;
-use Kir\MySQL\Databases\MySQL;
-use Kir\MySQL\Tools\AliasRegistry;
-use Kir\MySQL\Tools\VirtualTables;
-use Phake;
+use Kir\MySQL\Common\DBTestCase;
 
-class UpdateTest extends \PHPUnit_Framework_TestCase {
+class UpdateTest extends DBTestCase {
 	public function testAlias() {
-		$sql = TestUpdate::create()
+		$sql = $this->update()
 		->table('travis#test1')
 		->set('field1', 1)
 		->asString();
@@ -17,7 +14,7 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testMultipleTables() {
-		$sql = TestUpdate::create()
+		$sql = $this->update()
 		->table('t1', 'travis#test1')
 		->table('t2', 'travis#test2')
 		->set('t1.field1', 1)
@@ -26,7 +23,7 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testJoin() {
-		$sql = TestUpdate::create()
+		$sql = $this->update()
 		->table('t1', 'travis#test1')
 		->joinInner('t2', 'travis#test2', 't1.field1 = t2.field1')
 		->set('t1.field1', 1)
@@ -35,7 +32,7 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testSet() {
-		$sql = TestUpdate::create()
+		$sql = $this->update()
 		->table('test1')
 		->set('field1', 1)
 		->asString();
@@ -43,7 +40,7 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testSetDefault() {
-		$sql = TestUpdate::create()
+		$sql = $this->update()
 			->table('test1')
 			->setDefault('field1')
 			->asString();
@@ -51,7 +48,7 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testSetExpr() {
-		$sql = TestUpdate::create()
+		$sql = $this->update()
 		->table('test1')
 		->setExpr('field1=1')
 		->asString();
@@ -59,7 +56,7 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testSetExprWithParams() {
-		$sql = TestUpdate::create()
+		$sql = $this->update()
 		->table('test1')
 		->setExpr('field1=COALESCE(?, ?)', 1, 2)
 		->asString();
@@ -67,7 +64,7 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testSetAll1() {
-		$sql = TestUpdate::create()
+		$sql = $this->update()
 		->table('test1')
 		->setAll(['field1' => 1, 'field2' => 2, 'field3' => 3], ['field1', 'field2'])
 		->asString();
@@ -75,30 +72,22 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testSetAll2() {
-		$db = Phake::mock(MySQL::class);
-		$reg = Phake::mock(AliasRegistry::class);
-		$vt = Phake::mock(VirtualTables::class);
-		Phake::when($db)->__call('getTableFields', ['test1'])->thenReturn(['field1', 'field2']);
-		Phake::when($db)->__call('quoteField', [Phake::anyParameters()])->thenGetReturnByLambda(function ($fieldName) { return "`{$fieldName}`"; });
-		Phake::when($db)->__call('quote', [Phake::anyParameters()])->thenGetReturnByLambda(function ($value) { return "'{$value}'"; });
-		Phake::when($db)->__call('getAliasRegistry', [])->thenReturn($reg);
-		Phake::when($db)->__call('getVirtualTables', [])->thenReturn($vt);
-		$sql = (new TestUpdate($db))
+		$sql = $this->update()
 		->table('test1')
 		->setAll(['field1' => 1, 'field2' => 2, 'field3' => 3])
 		->asString();
-		self::assertEquals("UPDATE\n\ttest1\nSET\n\t`field1`='1',\n\t`field2`='2'\n", $sql);
+		self::assertEquals("UPDATE\n\ttest1\nSET\n\t`field1`='1',\n\t`field2`='2',\n\t`field3`='3'\n", $sql);
 	}
 
 	public function testWhere() {
-		$sql = TestUpdate::create()
+		$sql = $this->update()
 		->table('test1')
 		->set('field1', 1)
 		->where('field1=?', 2)
 		->asString();
 		self::assertEquals("UPDATE\n\ttest1\nSET\n\t`field1`='1'\nWHERE\n\t(field1='2')\n", $sql);
 
-		$sql = TestUpdate::create()
+		$sql = $this->update()
 		->table('test1')
 		->set('field1', 1)
 		->where(['field1' => 1, 'field2' => 'aaa'])
@@ -107,7 +96,7 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testOrder() {
-		$sql = TestUpdate::create()
+		$sql = $this->update()
 		->table('test1')
 		->set('field1', 1)
 		->orderBy('field1', 'DESC')
@@ -116,14 +105,14 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testLimit() {
-		$sql = TestUpdate::create()
+		$sql = $this->update()
 		->table('test1')
 		->set('field1', 1)
 		->limit(10)
 		->asString();
 		self::assertEquals("UPDATE\n\ttest1\nSET\n\t`field1`='1'\nLIMIT\n\t10\n", $sql);
 
-		$sql = TestUpdate::create()
+		$sql = $this->update()
 		->table('test1')
 		->set('field1', 1)
 		->limit(10)
@@ -133,7 +122,7 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testMask() {
-		$sql = TestUpdate::create()
+		$sql = $this->update()
 		->table('test1')
 		->set('field1', 1)
 		->set('field2', 2)
@@ -144,7 +133,7 @@ class UpdateTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testDBExpr() {
-		$sql = TestUpdate::create()
+		$sql = $this->update()
 		->table('test1')
 		->set('field1', 1)
 		->set('field2', new DBExpr('NOW()'))

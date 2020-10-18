@@ -3,11 +3,9 @@ namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\InsertTest\TestInsert;
 use Kir\MySQL\Builder\SelectTest\TestSelect;
-use Kir\MySQL\Databases\MySQL;
-use Kir\MySQL\Tools\AliasRegistry;
-use Phake;
+use Kir\MySQL\Common\DBTestCase;
 
-class InsertTest extends \PHPUnit_Framework_TestCase {
+class InsertTest extends DBTestCase {
 	public function testAlias() {
 		$query = TestInsert::create()
 		->into('travis#test1')
@@ -40,29 +38,19 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testAddAll() {
-		$reg = Phake::mock(AliasRegistry::class);
-		Phake::when($reg)->__call('get', ['travis'])->thenReturn('travis_test.');
-
-		$db = Phake::mock(MySQL::class);
-		Phake::when($db)->__call('getTableFields', ['test1'])->thenReturn(['field1', 'field2']);
-		Phake::when($db)->__call('getTableFields', ['travis_test.test1'])->thenReturn(['field1', 'field2']);
-		Phake::when($db)->__call('quoteField', [Phake::anyParameters()])->thenGetReturnByLambda(function ($fieldName) { return "`{$fieldName}`"; });
-		Phake::when($db)->__call('quote', [Phake::anyParameters()])->thenGetReturnByLambda(function ($value) { return "'{$value}'"; });
-		Phake::when($db)->__call('getAliasRegistry', [])->thenReturn($reg);
-
-		$query = (new TestInsert($db))
-		->into('test1')
+		$query = TestInsert::create()
+		->into('travis#test1')
 		->addAll(['field1' => 123, 'field2' => 456])
 		->asString();
-		self::assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123',\n\t`field2`='456'\n", $query);
+		self::assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\t`field1`='123',\n\t`field2`='456'\n", $query);
 
-		$query = (new TestInsert($db))
-		->into('test1')
+		$query = TestInsert::create()
+		->into('travis#test1')
 		->addAll(['field1' => 123, 'field2' => 456], ['field1'])
 		->asString();
-		self::assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123'\n", $query);
+		self::assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\t`field1`='123'\n", $query);
 
-		$query = (new TestInsert($db))
+		$query = TestInsert::create()
 		->into('travis#test1')
 		->addAll(['field1' => 123, 'field2' => 456], ['field1'])
 		->asString();
@@ -70,31 +58,21 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testUpdateAll() {
-		$reg = Phake::mock('Kir\\MySQL\\Tools\\AliasRegistry');
-		Phake::when($reg)->__call('get', ['travis'])->thenReturn('travis_test.');
-
-		$db = Phake::mock('Kir\\MySQL\\Databases\\MySQL');
-		Phake::when($db)->__call('getTableFields', ['test1'])->thenReturn(['field1', 'field2']);
-		Phake::when($db)->__call('getTableFields', ['travis_test.test1'])->thenReturn(['field1', 'field2']);
-		Phake::when($db)->__call('quoteField', [Phake::anyParameters()])->thenGetReturnByLambda(function ($fieldName) { return "`{$fieldName}`"; });
-		Phake::when($db)->__call('quote', [Phake::anyParameters()])->thenGetReturnByLambda(function ($value) { return "'{$value}'"; });
-		Phake::when($db)->__call('getAliasRegistry', [])->thenReturn($reg);
-
-		$query = (new TestInsert($db))
-		->into('test1')
+		$query = $this->insert()
+		->into('travis#test1')
 		->add('field1', 123)
 		->updateAll(['field1' => 123, 'field2' => 456])
 		->asString();
-		self::assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123',\n\t`field2`='456'\n", $query);
+		self::assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123',\n\t`field2`='456'\n", $query);
 
-		$query = (new TestInsert($db))
-		->into('test1')
+		$query = $this->insert()
+		->into('travis#test1')
 		->add('field1', 123)
 		->updateAll(['field1' => 123, 'field2' => 456], ['field1'])
 		->asString();
-		self::assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123'\n", $query);
+		self::assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123'\n", $query);
 
-		$query = (new TestInsert($db))
+		$query = $this->insert()
 		->into('travis#test1')
 		->add('field1', 123)
 		->updateAll(['field1' => 123, 'field2' => 456], ['field1'])
@@ -103,29 +81,19 @@ class InsertTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testAddOrUpdateAll() {
-		$reg = Phake::mock(AliasRegistry::class);
-		Phake::when($reg)->__call('get', ['travis'])->thenReturn('travis_test.');
-
-		$db = Phake::mock(MySQL::class);
-		Phake::when($db)->__call('getTableFields', ['test1'])->thenReturn(['field1', 'field2']);
-		Phake::when($db)->__call('getTableFields', ['travis_test.test1'])->thenReturn(['field1', 'field2']);
-		Phake::when($db)->__call('quoteField', [Phake::anyParameters()])->thenGetReturnByLambda(function ($fieldName) { return "`{$fieldName}`"; });
-		Phake::when($db)->__call('quote', [Phake::anyParameters()])->thenGetReturnByLambda(function ($value) { return "'{$value}'"; });
-		Phake::when($db)->__call('getAliasRegistry', [])->thenReturn($reg);
-
-		$query = (new TestInsert($db))
-		->into('test1')
+		$query = $this->insert()
+		->into('travis#test1')
 		->addOrUpdateAll(['field1' => 123, 'field2' => 456])
 		->asString();
-		self::assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123',\n\t`field2`='456'\nON DUPLICATE KEY UPDATE\n\t`field1`='123',\n\t`field2`='456'\n", $query);
+		self::assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\t`field1`='123',\n\t`field2`='456'\nON DUPLICATE KEY UPDATE\n\t`field1`='123',\n\t`field2`='456'\n", $query);
 
-		$query = (new TestInsert($db))
-		->into('test1')
+		$query = $this->insert()
+		->into('travis#test1')
 		->addOrUpdateAll(['field1' => 123, 'field2' => 456], ['field1'])
 		->asString();
-		self::assertEquals("INSERT INTO\n\ttest1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123'\n", $query);
+		self::assertEquals("INSERT INTO\n\ttravis_test.test1\nSET\n\t`field1`='123'\nON DUPLICATE KEY UPDATE\n\t`field1`='123'\n", $query);
 
-		$query = (new TestInsert($db))
+		$query = $this->insert()
 		->into('travis#test1')
 		->addOrUpdateAll(['field1' => 123, 'field2' => 456], ['field1'])
 		->asString();
