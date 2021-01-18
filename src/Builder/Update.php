@@ -35,7 +35,7 @@ class Update extends InsertUpdateStatement {
 
 	/**
 	 * @param string $fieldName
-	 * @param string $value
+	 * @param mixed $value
 	 * @return $this
 	 */
 	public function set($fieldName, $value) {

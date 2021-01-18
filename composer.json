@@ -1,6 +1,6 @@
 {
 	"name": "rkr/php-mysql-query-builder",
-	"description": "Easy to use query builder for PHP7.0+/PDO",
+	"description": "Easy to use query builder for PHP7.1+/PDO",
 	"license": "MIT",
 	"type": "library",
 	"authors": [{
