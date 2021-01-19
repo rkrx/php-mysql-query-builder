@@ -49,5 +49,5 @@ trait TableNameBuilder {
 	/**
 	 * @return MySQL
 	 */
-	abstract protected function db(): MySQL;
+	abstract protected function db();
 }

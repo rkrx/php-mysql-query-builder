@@ -7,5 +7,5 @@ trait AbstractDB {
 	/**
 	 * @return Database
 	 */
-	abstract protected function db(): Database;
+	abstract protected function db();
 }
