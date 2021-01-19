@@ -12,7 +12,7 @@ trait TableNameBuilder {
 	 * @param string|array|object $name
 	 * @return string
 	 */
-	protected function buildTableName(string $alias, $name): string {
+	protected function buildTableName(?string $alias, $name): string {
 		if(is_object($name) && !($name instanceof VirtualTable) && method_exists($name, '__toString')) {
 			$name = (string) $name;
 			$lines = explode("\n", $name);
