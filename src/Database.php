@@ -88,7 +88,7 @@ interface Database {
 	/**
 	 * @return Builder\RunnableDelete
 	 */
-	public function delete();
+	public function delete(): Builder\RunnableDelete;
 
 	/**
 	 * @return $this

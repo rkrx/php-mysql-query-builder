@@ -103,7 +103,7 @@ class MySQL implements Database {
 	 * @return QueryStatement
 	 */
 	public function prepare(string $query) {
-		return $this->buildQueryStatement($query, function ($query) {
+		return $this->buildQueryStatement((string) $query, function ($query) {
 			return $this->pdo->prepare($query);
 		});
 	}
@@ -181,7 +181,7 @@ class MySQL implements Database {
 	 * @param array<string|int, string>|null $fields
 	 * @return MySQLRunnableSelect
 	 */
-	public function select(array $fields = null) {
+	public function select(array $fields = null): Builder\RunnableSelect {
 		$select = array_key_exists('select-factory', $this->options)
 			? call_user_func($this->options['select-factory'], $this, $this->options['select-options'])
 			: new MySQL\MySQLRunnableSelect($this, $this->options['select-options']);
@@ -195,7 +195,7 @@ class MySQL implements Database {
 	 * @param null|array<string|int, string> $fields
 	 * @return Builder\RunnableInsert
 	 */
-	public function insert(array $fields = null) {
+	public function insert(array $fields = null): Builder\RunnableInsert {
 		$insert = array_key_exists('insert-factory', $this->options)
 			? call_user_func($this->options['insert-factory'], $this, $this->options['insert-options'])
 			: new Builder\RunnableInsert($this, $this->options['insert-options']);
@@ -209,7 +209,7 @@ class MySQL implements Database {
 	 * @param array<string|int, string>|null $fields
 	 * @return Builder\RunnableUpdate
 	 */
-	public function update(array $fields = null) {
+	public function update(array $fields = null): Builder\RunnableUpdate {
 		$update = array_key_exists('update-factory', $this->options)
 			? call_user_func($this->options['update-factory'], $this, $this->options['update-options'])
 			: new Builder\RunnableUpdate($this, $this->options['update-options']);
@@ -222,7 +222,7 @@ class MySQL implements Database {
 	/**
 	 * @return Builder\RunnableDelete
 	 */
-	public function delete() {
+	public function delete(): Builder\RunnableDelete {
 		return array_key_exists('delete-factory', $this->options)
 			? call_user_func($this->options['delete-factory'], $this, $this->options['delete-options'])
 			: new Builder\RunnableDelete($this, $this->options['delete-options']);
@@ -321,7 +321,7 @@ class MySQL implements Database {
 	 * @param callable(): void $fn
 	 * @return $this
 	 */
-	private function transactionEnd(callable $fn): self {
+	private function transactionEnd($fn): self {
 		$this->transactionLevel--;
 		if($this->transactionLevel < 0) {
 			throw new RuntimeException("Transaction-Nesting-Problem: Trying to invoke commit on a already closed transaction");
@@ -361,5 +361,22 @@ class MySQL implements Database {
 			$this->exceptionInterpreter->throwMoreConcreteException($e);
 		}
 		return null;
+	}
+
+	/**
+	 * @return string
+	 */
+	private function genUniqueId(): string {
+		// Generate a unique id from a former random-uuid-generator
+		return sprintf('ID%04x%04x%04x%04x%04x%04x%04x%04x',
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0x0fff) | 0x4000,
+			mt_rand(0, 0x3fff) | 0x8000,
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff)
+		);
 	}
 }

@@ -52,7 +52,7 @@ class DBExprFilter implements OptionalExpression {
 	/**
 	 * @return bool
 	 */
-	public function isValid() {
+	public function isValid(): bool {
 		if(!$this->hasValue) {
 			return false;
 		}

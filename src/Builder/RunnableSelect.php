@@ -127,12 +127,12 @@ interface RunnableSelect extends Select, IteratorAggregate {
 	}
 
 	/**
-	 * @param Closure $callback
+	 * @param Closure|null $callback
 	 * @param int $mode
 	 * @param mixed $arg0
 	 * @return mixed
 	 */
-	private function fetchAll(Closure $callback = null, $mode, $arg0 = null) {
+	private function fetchAll(Closure $callback = null, int $mode = 0, $arg0 = null) {
 		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0) {
 			$statement->setFetchMode($mode, $arg0);
 			$data = $statement->fetchAll();
@@ -160,12 +160,12 @@ interface RunnableSelect extends Select, IteratorAggregate {
 	}
 
 	/**
-	 * @param Closure $callback
+	 * @param Closure|null $callback
 	 * @param int $mode
 	 * @param mixed $arg0
 	 * @return Traversable|mixed[]
 	 */
-	private function fetchLazy(Closure $callback = null, $mode, $arg0 = null) {
+	private function fetchLazy(Closure $callback = null, int $mode = PDO::FETCH_ASSOC, $arg0 = null) {
 		$statement = $this->createStatement();
 		$statement->setFetchMode($mode, $arg0);
 		$generator = new LazyRowGenerator($this->preserveTypes);
@@ -173,13 +173,13 @@ interface RunnableSelect extends Select, IteratorAggregate {
 	}
 
 	/**
-	 * @param Closure $callback
+	 * @param Closure|null $callback
 	 * @param int $mode
 	 * @param mixed $arg0
-	 * @param Closure $resultValidator
+	 * @param Closure|null $resultValidator
 	 * @return mixed
 	 */
-	private function fetch(Closure $callback = null, $mode, $arg0 = null, Closure $resultValidator = null) {
+	private function fetch(Closure $callback = null, int $mode = PDO::FETCH_ASSOC, $arg0 = null, Closure $resultValidator = null) {
 		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0, $resultValidator) {
 			$statement->setFetchMode($mode, $arg0);
 			$row = $statement->fetch();
