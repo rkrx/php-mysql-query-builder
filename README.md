@@ -2,7 +2,7 @@ mysql query builder (php 7.1+)
 ==============================
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/rkrx/php-mysql-query-builder/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/rkrx/php-mysql-query-builder/?branch=master)
-[![Build Status](https://travis-ci.org/rkrx/php-mysql-query-builder.svg)](https://travis-ci.org/rkrx/php-mysql-query-builder)
+[![Build Status](https://travis-ci.com/rkrx/php-mysql-query-builder.svg)](https://travis-ci.com/rkrx/php-mysql-query-builder)
 [![Latest Stable Version](https://poser.pugx.org/rkr/php-mysql-query-builder/v/stable)](https://packagist.org/packages/rkr/php-mysql-query-builder)
 [![License](https://poser.pugx.org/rkr/php-mysql-query-builder/license)](https://packagist.org/packages/rkr/php-mysql-query-builder)
 
