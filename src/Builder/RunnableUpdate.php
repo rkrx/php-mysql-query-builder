@@ -3,7 +3,6 @@ namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\Internal\DDLPreparable;
 use Kir\MySQL\Builder\Traits\CreateDDLRunnable;
-use Kir\MySQL\Databases\MySQL;
 
 class RunnableUpdate extends Update implements DDLPreparable {
 	use CreateDDLRunnable;

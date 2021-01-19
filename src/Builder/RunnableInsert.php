@@ -5,7 +5,6 @@ use BadMethodCallException;
 use Kir\MySQL\Builder\Internal\DDLPreparable;
 use Kir\MySQL\Builder\Internal\DDLRunnable;
 use Kir\MySQL\Builder\Traits\CreateDDLRunnable;
-use Kir\MySQL\Databases\MySQL;
 use Traversable;
 
 class RunnableInsert extends Insert implements DDLPreparable {

@@ -114,11 +114,11 @@ class Select extends Statement {
 	}
 
 	/**
-	 * @param string $alias
-	 * @param string|array|null $tableName
+	 * @param string|array|Select $alias
+	 * @param string|array|Select|null $tableName
 	 * @return $this
 	 */
-	public function from(string $alias, $tableName = null) {
+	public function from($alias, $tableName = null) {
 		$this->addTable($alias, $tableName);
 		return $this;
 	}
