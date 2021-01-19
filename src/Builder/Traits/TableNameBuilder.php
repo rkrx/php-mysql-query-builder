@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
+use Kir\MySQL\Builder\Select;
 use Kir\MySQL\Databases\MySQL;
 use Kir\MySQL\Tools\VirtualTable;
 
@@ -9,7 +10,7 @@ trait TableNameBuilder {
 
 	/**
 	 * @param string|null $alias
-	 * @param string|array|object $name
+	 * @param string|array|object|Select|VirtualTable $name
 	 * @return string
 	 */
 	protected function buildTableName(?string $alias, $name): string {
