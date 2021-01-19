@@ -28,7 +28,7 @@ class Update extends InsertUpdateStatement {
 	 * @param string $table
 	 * @return $this
 	 */
-	public function table($alias, $table = null) {
+	public function table(string $alias, $table = null) {
 		$this->addTable($alias, $table);
 		return $this;
 	}
@@ -38,7 +38,7 @@ class Update extends InsertUpdateStatement {
 	 * @param mixed $value
 	 * @return $this
 	 */
-	public function set($fieldName, $value) {
+	public function set(string $fieldName, $value) {
 		$sqlField = $fieldName;
 		$sqlValue = $this->db()->quote($value);
 		$this->fields[$sqlField] = $sqlValue;
@@ -49,7 +49,7 @@ class Update extends InsertUpdateStatement {
 	 * @param string $fieldName
 	 * @return $this
 	 */
-	public function setDefault($fieldName) {
+	public function setDefault(string $fieldName) {
 		$sqlField = $fieldName;
 		$this->fields[$sqlField] = new DefaultValue();
 		return $this;
@@ -60,7 +60,7 @@ class Update extends InsertUpdateStatement {
 	 * @param mixed ...$args
 	 * @return $this
 	 */
-	public function setExpr($expr, ...$args) {
+	public function setExpr(string $expr, ...$args) {
 		if(count($args) > 0) {
 			$this->fields[] = func_get_args();
 		} else {
@@ -71,7 +71,7 @@ class Update extends InsertUpdateStatement {
 
 	/**
 	 * @param array $data
-	 * @param array $allowedFields
+	 * @param array|null $allowedFields
 	 * @return $this
 	 */
 	public function setAll(array $data, array $allowedFields = null) {
@@ -93,7 +93,7 @@ class Update extends InsertUpdateStatement {
 	/**
 	 * @return string
 	 */
-	public function __toString() {
+	public function __toString(): string {
 		$query = "UPDATE\n";
 		$query = $this->buildTables($query);
 		$query = $this->buildJoins($query);
@@ -110,7 +110,7 @@ class Update extends InsertUpdateStatement {
 	 * @param string $query
 	 * @return string
 	 */
-	private function buildAssignments($query) {
+	private function buildAssignments(string $query): string {
 		$sqlFields = $this->buildFieldList($this->fields);
 		if (!count($sqlFields)) {
 			throw new RuntimeException('No field-data found');
@@ -122,7 +122,7 @@ class Update extends InsertUpdateStatement {
 	 * @param array $values
 	 * @return array
 	 */
-	private function clearValues(array $values) {
+	private function clearValues(array $values): array {
 		if (!count($values)) {
 			return [];
 		}

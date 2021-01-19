@@ -1,6 +1,8 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
+use Kir\MySQL\Builder\Select;
+
 trait TableBuilder {
 	use AbstractTableNameBuilder;
 
@@ -8,8 +10,8 @@ trait TableBuilder {
 	private $tables = [];
 
 	/**
-	 * @param string $alias
-	 * @param string $table
+	 * @param string|array|Select $alias
+	 * @param string|Select|null $table
 	 * @return $this
 	 */
 	protected function addTable($alias, $table = null) {
@@ -24,7 +26,7 @@ trait TableBuilder {
 	 * @param string $query
 	 * @return string
 	 */
-	protected function buildTables($query) {
+	protected function buildTables(string $query): string {
 		$arr = [];
 		foreach($this->tables as $table) {
 			$arr[] = "\t".$this->buildTableName($table['alias'], $table['name']);
@@ -38,7 +40,7 @@ trait TableBuilder {
 	/**
 	 * @return array[]
 	 */
-	protected function getTables() {
+	protected function getTables(): array {
 		return $this->tables;
 	}
 }

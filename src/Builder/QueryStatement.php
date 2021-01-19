@@ -25,7 +25,7 @@ class QueryStatement implements DatabaseStatement {
 	 * @param MySQLExceptionInterpreter $exceptionInterpreter
 	 * @param QueryLoggers $queryLoggers
 	 */
-	public function __construct(PDOStatement $stmt, $query, MySQLExceptionInterpreter $exceptionInterpreter, QueryLoggers $queryLoggers) {
+	public function __construct(PDOStatement $stmt, string $query, MySQLExceptionInterpreter $exceptionInterpreter, QueryLoggers $queryLoggers) {
 		$this->statement = $stmt;
 		$this->queryLoggers = $queryLoggers;
 		$this->query = $query;
@@ -35,17 +35,17 @@ class QueryStatement implements DatabaseStatement {
 	/**
 	 * @return PDOStatement
 	 */
-	public function getStatement() {
+	public function getStatement(): PDOStatement {
 		return $this->statement;
 	}
 
 	/**
 	 * @param int $mode
 	 * @param mixed $arg0
-	 * @param array $arg1
+	 * @param array|null $arg1
 	 * @return $this
 	 */
-	public function setFetchMode($mode, $arg0 = null, array $arg1 = null) {
+	public function setFetchMode(int $mode = PDO::FETCH_ASSOC, $arg0 = null, ?array $arg1 = null) {
 		$args = [$mode];
 		if($arg0 !== null) {
 			$args[] = $arg0;
@@ -80,7 +80,7 @@ class QueryStatement implements DatabaseStatement {
 	 * @param array $ctorArgs
 	 * @return array
 	 */
-	public function fetchAll($fetchStyle = null, $fetchArgument = null, array $ctorArgs = []) {
+	public function fetchAll($fetchStyle = null, $fetchArgument = null, array $ctorArgs = []): array {
 		return $this->exceptionHandler(function() use ($fetchStyle, $fetchArgument, $ctorArgs) {
 			if($fetchArgument !== null) {
 				return $this->statement->fetchAll($fetchStyle, $fetchArgument, $ctorArgs);
@@ -114,7 +114,7 @@ class QueryStatement implements DatabaseStatement {
 	/**
 	 * @return bool
 	 */
-	public function closeCursor() {
+	public function closeCursor(): bool {
 		return $this->exceptionHandler(function() {
 			return $this->statement->closeCursor();
 		});
@@ -123,7 +123,7 @@ class QueryStatement implements DatabaseStatement {
 	/**
 	 * @return int
 	 */
-	public function columnCount() {
+	public function columnCount(): int {
 		return $this->exceptionHandler(function() {
 			return $this->statement->columnCount();
 		});
@@ -133,7 +133,7 @@ class QueryStatement implements DatabaseStatement {
 	 * @param int $columnNo
 	 * @return array
 	 */
-	public function getColumnMeta($columnNo) {
+	public function getColumnMeta(int $columnNo): array {
 		return $this->exceptionHandler(function() use ($columnNo) {
 			return $this->statement->getColumnMeta($columnNo);
 		});
@@ -143,7 +143,7 @@ class QueryStatement implements DatabaseStatement {
 	 * @param callable $fn
 	 * @return mixed
 	 */
-	private function exceptionHandler($fn) {
+	private function exceptionHandler(callable $fn) {
 		try {
 			return $fn();
 		} catch (PDOException $e) {

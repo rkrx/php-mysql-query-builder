@@ -26,7 +26,7 @@ trait WhereBuilder {
 	 * @param string $query
 	 * @return string
 	 */
-	protected function buildWhereConditions(string $query) {
+	protected function buildWhereConditions(string $query): string {
 		return ConditionBuilder::build($this->db(), $query, $this->where, 'WHERE');
 	}
 }

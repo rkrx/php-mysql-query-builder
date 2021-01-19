@@ -14,7 +14,7 @@ trait OrderByBuilder {
 	 * @param string $direction
 	 * @return $this
 	 */
-	public function orderBy($expression, $direction = 'asc') {
+	public function orderBy($expression, string $direction = 'asc') {
 		if($expression instanceof OrderBySpecification) {
 			foreach($expression->getFields() as $field) {
 				$this->addOrder($field[0], $field[1]);
@@ -30,7 +30,7 @@ trait OrderByBuilder {
 	 * @param array $values
 	 * @return $this
 	 */
-	public function orderByValues($fieldName, array $values) {
+	public function orderByValues(string $fieldName, array $values) {
 		$expr = [];
 		foreach(array_values($values) as $idx => $value) {
 			$expr[] = $this->db()->quoteExpression("WHEN ? THEN ?", [$value, $idx]);
@@ -43,7 +43,7 @@ trait OrderByBuilder {
 	 * @param string $query
 	 * @return string
 	 */
-	protected function buildOrder($query) {
+	protected function buildOrder(string $query): string {
 		if(!count($this->orderBy)) {
 			return $query;
 		}
@@ -59,7 +59,7 @@ trait OrderByBuilder {
 	 * @param string|array $expression
 	 * @param string $direction
 	 */
-	private function addOrder($expression, $direction) {
+	private function addOrder($expression, string $direction) {
 		$direction = $this->fixDirection($direction);
 		if(is_array($expression)) {
 			if(!count($expression)) {
@@ -78,7 +78,7 @@ trait OrderByBuilder {
 	 * @param string $direction
 	 * @return string
 	 */
-	private function fixDirection($direction) {
+	private function fixDirection(string $direction): string {
 		return strtoupper($direction) !== 'ASC' ? 'DESC' : 'ASC';
 	}
 }

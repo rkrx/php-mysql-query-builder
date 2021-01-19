@@ -32,7 +32,7 @@ trait GroupByBuilder {
 	 * @param string $query
 	 * @return string
 	 */
-	protected function buildGroups($query) {
+	protected function buildGroups(string $query): string {
 		if(!count($this->groupBy)) {
 			return $query;
 		}

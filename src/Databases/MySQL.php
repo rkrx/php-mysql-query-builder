@@ -60,21 +60,21 @@ class MySQL implements Database {
 	/**
 	 * @return QueryLoggers
 	 */
-	public function getQueryLoggers() {
+	public function getQueryLoggers(): QueryLoggers {
 		return $this->queryLoggers;
 	}
 
 	/**
 	 * @return AliasRegistry
 	 */
-	public function getAliasRegistry() {
+	public function getAliasRegistry(): AliasRegistry {
 		return $this->aliasRegistry;
 	}
 
 	/**
 	 * @return VirtualTables
 	 */
-	public function getVirtualTables() {
+	public function getVirtualTables(): VirtualTables {
 		if($this->virtualTables === null) {
 			$this->virtualTables = new VirtualTables();
 		}
@@ -85,17 +85,17 @@ class MySQL implements Database {
 	 * @param string $query
 	 * @return QueryStatement
 	 */
-	public function query($query) {
+	public function query(string $query) {
 		return $this->buildQueryStatement($query, function ($query) {
 			return $this->pdo->query($query);
 		});
 	}
 
 	/**
-	 * @param string|object $query
+	 * @param string $query
 	 * @return QueryStatement
 	 */
-	public function prepare($query) {
+	public function prepare(string $query) {
 		return $this->buildQueryStatement((string) $query, function ($query) {
 			return $this->pdo->prepare($query);
 		});
@@ -106,7 +106,7 @@ class MySQL implements Database {
 	 * @param array $params
 	 * @return int
 	 */
-	public function exec($query, array $params = []) {
+	public function exec(string $query, array $params = []): int {
 		return $this->exceptionHandler(function () use ($query, $params) {
 			$stmt = $this->pdo->prepare($query);
 			$timer = microtime(true);
@@ -119,9 +119,10 @@ class MySQL implements Database {
 	}
 
 	/**
+	 * @param string|null $name
 	 * @return string
 	 */
-	public function getLastInsertId() {
+	public function getLastInsertId(?string $name = null): string {
 		return $this->pdo->lastInsertId();
 	}
 
@@ -129,7 +130,7 @@ class MySQL implements Database {
 	 * @param string $table
 	 * @return array
 	 */
-	public function getTableFields($table) {
+	public function getTableFields(string $table): array {
 		$table = $this->select()->aliasReplacer()->replace($table);
 		if(array_key_exists($table, self::$tableFields)) {
 			return self::$tableFields[$table];
@@ -146,7 +147,7 @@ class MySQL implements Database {
 	 * @param array $arguments
 	 * @return string
 	 */
-	public function quoteExpression($expression, array $arguments = array()) {
+	public function quoteExpression($expression, array $arguments = []): string {
 		$index = -1;
 		$func = function () use ($arguments, &$index) {
 			$index++;
@@ -170,7 +171,7 @@ class MySQL implements Database {
 	 * @param mixed $value
 	 * @return string
 	 */
-	public function quote($value) {
+	public function quote($value): string {
 		if(is_null($value)) {
 			$result = 'NULL';
 		} elseif($value instanceof Builder\DBExpr) {
@@ -189,7 +190,7 @@ class MySQL implements Database {
 	 * @param string $field
 	 * @return string
 	 */
-	public function quoteField($field) {
+	public function quoteField(string $field): string {
 		if (is_numeric($field) || !is_string($field)) {
 			throw new UnexpectedValueException('Field name is invalid');
 		}
@@ -201,10 +202,10 @@ class MySQL implements Database {
 	}
 
 	/**
-	 * @param array $fields
+	 * @param array|null $fields
 	 * @return Builder\RunnableSelect
 	 */
-	public function select(array $fields = null) {
+	public function select(array $fields = null): Builder\RunnableSelect {
 		$select = array_key_exists('select-factory', $this->options)
 			? call_user_func($this->options['select-factory'], $this, $this->options['select-options'])
 			: new Builder\RunnableSelect($this, $this->options['select-options']);
@@ -215,10 +216,10 @@ class MySQL implements Database {
 	}
 
 	/**
-	 * @param array $fields
+	 * @param array|null $fields
 	 * @return Builder\RunnableInsert
 	 */
-	public function insert(array $fields = null) {
+	public function insert(array $fields = null): Builder\RunnableInsert {
 		$insert = array_key_exists('insert-factory', $this->options)
 			? call_user_func($this->options['insert-factory'], $this, $this->options['insert-options'])
 			: new Builder\RunnableInsert($this, $this->options['insert-options']);
@@ -229,10 +230,10 @@ class MySQL implements Database {
 	}
 
 	/**
-	 * @param array $fields
+	 * @param array|null $fields
 	 * @return Builder\RunnableUpdate
 	 */
-	public function update(array $fields = null) {
+	public function update(array $fields = null): Builder\RunnableUpdate {
 		$update = array_key_exists('update-factory', $this->options)
 			? call_user_func($this->options['update-factory'], $this, $this->options['update-options'])
 			: new Builder\RunnableUpdate($this, $this->options['update-options']);
@@ -245,7 +246,7 @@ class MySQL implements Database {
 	/**
 	 * @return Builder\RunnableDelete
 	 */
-	public function delete() {
+	public function delete(): Builder\RunnableDelete {
 		return array_key_exists('delete-factory', $this->options)
 			? call_user_func($this->options['delete-factory'], $this, $this->options['delete-options'])
 			: new Builder\RunnableDelete($this, $this->options['delete-options']);
@@ -342,7 +343,7 @@ class MySQL implements Database {
 	 * @param callable $fn
 	 * @return $this
 	 */
-	private function transactionEnd($fn) {
+	private function transactionEnd(callable $fn) {
 		$this->transactionLevel--;
 		if($this->transactionLevel < 0) {
 			throw new RuntimeException("Transaction-Nesting-Problem: Trying to invoke commit on a already closed transaction");
@@ -362,7 +363,7 @@ class MySQL implements Database {
 	 * @param callable $fn
 	 * @return QueryStatement
 	 */
-	private function buildQueryStatement($query, $fn) {
+	private function buildQueryStatement(string $query, callable $fn): QueryStatement {
 		$stmt = $fn($query);
 		if(!$stmt) {
 			throw new RuntimeException("Could not execute statement:\n{$query}");
@@ -374,7 +375,7 @@ class MySQL implements Database {
 	 * @param callable $fn
 	 * @return mixed
 	 */
-	private function exceptionHandler($fn) {
+	private function exceptionHandler(callable $fn) {
 		try {
 			return $fn();
 		} catch (PDOException $e) {
@@ -386,7 +387,7 @@ class MySQL implements Database {
 	/**
 	 * @return string
 	 */
-	private function genUniqueId() {
+	private function genUniqueId(): string {
 		// Generate a unique id from a former random-uuid-generator
 		return sprintf('ID%04x%04x%04x%04x%04x%04x%04x%04x',
 			mt_rand(0, 0xffff),

@@ -25,10 +25,10 @@ class Delete extends Statement {
 	 * Name der Tabelle
 	 *
 	 * @param string $alias
-	 * @param string $table
+	 * @param string|Select $table
 	 * @return $this
 	 */
-	public function from($alias, $table = null) {
+	public function from(string $alias, $table = null) {
 		if($table !== null) {
 			$this->aliases[] = $alias;
 		}
@@ -39,7 +39,7 @@ class Delete extends Statement {
 	/**
 	 * @return string
 	 */
-	public function __toString() {
+	public function __toString(): string {
 		$query = "DELETE ";
 		$query .= implode(', ', $this->aliases);
 		$query = trim($query) . " FROM\n";

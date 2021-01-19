@@ -19,7 +19,7 @@ class LoggerInterfaceQueryLogger implements QueryLogger {
 	 * @param float $duration Duration in seconds
 	 * @return void
 	 */
-	public function log($query, $duration) {
+	public function log(string $query, float $duration): void {
 		$this->logger->info(sprintf("Query %s took %0.4f seconds", $query, $duration), ['query' => $query, 'duration' => $duration]);
 	}
 }

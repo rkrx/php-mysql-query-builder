@@ -23,7 +23,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param string $table
 	 * @return $this
 	 */
-	public function into($table) {
+	public function into(string $table) {
 		$this->table = $table;
 		return $this;
 	}
@@ -32,7 +32,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param bool $value
 	 * @return $this
 	 */
-	public function setIgnore($value = true) {
+	public function setIgnore(bool $value = true) {
 		$this->ignore = $value;
 		return $this;
 	}
@@ -44,7 +44,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param string $field
 	 * @return $this
 	 */
-	public function setKey($field) {
+	public function setKey(string $field) {
 		$this->keyField = $field;
 		return $this;
 	}
@@ -54,7 +54,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param bool|int|float|string $value
 	 * @return $this
 	 */
-	public function add($field, $value) {
+	public function add(string $field, $value) {
 		$this->fields = $this->addTo($this->fields, $field, $value);
 		return $this;
 	}
@@ -64,7 +64,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param bool|int|float|string $value
 	 * @return $this
 	 */
-	public function update($field, $value) {
+	public function update(string $field, $value) {
 		$this->update = $this->addTo($this->update, $field, $value);
 		return $this;
 	}
@@ -74,7 +74,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param bool|int|float|string $value
 	 * @return $this
 	 */
-	public function addOrUpdate($field, $value) {
+	public function addOrUpdate(string $field, $value) {
 		$this->add($field, $value);
 		$this->update($field, $value);
 		return $this;
@@ -85,7 +85,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param mixed ...$args
 	 * @return $this
 	 */
-	public function addExpr($str, ...$args) {
+	public function addExpr(string $str, ...$args) {
 		if(count($args) > 0) {
 			$this->fields[] = func_get_args();
 		} else {
@@ -99,7 +99,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param mixed ...$args
 	 * @return $this
 	 */
-	public function updateExpr($str, ...$args) {
+	public function updateExpr(string $str, ...$args) {
 		if(count($args) > 0) {
 			$this->update[] = func_get_args();
 		} else {
@@ -113,7 +113,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param mixed ...$args
 	 * @return $this
 	 */
-	public function addOrUpdateExpr($expr, ...$args) {
+	public function addOrUpdateExpr(string $expr, ...$args) {
 		if(count($args) > 0) {
 			$this->fields[] = func_get_args();
 			$this->update[] = func_get_args();
@@ -126,8 +126,8 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param array $data
-	 * @param array $mask
-	 * @param array $excludeFields
+	 * @param array|null $mask
+	 * @param array|null $excludeFields
 	 * @return $this
 	 */
 	public function addAll(array $data, array $mask = null, array $excludeFields = null) {
@@ -139,8 +139,8 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param array $data
-	 * @param array $mask
-	 * @param array $excludeFields
+	 * @param array|null $mask
+	 * @param array|null $excludeFields
 	 * @return $this
 	 */
 	public function updateAll(array $data, array $mask = null, array $excludeFields = null) {
@@ -154,8 +154,8 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param array $data
-	 * @param array $mask
-	 * @param array $excludeFields
+	 * @param array|null $mask
+	 * @param array|null $excludeFields
 	 * @return $this
 	 */
 	public function addOrUpdateAll(array $data, array $mask = null, array $excludeFields = null) {
@@ -176,7 +176,7 @@ class Insert extends InsertUpdateStatement {
 	/**
 	 * @return string
 	 */
-	public function __toString() {
+	public function __toString(): string {
 		if ($this->table === null) {
 			throw new RuntimeException('Specify a table-name');
 		}
@@ -214,7 +214,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param bool|int|float|string $value
 	 * @return array
 	 */
-	private function addTo(array $fields, $field, $value) {
+	private function addTo(array $fields, string $field, $value) {
 		if ($this->isFieldNameValid($field)) {
 			throw new UnexpectedValueException('Field name is invalid');
 		}
@@ -226,12 +226,12 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param array $data
-	 * @param array $mask
-	 * @param array $excludeFields
+	 * @param array|null $mask
+	 * @param array|null $excludeFields
 	 * @param callable $fn
 	 * @return $this
 	 */
-	private function addAllTo(array $data, array $mask = null, array $excludeFields = null, $fn) {
+	private function addAllTo(array $data, ?array $mask = null, ?array $excludeFields = null, $fn = null) {
 		if($mask !== null) {
 			$data = array_intersect_key($data, array_combine($mask, $mask));
 		}
@@ -252,7 +252,7 @@ class Insert extends InsertUpdateStatement {
 	/**
 	 * @return string
 	 */
-	private function buildUpdate() {
+	private function buildUpdate(): string {
 		$queryArr = [];
 		if(!empty($this->update)) {
 			$queryArr[] = "ON DUPLICATE KEY UPDATE\n";
@@ -271,7 +271,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param string $fieldName
 	 * @return bool
 	 */
-	private function isFieldNameValid($fieldName) {
+	private function isFieldNameValid(string $fieldName): bool {
 		return is_numeric($fieldName) || !is_scalar($fieldName);
 	}
 
@@ -279,7 +279,7 @@ class Insert extends InsertUpdateStatement {
 	 * @param array $values
 	 * @return array
 	 */
-	private function clearValues(array $values) {
+	private function clearValues(array $values): array {
 		if(!count($values)) {
 			return [];
 		}

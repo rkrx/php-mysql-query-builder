@@ -9,7 +9,7 @@ interface DatabaseStatement {
 	/**
 	 * @return PDOStatement
 	 */
-	public function getStatement();
+	public function getStatement(): PDOStatement;
 
 	/**
 	 * @param array $params
@@ -24,7 +24,7 @@ interface DatabaseStatement {
 	 * @param array $ctorArgs
 	 * @return array
 	 */
-	public function fetchAll($fetchStyle = PDO::FETCH_ASSOC, $fetchArgument = null, array $ctorArgs = []);
+	public function fetchAll($fetchStyle = PDO::FETCH_ASSOC, $fetchArgument = null, array $ctorArgs = []): array;
 
 	/**
 	 * @param int $fetchStyle
@@ -43,16 +43,16 @@ interface DatabaseStatement {
 	/**
 	 * @return bool
 	 */
-	public function closeCursor();
+	public function closeCursor(): bool;
 
 	/**
 	 * @return int
 	 */
-	public function columnCount();
+	public function columnCount(): int;
 
 	/**
 	 * @param int $columnNo
 	 * @return array
 	 */
-	public function getColumnMeta($columnNo);
+	public function getColumnMeta(int $columnNo): array;
 }

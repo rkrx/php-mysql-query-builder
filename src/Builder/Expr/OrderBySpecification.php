@@ -8,5 +8,5 @@ interface OrderBySpecification {
 	 *
 	 * @return array[]
 	 */
-	public function getFields();
+	public function getFields(): array;
 }

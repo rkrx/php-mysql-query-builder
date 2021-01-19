@@ -8,21 +8,21 @@ class DBExpr {
 	/**
 	 * @param string $expression
 	 */
-	public function __construct($expression) {
+	public function __construct(string $expression) {
 		$this->expression = $expression;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getExpression() {
+	public function getExpression(): string {
 		return $this->expression;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function __toString() {
+	public function __toString(): string {
 		return $this->expression;
 	}
 }

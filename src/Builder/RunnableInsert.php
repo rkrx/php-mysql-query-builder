@@ -33,7 +33,7 @@ class RunnableInsert extends Insert implements DDLPreparable {
 	/**
 	 * @return DDLRunnable
 	 */
-	public function prepare() {
+	public function prepare(): DDLRunnable {
 		return $this->createPreparable($this->db()->prepare($this), function() {
 			return (int) $this->db()->getLastInsertId();
 		});
@@ -43,7 +43,7 @@ class RunnableInsert extends Insert implements DDLPreparable {
 	 * @param array $params
 	 * @return int
 	 */
-	public function run(array $params = []) {
+	public function run(array $params = []): int {
 		return $this->prepare()->run($params);
 	}
 }

@@ -11,7 +11,7 @@ class DDLRunnable {
 
 	/**
 	 * @param DatabaseStatement $query
-	 * @param callable $callbackFn
+	 * @param callable|null $callbackFn
 	 */
 	public function __construct(DatabaseStatement $query, callable $callbackFn = null) {
 		$this->query = $query;

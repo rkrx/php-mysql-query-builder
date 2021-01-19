@@ -33,7 +33,7 @@ class OptionalDBFilterMap {
 	 * @param callable|null $validator
 	 * @return DBExprFilter
 	 */
-	public function __invoke($expression, $keyPath, $validator = null) {
+	public function __invoke(string $expression, $keyPath, callable $validator = null): DBExprFilter {
 		return new DBExprFilter($expression, $this->map, $keyPath, $validator);
 	}
 }

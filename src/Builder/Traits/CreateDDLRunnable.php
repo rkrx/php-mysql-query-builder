@@ -10,7 +10,7 @@ trait CreateDDLRunnable {
 	 * @param callable|null $callbackFn
 	 * @return DDLRunnable
 	 */
-	public function createPreparable(DatabaseStatement $query, callable $callbackFn = null) {
+	public function createPreparable(DatabaseStatement $query, callable $callbackFn = null): DDLRunnable {
 		return new DDLRunnable($query, $callbackFn);
 	}
 }

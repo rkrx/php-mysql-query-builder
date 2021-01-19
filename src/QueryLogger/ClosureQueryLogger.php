@@ -8,7 +8,7 @@ class ClosureQueryLogger implements QueryLogger {
 	/**
 	 * @param callable $fn
 	 */
-	public function __construct($fn) {
+	public function __construct(callable $fn) {
 		$this->fn = $fn;
 	}
 
@@ -17,7 +17,7 @@ class ClosureQueryLogger implements QueryLogger {
 	 * @param float $duration Duration in seconds
 	 * @return void
 	 */
-	public function log($query, $duration) {
+	public function log(string $query, float $duration): void {
 		call_user_func($this->fn, $query, $duration);
 	}
 }

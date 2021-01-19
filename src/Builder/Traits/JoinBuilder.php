@@ -1,6 +1,8 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
+use Kir\MySQL\Builder\Select;
+
 trait JoinBuilder {
 	use AbstractDB;
 	use AbstractTableNameBuilder;
@@ -10,34 +12,34 @@ trait JoinBuilder {
 
 	/**
 	 * @param string $alias
-	 * @param string|array[] $table
-	 * @param string $expression
+	 * @param string|array[]|Select $table
+	 * @param string|null $expression
 	 * @param array<int, mixed> $args
 	 * @return $this
 	 */
-	public function joinInner($alias, $table, $expression = null, ...$args) {
+	public function joinInner(string $alias, $table, ?string $expression = null, ...$args) {
 		return $this->addJoin('INNER', $alias, $table, $expression, $args);
 	}
 
 	/**
 	 * @param string $alias
-	 * @param string|array[] $table
+	 * @param string|array[]|Select $table
 	 * @param string $expression
 	 * @param array<int, mixed> $args
 	 * @return $this
 	 */
-	public function joinLeft($alias, $table, $expression, ...$args) {
+	public function joinLeft(string $alias, $table, string $expression, ...$args) {
 		return $this->addJoin('LEFT', $alias, $table, $expression, $args);
 	}
 
 	/**
 	 * @param string $alias
-	 * @param string|array[] $table
+	 * @param string|array[]|Select $table
 	 * @param string $expression
 	 * @param array<int, mixed> $args
 	 * @return $this
 	 */
-	public function joinRight($alias, $table, $expression, ...$args) {
+	public function joinRight(string $alias, $table, string $expression, ...$args) {
 		return $this->addJoin('RIGHT', $alias, $table, $expression, $args);
 	}
 
@@ -45,7 +47,7 @@ trait JoinBuilder {
 	 * @param string $query
 	 * @return string
 	 */
-	protected function buildJoins($query) {
+	protected function buildJoins(string $query): string {
 		$arr = [];
 		foreach($this->joinTables as $table) {
 			$join = $table['type']." JOIN\n";
@@ -65,11 +67,11 @@ trait JoinBuilder {
 	 * @param string $type
 	 * @param string $alias
 	 * @param string|array[] $name
-	 * @param string $expression
+	 * @param string|null $expression
 	 * @param array<int, mixed> $arguments
 	 * @return $this
 	 */
-	private function addJoin(string $type, $alias, $name, $expression = null, array $arguments = []) {
+	private function addJoin(string $type, string $alias, $name, ?string $expression = null, array $arguments = []) {
 		$this->joinTables[] = [
 			'type' => $type,
 			'alias' => $alias,

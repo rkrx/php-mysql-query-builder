@@ -7,5 +7,5 @@ trait AbstractAliasReplacer {
 	/**
 	 * @return AliasReplacer
 	 */
-	abstract protected function aliasReplacer();
+	abstract protected function aliasReplacer(): AliasReplacer;
 }

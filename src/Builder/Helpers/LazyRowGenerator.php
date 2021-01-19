@@ -12,13 +12,13 @@ class LazyRowGenerator {
 	/**
 	 * @param bool $preserveTypes
 	 */
-	public function __construct($preserveTypes) {
+	public function __construct(bool $preserveTypes) {
 		$this->preserveTypes = $preserveTypes;
 	}
 
 	/**
 	 * @param QueryStatement $statement
-	 * @param Closure $callback
+	 * @param Closure|null $callback
 	 * @return Generator|mixed[]
 	 */
 	public function generate(QueryStatement $statement, Closure $callback = null) {
@@ -31,6 +31,7 @@ class LazyRowGenerator {
 				$result = $callback($row);
 				if($result instanceof DBIgnoreRow) {
 					// Do nothing in this case
+					continue;
 				} elseif($result !== null) {
 					yield $result;
 				} else {

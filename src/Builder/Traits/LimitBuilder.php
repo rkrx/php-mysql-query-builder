@@ -8,7 +8,7 @@ trait LimitBuilder {
 	/**
 	 * @return int|null
 	 */
-	protected function getLimit() {
+	protected function getLimit(): ?int {
 		return $this->limit;
 	}
 
@@ -16,7 +16,7 @@ trait LimitBuilder {
 	 * @param int|null $limit
 	 * @return $this
 	 */
-	public function limit($limit) {
+	public function limit(?int $limit) {
 		$this->limit = $limit;
 		return $this;
 	}
@@ -26,7 +26,7 @@ trait LimitBuilder {
 	 * @param int|null $offset
 	 * @return string
 	 */
-	protected function buildLimit($query, $offset = null) {
+	protected function buildLimit(string $query, ?int $offset = null) {
 		$limit = $this->limit;
 		if($limit === null && $offset !== null) {
 			$limit = '18446744073709551615';

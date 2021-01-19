@@ -35,7 +35,7 @@ trait UnionBuilder {
 	 * @param string $query
 	 * @return string
 	 */
-	protected function buildUnions($query) {
+	protected function buildUnions(string $query): string {
 		$wrap = static function ($query) {
 			$query = trim($query);
 			$query = implode("\n\t", explode("\n", $query));

@@ -7,5 +7,5 @@ trait AbstractTableNameBuilder {
 	 * @param string $name
 	 * @return string
 	 */
-	abstract protected function buildTableName($alias, $name);
+	abstract protected function buildTableName(string $alias, string $name): string;
 }

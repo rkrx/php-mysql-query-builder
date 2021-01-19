@@ -1,7 +1,6 @@
 <?php
 namespace Kir\MySQL\Builder;
 
-use Kir\MySQL\Database;
 use Kir\MySQL\Databases\MySQL;
 use Kir\MySQL\Tools\AliasReplacer;
 
@@ -42,26 +41,26 @@ abstract class Statement {
 	/**
 	 * @return Statement
 	 */
-	public function cloneStatement() {
+	public function cloneStatement(): Statement {
 		return clone $this;
 	}
 
 	/**
 	 * @return AliasReplacer
 	 */
-	public function aliasReplacer() {
+	public function aliasReplacer(): AliasReplacer {
 		return $this->aliasReplacer;
 	}
 
 	/**
 	 * @return MySQL
 	 */
-	protected function db() {
+	protected function db(): MySQL {
 		return $this->db;
 	}
 
 	/**
 	 * @return string
 	 */
-	abstract public function __toString();
+	abstract public function __toString(): string;
 }

@@ -38,7 +38,7 @@ class Select extends Statement {
 	 * @param bool $distinct
 	 * @return $this
 	 */
-	public function distinct($distinct = true) {
+	public function distinct(bool $distinct = true) {
 		$this->distinct = $distinct;
 		return $this;
 	}
@@ -81,7 +81,7 @@ class Select extends Statement {
 	/**
 	 * @return array
 	 */
-	public function getFields() {
+	public function getFields(): array {
 		return $this->fields;
 	}
 
@@ -89,7 +89,7 @@ class Select extends Statement {
 	 * @param bool $enabled
 	 * @return $this
 	 */
-	public function forUpdate($enabled = true) {
+	public function forUpdate(bool $enabled = true) {
 		$this->forUpdate = $enabled;
 		return $this;
 	}
@@ -97,7 +97,7 @@ class Select extends Statement {
 	/**
 	 * @return bool
 	 */
-	public function getCalcFoundRows() {
+	public function getCalcFoundRows(): bool {
 		return $this->calcFoundRows;
 	}
 
@@ -115,10 +115,10 @@ class Select extends Statement {
 
 	/**
 	 * @param string $alias
-	 * @param string $tableName
+	 * @param string|array|null $tableName
 	 * @return $this
 	 */
-	public function from($alias, $tableName = null) {
+	public function from(string $alias, $tableName = null) {
 		$this->addTable($alias, $tableName);
 		return $this;
 	}
@@ -126,7 +126,7 @@ class Select extends Statement {
 	/**
 	 * @return string
 	 */
-	public function __toString() {
+	public function __toString(): string {
 		$query = "SELECT";
 		if ($this->calcFoundRows) {
 			$query .= " SQL_CALC_FOUND_ROWS";
@@ -156,7 +156,7 @@ class Select extends Statement {
 	 * @param string $query
 	 * @return string
 	 */
-	private function buildFields($query) {
+	private function buildFields(string $query): string {
 		$fields = [];
 		if (count($this->fields)) {
 			foreach ($this->fields as $alias => $expression) {
@@ -176,7 +176,7 @@ class Select extends Statement {
 	 * @param string $query
 	 * @return string
 	 */
-	private function buildForUpdate($query) {
+	private function buildForUpdate(string $query): string {
 		if ($this->forUpdate) {
 			$query .= "FOR UPDATE\n";
 		}

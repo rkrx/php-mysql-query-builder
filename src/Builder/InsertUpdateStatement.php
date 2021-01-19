@@ -10,7 +10,7 @@ abstract class InsertUpdateStatement extends Statement {
 	/**
 	 * @return array|null
 	 */
-	public function getMask() {
+	public function getMask(): ?array {
 		return $this->mask;
 	}
 
@@ -28,7 +28,7 @@ abstract class InsertUpdateStatement extends Statement {
 	 * @param array $query
 	 * @return string[]
 	 */
-	protected function buildFieldList(array $fields, array $query = []) {
+	protected function buildFieldList(array $fields, array $query = []): array {
 		foreach ($fields as $fieldName => $fieldValue) {
 			if ($fieldValue instanceof DefaultValue) {
 				$fieldValue = 'DEFAULT';
@@ -54,7 +54,7 @@ abstract class InsertUpdateStatement extends Statement {
 	 * @param array $tableFields
 	 * @return bool
 	 */
-	protected function isFieldAccessible($fieldName, array $tableFields) {
+	protected function isFieldAccessible(string $fieldName, array $tableFields): bool {
 		if (!in_array($fieldName, $tableFields)) {
 			return false;
 		}

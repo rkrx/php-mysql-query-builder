@@ -22,7 +22,7 @@ class DBExprFilter implements OptionalExpression {
 	 * @param callable|null $validator
 	 * @param callable|null $validationResultHandler
 	 */
-	public function __construct($expression, array $data, $keyPath, $validator = null, $validationResultHandler = null) {
+	public function __construct(string $expression, array $data, $keyPath, $validator = null, $validationResultHandler = null) {
 		$this->expression = $expression;
 		$this->value = $data;
 		$this->keyPath = $this->buildKey($keyPath);
@@ -43,16 +43,16 @@ class DBExprFilter implements OptionalExpression {
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
-	public function getExpression() {
+	public function getExpression(): string {
 		return $this->expression;
 	}
 
 	/**
 	 * @return bool
 	 */
-	public function isValid() {
+	public function isValid(): bool {
 		$result = call_user_func($this->validator, $this->value);
 		call_user_func($this->validationResultHandler, $result, [
 			'value' => $this->value,
@@ -62,9 +62,9 @@ class DBExprFilter implements OptionalExpression {
 	}
 
 	/**
-	 * @return mixed
+	 * @return array
 	 */
-	public function getValue() {
+	public function getValue(): array {
 		return [$this->value];
 	}
 
@@ -72,7 +72,7 @@ class DBExprFilter implements OptionalExpression {
 	 * @param string|string[] $keyPath
 	 * @return string[]
 	 */
-	private function buildKey($keyPath) {
+	private function buildKey($keyPath): array {
 		if(is_string($keyPath)) {
 			$keyPath = explode('.', $keyPath);
 		}
@@ -86,7 +86,7 @@ class DBExprFilter implements OptionalExpression {
 	 * @param array $array
 	 * @return bool
 	 */
-	private function isValidArray(array $array) {
+	private function isValidArray(array $array): bool {
 		$data = array_filter($array, function ($value) {
 			if(is_array($value)) {
 				return $this->isValidArray($value);
@@ -100,9 +100,9 @@ class DBExprFilter implements OptionalExpression {
 	 * @param array $array
 	 * @param array $path
 	 * @param mixed $default
-	 * @return array
+	 * @return mixed
 	 */
-	private function recursiveGet($array, $path, $default) {
+	private function recursiveGet(array $array, array $path, $default) {
 		$count = count($path);
 		if (!$count) {
 			return $default;

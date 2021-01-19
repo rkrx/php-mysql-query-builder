@@ -13,7 +13,7 @@ class VirtualTables {
 	 * @param Select|Closure $select
 	 * @return $this
 	 */
-	public function add($tableName, $select) {
+	public function add(string $tableName, $select) {
 		$this->virtualTables[$tableName] = $select;
 		return $this;
 	}
@@ -22,7 +22,7 @@ class VirtualTables {
 	 * @param string|VirtualTable $tableName
 	 * @return bool
 	 */
-	public function has($tableName) {
+	public function has($tableName): bool {
 		return array_key_exists((string) $tableName, $this->virtualTables);
 	}
 
@@ -30,7 +30,7 @@ class VirtualTables {
 	 * @param string|VirtualTable $tableName
 	 * @return Select|null
 	 */
-	public function get($tableName) {
+	public function get($tableName): ?Select {
 		if($this->has($tableName)) {
 			$table = $this->virtualTables[(string) $tableName];
 			if($table instanceof Closure) {

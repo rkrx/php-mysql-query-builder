@@ -7,5 +7,5 @@ interface QueryLogger {
 	 * @param float $duration Duration in seconds
 	 * @return void
 	 */
-	public function log($query, $duration);
+	public function log(string $query, float $duration): void;
 }

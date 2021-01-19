@@ -16,7 +16,7 @@ class AliasReplacer {
 	 * @param string $name
 	 * @return string
 	 */
-	public function replace($name) {
+	public function replace(string $name): string {
 		$fn = function($values) {
 			list(, $alias, $part) = $values;
 			$string = $this->aliasRegistry->get($alias);

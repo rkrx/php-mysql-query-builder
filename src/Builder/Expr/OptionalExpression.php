@@ -5,12 +5,12 @@ interface OptionalExpression {
 	/**
 	 * @return string
 	 */
-	public function getExpression();
+	public function getExpression(): string;
 
 	/**
 	 * @return bool
 	 */
-	public function isValid();
+	public function isValid(): bool;
 
 	/**
 	 * @return mixed

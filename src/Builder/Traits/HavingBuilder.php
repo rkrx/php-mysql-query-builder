@@ -26,7 +26,7 @@ trait HavingBuilder {
 	 * @param string $query
 	 * @return string
 	 */
-	protected function buildHavingConditions(string $query) {
+	protected function buildHavingConditions(string $query): string {
 		return ConditionBuilder::build($this->db(), $query, $this->having, 'HAVING');
 	}
 }

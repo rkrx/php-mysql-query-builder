@@ -4,12 +4,12 @@ namespace Kir\MySQL\Builder\Expr;
 class DBExprOrderBySpec implements OrderBySpecification {
 	/** @var array[] */
 	private $fields = [];
-	
+
 	/**
 	 * @param array $spec
 	 * @param array $sortFieldsSpec
 	 */
-	public function __construct($spec, $sortFieldsSpec) {
+	public function __construct(array $spec, array $sortFieldsSpec) {
 		$expressions = [];
 		foreach($spec as $specReference => $dbExpr) {
 			if(is_int($specReference)) {
@@ -30,14 +30,14 @@ class DBExprOrderBySpec implements OrderBySpecification {
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns an array[], where each value is a [db-expression, sort-direction]
 	 * The sort-direction can be either ASC or DESC
 	 *
 	 * @return array[]
 	 */
-	public function getFields() {
+	public function getFields(): array {
 		return $this->fields;
 	}
 }

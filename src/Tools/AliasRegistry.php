@@ -12,7 +12,7 @@ class AliasRegistry {
 	 * @param string $string
 	 * @return $this
 	 */
-	public function add($alias, $string) {
+	public function add(string $alias, string $string) {
 		$this->aliases[$alias] = $string;
 		return $this;
 	}
@@ -21,7 +21,7 @@ class AliasRegistry {
 	 * @param string $alias
 	 * @return string
 	 */
-	public function get($alias) {
+	public function get(string $alias): string {
 		if (!array_key_exists($alias, $this->aliases)) {
 			throw new RuntimeException("Alias not found: {$alias}");
 		}
@@ -31,7 +31,7 @@ class AliasRegistry {
 	/**
 	 * @return string[]
 	 */
-	public function getAll() {
+	public function getAll(): array {
 		return $this->aliases;
 	}
 }

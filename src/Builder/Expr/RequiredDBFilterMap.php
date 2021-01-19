@@ -33,7 +33,7 @@ class RequiredDBFilterMap {
 	 * @param callable|null $validator
 	 * @return DBExprFilter
 	 */
-	public function __invoke($expression, $keyPath, $validator = null) {
+	public function __invoke(string $expression, $keyPath, $validator = null) {
 		return new DBExprFilter($expression, $this->map, $keyPath, $validator, static function ($result, array $data) {
 			if(!$result) {
 				throw new RequiredValueNotFoundException(sprintf("Required value %s not found", $data['key']));

@@ -11,7 +11,7 @@ final class ConditionBuilder {
 	 * @param string $token
 	 * @return string
 	 */
-	public static function build(Database $db, $query, array $conditions, $token) {
+	public static function build(Database $db, string $query, array $conditions, string $token): string {
 		if(!count($conditions)) {
 			return $query;
 		}
@@ -41,7 +41,7 @@ final class ConditionBuilder {
 	 * @param Database $db
 	 * @return array
 	 */
-	private static function buildCondition(array $conditions, $expression, $arguments, Database $db) {
+	private static function buildCondition(array $conditions, $expression, $arguments, Database $db): array {
 		$expr = $db->quoteExpression($expression, $arguments);
 		$conditions[] = "\t({$expr})";
 		return $conditions;

@@ -12,14 +12,15 @@ class RunnableUpdate extends Update implements DDLPreparable {
 	 * @param array $params
 	 * @return int
 	 */
-	public function run(array $params = []) {
+	public function run(array $params = []): int {
 		$query = $this->__toString();
 		return $this->db()->exec($query, $params);
 	}
 
 	/**
+	 * @return Internal\DDLRunnable
 	 */
-	public function prepare() {
+	public function prepare(): Internal\DDLRunnable {
 		return $this->createPreparable($this->db()->prepare($this));
 	}
 }

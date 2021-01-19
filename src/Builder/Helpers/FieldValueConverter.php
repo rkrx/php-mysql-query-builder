@@ -7,7 +7,7 @@ class FieldValueConverter {
 	 * @param array $columnDefinitions
 	 * @return array
 	 */
-	public static function convertValues(array $row, array $columnDefinitions) {
+	public static function convertValues(array $row, array $columnDefinitions): array {
 		foreach($row as $key => &$value) {
 			if($value !== null) {
 				$value = self::convertValue($value, $columnDefinitions[$key]);
@@ -21,7 +21,7 @@ class FieldValueConverter {
 	 * @param string $type
 	 * @return mixed
 	 */
-	private static function convertValue($value, $type) {
+	private static function convertValue($value, string $type) {
 		switch ($type) {
 			case 'i':
 				return $value !== null ? (int) $value : null;

@@ -17,7 +17,7 @@ class QueryLoggers {
 	 * @param float $duration
 	 * @return $this
 	 */
-	public function log($query, $duration) {
+	public function log(string $query, float $duration) {
 		foreach ($this->queryLoggers as $queryLogger) {
 			$queryLogger->log($query, $duration);
 		}
