@@ -12,7 +12,7 @@ interface DatabaseStatement {
 	public function getStatement(): PDOStatement;
 
 	/**
-	 * @param array $params
+	 * @param array<string, mixed> $params
 	 * @throws SqlException
 	 * @return $this
 	 */
@@ -21,8 +21,8 @@ interface DatabaseStatement {
 	/**
 	 * @param int $fetchStyle
 	 * @param mixed $fetchArgument
-	 * @param array $ctorArgs
-	 * @return array
+	 * @param array<mixed, mixed> $ctorArgs
+	 * @return array<mixed, mixed>
 	 */
 	public function fetchAll($fetchStyle = PDO::FETCH_ASSOC, $fetchArgument = null, array $ctorArgs = []): array;
 
@@ -52,7 +52,7 @@ interface DatabaseStatement {
 
 	/**
 	 * @param int $columnNo
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function getColumnMeta(int $columnNo): array;
 }

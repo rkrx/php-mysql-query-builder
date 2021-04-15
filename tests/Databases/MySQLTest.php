@@ -6,7 +6,7 @@ use Kir\MySQL\Common\DBTestCase;
 use RuntimeException;
 
 class MySQLTest extends DBTestCase {
-	public function testGetTableFields() {
+	public function testGetTableFields(): void {
 		$fields = $this->getDB()->getTableFields('test1');
 		self::assertEquals(['id', 'field1', 'field2', 'field3', 'field4'], $fields);
 	}
@@ -14,7 +14,7 @@ class MySQLTest extends DBTestCase {
 	/**
 	 * Test if the outer nested transaction detection works as expected
 	 */
-	public function testNestedTransaction() {
+	public function testNestedTransaction(): void {
 		$this->getDB()->transactionStart();
 		$this->getDB()->transactionStart();
 		$this->getDB()->transactionStart();
@@ -24,22 +24,7 @@ class MySQLTest extends DBTestCase {
 		self::assertTrue(true);
 	}
 
-	/**
-	 * Test if the outer nested transaction detection works as expected
-	 */
-	/*public function testOuterNestedTransaction() {
-		$this->getDB()->getPDO()->beginTransaction();
-		$this->getDB()->transactionStart();
-		$this->getDB()->transactionStart();
-		$this->getDB()->transactionStart();
-		$this->getDB()->transactionRollback();
-		$this->getDB()->transactionRollback();
-		$this->getDB()->transactionRollback();
-
-		self::assertTrue(true);
-	}*/
-
-	public function testFetchRow() {
+	public function testFetchRow(): void {
 		// Closure w/o return, but with reference
 		$row = TestSelect::create()
 		->field('t.id')
@@ -62,7 +47,7 @@ class MySQLTest extends DBTestCase {
 		self::assertEquals(['id' => 1, 'test' => 10], $row);
 	}
 
-	public function testFetchRows() {
+	public function testFetchRows(): void {
 		// Closure w/o return, but with reference
 		$rows = TestSelect::create()
 		->field('t.id')
@@ -87,7 +72,7 @@ class MySQLTest extends DBTestCase {
 		self::assertEquals([['id' => 1, 'test' => 10]], $rows);
 	}
 
-	public function testFetchRowsLazy() {
+	public function testFetchRowsLazy(): void {
 		// Closure w/o return, but with reference
 		$rows = TestSelect::create()
 		->field('t.id')

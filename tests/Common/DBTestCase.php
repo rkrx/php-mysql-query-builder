@@ -1,7 +1,6 @@
 <?php
 namespace Kir\MySQL\Common;
 
-use Closure;
 use Kir\MySQL\Builder\DeleteTest\TestDelete;
 use Kir\MySQL\Builder\InsertTest\TestInsert;
 use Kir\MySQL\Builder\SelectTest\TestSelect;
@@ -10,7 +9,7 @@ use Kir\MySQL\Databases\TestDB;
 use PHPUnit\Framework\TestCase;
 
 class DBTestCase extends TestCase {
-	/** @var TestDB */
+	/** @var TestDB|null */
 	private $db;
 
 	public static function setUpBeforeClass(): void {
@@ -25,39 +24,48 @@ class DBTestCase extends TestCase {
 		});
 	}
 
-	protected function use(Closure $fn) {
-		TestDB::use($fn);
+	/**
+	 * @template T
+	 * @param callable(TestDB): T $fn
+	 * @return T
+	 */
+	protected function use(callable $fn) {
+		return TestDB::use($fn);
 	}
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->db = new TestDB();
-		$this->db->exec('USE travis_test');
 	}
 
 	protected function tearDown(): void {
 		parent::tearDown();
-		$this->db->close();
-		$this->db = null;
+		if($this->db !== null) {
+			$this->db->close();
+			$this->db = null;
+		}
 	}
 
 	protected function getDB(): TestDB {
+		if($this->db === null) {
+			$this->db = new TestDB();
+			$this->db->exec('USE travis_test');
+		}
 		return $this->db;
 	}
 
-	protected function select() {
-		return new TestSelect($this->db);
+	protected function select(): TestSelect {
+		return new TestSelect($this->getDB());
 	}
 
 	protected function insert(): TestInsert {
-		return new TestInsert($this->db);
+		return new TestInsert($this->getDB());
 	}
 
 	protected function update(): TestUpdate {
-		return new TestUpdate($this->db);
+		return new TestUpdate($this->getDB());
 	}
 
 	protected function delete(): TestDelete {
-		return new TestDelete($this->db);
+		return new TestDelete($this->getDB());
 	}
 }

@@ -5,11 +5,15 @@ use Kir\MySQL\Builder\Internal\DDLPreparable;
 use Kir\MySQL\Builder\Internal\DDLRunnable;
 use Kir\MySQL\Builder\Traits\CreateDDLRunnable;
 
+/**
+ * @implements DDLPreparable<int>
+ */
 class RunnableDelete extends Delete implements DDLPreparable {
+	/** @use CreateDDLRunnable<int> */
 	use CreateDDLRunnable;
 
 	/**
-	 * @param array $params
+	 * @param array<string, mixed> $params
 	 * @return int
 	 */
 	public function run(array $params = []) {
@@ -17,9 +21,9 @@ class RunnableDelete extends Delete implements DDLPreparable {
 	}
 
 	/**
-	 * @return DDLRunnable
+	 * @return DDLRunnable<int>
 	 */
-	public function prepare() {
+	public function prepare(): DDLRunnable {
 		return $this->createPreparable($this->db()->prepare($this));
 	}
 }

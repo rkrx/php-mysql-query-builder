@@ -5,18 +5,20 @@ use BadMethodCallException;
 use Kir\MySQL\Builder\Internal\DDLPreparable;
 use Kir\MySQL\Builder\Internal\DDLRunnable;
 use Kir\MySQL\Builder\Traits\CreateDDLRunnable;
-use Traversable;
 
+/**
+ * @implements DDLPreparable<int>
+ */
 class RunnableInsert extends Insert implements DDLPreparable {
+	/** @use CreateDDLRunnable<int> */
 	use CreateDDLRunnable;
 
 	/**
-	 * @param array|Traversable|mixed $rows
-	 * @return int[] Insert IDs
+	 * @inheritDoc
 	 */
 	public function insertRows($rows) {
-		if (!(is_array($rows) || $rows instanceof Traversable)) {
-			throw new BadMethodCallException('Expected $rows to by an array or an instance of \\Traversable');
+		if (!is_iterable($rows)) {
+			throw new BadMethodCallException('Expected $rows to by an iterable');
 		}
 		$result = [];
 		$query = $this->__toString();
@@ -30,19 +32,18 @@ class RunnableInsert extends Insert implements DDLPreparable {
 	}
 
 	/**
-	 * @return DDLRunnable
+	 * @inheritDoc
+	 */
+	public function run(array $params = []): int {
+		return $this->prepare()->run($params);
+	}
+
+	/**
+	 * @return DDLRunnable<int>
 	 */
 	public function prepare(): DDLRunnable {
 		return $this->createPreparable($this->db()->prepare($this), function() {
 			return (int) $this->db()->getLastInsertId();
 		});
-	}
-
-	/**
-	 * @param array $params
-	 * @return int
-	 */
-	public function run(array $params = []): int {
-		return $this->prepare()->run($params);
 	}
 }

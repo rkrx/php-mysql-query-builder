@@ -9,7 +9,7 @@ use Kir\MySQL\Builder\Traits\TableBuilder;
 use Kir\MySQL\Builder\Traits\TableNameBuilder;
 use Kir\MySQL\Builder\Traits\WhereBuilder;
 
-class Delete extends Statement {
+abstract class Delete extends Statement {
 	use TableNameBuilder;
 	use TableBuilder;
 	use JoinBuilder;
@@ -32,9 +32,18 @@ class Delete extends Statement {
 		if($table !== null) {
 			$this->aliases[] = $alias;
 		}
+		if($table === null) {
+			[$alias, $table] = [$table, $alias];
+		}
 		$this->addTable($alias, $table);
 		return $this;
 	}
+
+	/**
+	 * @param array<string, mixed> $params
+	 * @return int
+	 */
+	abstract public function run(array $params = []);
 
 	/**
 	 * @return string

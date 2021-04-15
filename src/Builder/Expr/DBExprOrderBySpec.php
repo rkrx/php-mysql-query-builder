@@ -2,12 +2,12 @@
 namespace Kir\MySQL\Builder\Expr;
 
 class DBExprOrderBySpec implements OrderBySpecification {
-	/** @var array[] */
+	/** @var array<int, array{string, 'ASC'|'DESC'}> */
 	private $fields = [];
 
 	/**
-	 * @param array $spec
-	 * @param array $sortFieldsSpec
+	 * @param array<string|int, string> $spec Can be used to build a order-by-spec based on a key-value array of fields where keys represent an field alias and the value part represents an SQL-expression.
+	 * @param array<int, array{string, 'ASC'|'DESC'}> $sortFieldsSpec Key value array where the key represents the field alias and the value is either 'ASC' or 'DESC'
 	 */
 	public function __construct(array $spec, array $sortFieldsSpec) {
 		$expressions = [];
@@ -35,7 +35,7 @@ class DBExprOrderBySpec implements OrderBySpecification {
 	 * Returns an array[], where each value is a [db-expression, sort-direction]
 	 * The sort-direction can be either ASC or DESC
 	 *
-	 * @return array[]
+	 * @return array<int, array{string, 'ASC'|'DESC'}>
 	 */
 	public function getFields(): array {
 		return $this->fields;

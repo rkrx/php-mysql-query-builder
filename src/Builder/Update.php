@@ -11,7 +11,7 @@ use Kir\MySQL\Builder\Traits\TableNameBuilder;
 use Kir\MySQL\Builder\Traits\WhereBuilder;
 use RuntimeException;
 
-class Update extends InsertUpdateStatement {
+abstract class Update extends InsertUpdateStatement {
 	use TableNameBuilder;
 	use TableBuilder;
 	use JoinBuilder;
@@ -28,7 +28,10 @@ class Update extends InsertUpdateStatement {
 	 * @param string $table
 	 * @return $this
 	 */
-	public function table(string $alias, $table = null) {
+	public function table(string $alias, $table = null): self {
+		if($table === null) {
+			[$alias, $table] = [$table, $alias];
+		}
 		$this->addTable($alias, $table);
 		return $this;
 	}
@@ -38,7 +41,7 @@ class Update extends InsertUpdateStatement {
 	 * @param mixed $value
 	 * @return $this
 	 */
-	public function set(string $fieldName, $value) {
+	public function set(string $fieldName, $value): self {
 		$sqlField = $fieldName;
 		$sqlValue = $this->db()->quote($value);
 		$this->fields[$sqlField] = $sqlValue;
@@ -49,7 +52,7 @@ class Update extends InsertUpdateStatement {
 	 * @param string $fieldName
 	 * @return $this
 	 */
-	public function setDefault(string $fieldName) {
+	public function setDefault(string $fieldName): self {
 		$sqlField = $fieldName;
 		$this->fields[$sqlField] = new DefaultValue();
 		return $this;
@@ -60,7 +63,7 @@ class Update extends InsertUpdateStatement {
 	 * @param mixed ...$args
 	 * @return $this
 	 */
-	public function setExpr(string $expr, ...$args) {
+	public function setExpr(string $expr, ...$args): self {
 		if(count($args) > 0) {
 			$this->fields[] = func_get_args();
 		} else {
@@ -70,25 +73,31 @@ class Update extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @param array $data
-	 * @param array|null $allowedFields
+	 * @param array<string, mixed> $data
+	 * @param array<int, string>|null $allowedFields
 	 * @return $this
 	 */
-	public function setAll(array $data, array $allowedFields = null) {
-		if ($allowedFields !== null) {
-			foreach ($data as $fieldName => $value) {
-				if (in_array($fieldName, $allowedFields)) {
+	public function setAll(array $data, array $allowedFields = null): self {
+		if($allowedFields !== null) {
+			foreach($data as $fieldName => $value) {
+				if(in_array($fieldName, $allowedFields)) {
 					$this->set($fieldName, $value);
 				}
 			}
 		} else {
 			$values = $this->clearValues($data);
-			foreach ($values as $fieldName => $value) {
+			foreach($values as $fieldName => $value) {
 				$this->set($fieldName, $value);
 			}
 		}
 		return $this;
 	}
+
+	/**
+	 * @param array<string, mixed> $params
+	 * @return int
+	 */
+	abstract public function run(array $params = []): int;
 
 	/**
 	 * @return string
@@ -112,39 +121,41 @@ class Update extends InsertUpdateStatement {
 	 */
 	private function buildAssignments(string $query): string {
 		$sqlFields = $this->buildFieldList($this->fields);
-		if (!count($sqlFields)) {
+		if(!count($sqlFields)) {
 			throw new RuntimeException('No field-data found');
 		}
 		return sprintf("%s%s\n", $query, implode(",\n", $sqlFields));
 	}
 
 	/**
-	 * @param array $values
-	 * @return array
+	 * @param array<string, mixed> $values
+	 * @return array<string, mixed>
 	 */
 	private function clearValues(array $values): array {
-		if (!count($values)) {
+		if(!count($values)) {
 			return [];
 		}
 		$tables = $this->getTables();
-		if (!count($tables)) {
+		if(!count($tables)) {
 			throw new RuntimeException('Table name is missing');
 		}
-		if (count($tables) > 1) {
+		if(count($tables) > 1) {
 			throw new RuntimeException('Batch values only work with max. one table');
 		}
-		list($table) = $tables;
+
+		$table = $tables[0];
 		$tableName = $table['name'];
 
-		$fields = $this->db()->getTableFields($tableName);
 		$result = [];
+		if(is_string($tableName)) {
+			$fields = $this->db()->getTableFields($tableName);
 
-		foreach ($values as $fieldName => $fieldValue) {
-			if (in_array($fieldName, $fields)) {
-				$result[$fieldName] = $fieldValue;
+			foreach($values as $fieldName => $fieldValue) {
+				if(in_array($fieldName, $fields, true)) {
+					$result[$fieldName] = $fieldValue;
+				}
 			}
 		}
-
 		return $result;
 	}
 }

@@ -6,26 +6,31 @@ use Kir\MySQL\Databases\TestDB;
 
 class TestInsert extends Insert {
 	/**
-	 * @return static
+	 * @return TestInsert
 	 */
-	public static function create() {
-		$functions = [
-			'getTableFields' => function ($tableName) {
-				return [
-					'id',
-					'name',
-					'last_update'
-				];
-			}
-		];
-		$db = new TestDB($functions);
+	public static function create(): TestInsert {
+		$db = new TestDB();
 		return new static($db);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function insertRows($rows) {
+		return [];
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function run(array $params = []): int {
+		return 0;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function asString() {
+	public function asString(): string {
 		return $this->__toString();
 	}
 }

@@ -14,7 +14,7 @@ class MySQLExceptionInterpreter {
 	 * @param PDOException $exception
 	 * @throw PDOException
 	 */
-	public function throwMoreConcreteException(PDOException $exception) {
+	public function throwMoreConcreteException(PDOException $exception): void {
 		$errorInfo = $exception->errorInfo;
 		/** @link http://php.net/manual/en/class.exception.php#Hcom115813 (cHao's comment) */
 		$code = is_array($errorInfo) && isset($errorInfo[1]) ? ((int) $errorInfo[1]) : ((int) $exception->getCode());

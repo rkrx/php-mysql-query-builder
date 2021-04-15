@@ -2,22 +2,20 @@
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Builder\Select;
+use Kir\MySQL\Tools\VirtualTable;
 
 trait TableBuilder {
 	use AbstractTableNameBuilder;
 
-	/** @var array[] */
+	/** @var array<int, array{alias: string|null, name: string|Select|VirtualTable|array<int, null|int|float|string|array<string, mixed>>}> */
 	private $tables = [];
 
 	/**
-	 * @param string|array|Select $alias
-	 * @param string|Select|null $table
+	 * @param string|null $alias
+	 * @param string|Select|VirtualTable|array<int, null|int|float|string|array<string, mixed>> $table
 	 * @return $this
 	 */
-	protected function addTable($alias, $table = null) {
-		if($table === null) {
-			list($alias, $table) = [$table, $alias];
-		}
+	protected function addTable(?string $alias, $table): self {
 		$this->tables[] = ['alias' => $alias, 'name' => $table];
 		return $this;
 	}
@@ -38,7 +36,7 @@ trait TableBuilder {
 	}
 
 	/**
-	 * @return array[]
+	 * @return array<int, array{alias: string|null, name: string|array<int, null|int|float|string|Select|VirtualTable|array<string, mixed>>}>
 	 */
 	protected function getTables(): array {
 		return $this->tables;

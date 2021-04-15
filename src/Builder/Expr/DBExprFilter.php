@@ -10,21 +10,20 @@ class DBExprFilter implements OptionalExpression {
 	private $value;
 	/** @var string[] */
 	private $keyPath;
-	/** @var callable|null */
+	/** @var null|callable(mixed): bool */
 	private $validator;
-	/** @var callable */
+	/** @var callable(bool, array{key: mixed, value: string}) */
 	private $validationResultHandler;
 
 	/**
 	 * @param string $expression
-	 * @param array $data
+	 * @param array<string, mixed> $data
 	 * @param string|string[] $keyPath
 	 * @param callable|null $validator
 	 * @param callable|null $validationResultHandler
 	 */
 	public function __construct(string $expression, array $data, $keyPath, $validator = null, $validationResultHandler = null) {
 		$this->expression = $expression;
-		$this->value = $data;
 		$this->keyPath = $this->buildKey($keyPath);
 		$this->value = $this->recursiveGet($data, $this->keyPath, null);
 		if($validator === null) {
@@ -53,16 +52,19 @@ class DBExprFilter implements OptionalExpression {
 	 * @return bool
 	 */
 	public function isValid(): bool {
-		$result = call_user_func($this->validator, $this->value);
-		call_user_func($this->validationResultHandler, $result, [
-			'value' => $this->value,
-			'key' => implode('.', $this->keyPath),
-		]);
+		$result = true;
+		if($this->validator !== null) {
+			$result = call_user_func($this->validator, $this->value);
+			call_user_func($this->validationResultHandler, $result, [
+				'value' => $this->value,
+				'key' => implode('.', $this->keyPath),
+			]);
+		}
 		return $result;
 	}
 
 	/**
-	 * @return array
+	 * @return array{mixed}
 	 */
 	public function getValue(): array {
 		return [$this->value];
@@ -83,7 +85,7 @@ class DBExprFilter implements OptionalExpression {
 	}
 
 	/**
-	 * @param array $array
+	 * @param array<string, mixed> $array
 	 * @return bool
 	 */
 	private function isValidArray(array $array): bool {
@@ -97,8 +99,8 @@ class DBExprFilter implements OptionalExpression {
 	}
 
 	/**
-	 * @param array $array
-	 * @param array $path
+	 * @param array<string, mixed> $array
+	 * @param array<int, string> $path
 	 * @param mixed $default
 	 * @return mixed
 	 */

@@ -1,6 +1,8 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Generator;
+use Kir\MySQL\Builder\Helpers\DBIgnoreRow;
 use Kir\MySQL\Builder\Traits\GroupByBuilder;
 use Kir\MySQL\Builder\Traits\HavingBuilder;
 use Kir\MySQL\Builder\Traits\OffsetBuilder;
@@ -11,9 +13,10 @@ use Kir\MySQL\Builder\Traits\LimitBuilder;
 use Kir\MySQL\Builder\Traits\TableNameBuilder;
 use Kir\MySQL\Builder\Traits\UnionBuilder;
 use Kir\MySQL\Builder\Traits\WhereBuilder;
+use Kir\MySQL\Tools\VirtualTable;
 use RuntimeException;
 
-class Select extends Statement {
+abstract class Select extends Statement {
 	use TableNameBuilder;
 	use TableBuilder;
 	use JoinBuilder;
@@ -38,17 +41,17 @@ class Select extends Statement {
 	 * @param bool $distinct
 	 * @return $this
 	 */
-	public function distinct(bool $distinct = true) {
+	public function distinct(bool $distinct = true): self {
 		$this->distinct = $distinct;
 		return $this;
 	}
 
 	/**
 	 * @param string|Select $expression
-	 * @param string $alias
+	 * @param string|null $alias
 	 * @return $this
 	 */
-	public function field($expression, $alias = null) {
+	public function field($expression, $alias = null): self {
 		if (is_object($expression)) {
 			$expression = (string) $expression;
 			$expression = trim($expression);
@@ -68,18 +71,18 @@ class Select extends Statement {
 	}
 
 	/**
-	 * @param array $fields
+	 * @param array<string, string>|array<int, string> $fields
 	 * @return $this
 	 */
-	public function fields(array $fields) {
+	public function fields(array $fields): self {
 		foreach ($fields as $alias => $expression) {
-			$this->field($expression, $alias);
+			$this->field($expression, is_int($alias) ? null : $alias);
 		}
 		return $this;
 	}
 
 	/**
-	 * @return array
+	 * @return array<int|string, string>
 	 */
 	public function getFields(): array {
 		return $this->fields;
@@ -105,7 +108,7 @@ class Select extends Statement {
 	 * @param bool $calcFoundRows
 	 * @return $this
 	 */
-	public function setCalcFoundRows($calcFoundRows = true) {
+	public function setCalcFoundRows($calcFoundRows = true): self {
 		if (ini_get("mysql.trace_mode")) {
 			throw new RuntimeException('This function cant operate with mysql.trace_mode is set.');
 		}
@@ -114,14 +117,121 @@ class Select extends Statement {
 	}
 
 	/**
-	 * @param string|array|Select $alias
-	 * @param string|array|Select|null $tableName
+	 * @param null|string $alias
+	 * @param null|string|Select|VirtualTable|array<int, null|int|float|string|array<string, mixed>> $table
 	 * @return $this
 	 */
-	public function from($alias, $tableName = null) {
-		$this->addTable($alias, $tableName);
+	public function from(?string $alias, $table = null): self {
+		if($table === null) {
+			[$alias, $table] = [$table, $alias];
+			$this->addTable($alias, (string) $table);
+		} else {
+			$this->addTable($alias, $table);
+		}
 		return $this;
 	}
+
+	/**
+	 * @param array<string, mixed> $values
+	 * @return $this
+	 */
+	abstract public function bindValues(array $values);
+
+	/**
+	 * @param string $key
+	 * @param string|int|bool|float|null $value
+	 * @return $this
+	 */
+	abstract public function bindValue(string $key, $value);
+
+	/**
+	 * @return $this
+	 */
+	abstract public function clearValues();
+
+	/**
+	 * @param bool $preserveTypes
+	 * @return $this
+	 */
+	abstract public function setPreserveTypes(bool $preserveTypes = true);
+
+	/**
+	 * @param null|callable(array<string, mixed>): array<string, mixed>|callable(array<string, mixed>): void|callable(array<string, mixed>): DBIgnoreRow $callback
+	 * @return array<int, array<string, mixed>>
+	 */
+	abstract public function fetchRows($callback = null): array;
+
+	/**
+	 * @param null|callable(array<string, mixed>): (array<mixed, mixed>|null|void) $callback
+	 * @return Generator<int, array<string, mixed>>
+	 */
+	abstract public function fetchRowsLazy($callback = null);
+
+	/**
+	 * @param null|callable(array<string, mixed>): array<string, mixed>|callable(array<string, mixed>): void|callable(array<string, mixed>): DBIgnoreRow $callback
+	 * @return array<string, mixed>
+	 */
+	abstract public function fetchRow($callback = null): array;
+
+	/**
+	 * @template T
+	 * @template U
+	 * @param class-string<T> $className
+	 * @param null|callable(T): U $callback
+	 * @return T[]|U[]
+	 */
+	abstract public function fetchObjects(string $className = 'stdClass', $callback = null): array;
+
+	/**
+	 * @template T
+	 * @template U
+	 * @param class-string<T> $className
+	 * @param null|callable(T): U $callback
+	 * @return Generator<int, T|U>
+	 */
+	abstract public function fetchObjectsLazy($className = null, $callback = null);
+
+	/**
+	 * @template T
+	 * @template U
+	 * @param class-string<T> $className
+	 * @param null|callable(T): U $callback
+	 * @return T|U
+	 */
+	abstract public function fetchObject($className = null, $callback = null);
+
+	/**
+	 * @param bool $treatValueAsArray
+	 * @return array<mixed, mixed>
+	 */
+	abstract public function fetchKeyValue($treatValueAsArray = false): array;
+
+	/**
+	 * @param string[] $fields
+	 * @return array<string, array<int, mixed>>
+	 */
+	abstract public function fetchGroups(array $fields): array;
+
+	/**
+	 * @template T
+	 * @param null|callable(null|bool|int|float|string): T $fn
+	 * @return array<int, T|string>
+	 */
+	abstract public function fetchArray(?callable $fn = null): array;
+
+	/**
+	 * @template TDefault
+	 * @template TCastFn
+	 * @param TDefault $default
+	 * @param null|callable(null|bool|string|int|float): TCastFn $fn
+	 * @return null|bool|string|int|float|TDefault|TCastFn
+	 */
+	abstract public function fetchValue($default = null, ?callable $fn = null);
+
+	/**
+	 * @return int
+	 */
+	abstract public function getFoundRows();
 
 	/**
 	 * @return string

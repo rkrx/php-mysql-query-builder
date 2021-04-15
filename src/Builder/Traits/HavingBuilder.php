@@ -8,17 +8,17 @@ use Kir\MySQL\Builder\Internal\ConditionBuilder;
 trait HavingBuilder {
 	use AbstractDB;
 
-	/** @var array[] */
+	/** @var array<int, array{string|array<string, mixed>|array<string, mixed>|object|OptionalExpression, array<int, null|string|array<int, string>|Builder\DBExpr|Builder\Select>}> */
 	private $having = [];
 
 	/**
-	 * @param string|array|object|OptionalExpression $expression
-	 * @param mixed[] $args
+	 * @param string|array<string, mixed>|object|OptionalExpression $expression
+	 * @param array<int, mixed> $args
 	 * @return $this
 	 */
-	public function having($expression, ...$args) {
-		$fn = function (...$args) { $this->having[] = $args; };
-		ConditionAddHelper::addCondition($fn, $expression, ...$args);
+	public function having($expression, ...$args): self {
+		$fn = function ($expression, $args) { $this->having[] = [$expression, $args]; };
+		ConditionAddHelper::addCondition($fn, $expression, $args);
 		return $this;
 	}
 

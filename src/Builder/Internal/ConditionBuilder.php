@@ -2,12 +2,13 @@
 namespace Kir\MySQL\Builder\Internal;
 
 use Kir\MySQL\Database;
+use Kir\MySQL\Builder;
 
 final class ConditionBuilder {
 	/**
 	 * @param Database $db
 	 * @param string $query
-	 * @param array $conditions
+	 * @param array<int, array{string|array<string, mixed>|object|OptionalExpression, array<int, null|string|array<int, string>|Builder\DBExpr|Builder\Select>}> $conditions
 	 * @param string $token
 	 * @return string
 	 */
@@ -17,7 +18,7 @@ final class ConditionBuilder {
 		}
 		$query .= "{$token}\n";
 		$arr = [];
-		foreach($conditions as list($expression, $arguments)) {
+		foreach($conditions as [$expression, $arguments]) {
 			if(is_array($expression)) {
 				foreach($expression as $key => $value) {
 					if($value === null) {
@@ -27,7 +28,7 @@ final class ConditionBuilder {
 					}
 				}
 			} else {
-				$arr = self::buildCondition($arr, $expression, $arguments, $db);
+				$arr = self::buildCondition($arr, (string) $expression, $arguments, $db);
 			}
 		}
 		$query .= implode("\n\tAND\n", $arr);
@@ -35,13 +36,13 @@ final class ConditionBuilder {
 	}
 
 	/**
-	 * @param array $conditions
-	 * @param mixed $expression
-	 * @param mixed $arguments
+	 * @param array<int, string> $conditions
+	 * @param string $expression
+	 * @param array<int, null|string|array<int, string>|Builder\DBExpr|Builder\Select> $arguments
 	 * @param Database $db
-	 * @return array
+	 * @return array<int, string>
 	 */
-	private static function buildCondition(array $conditions, $expression, $arguments, Database $db): array {
+	private static function buildCondition(array $conditions, string $expression, array $arguments, Database $db): array {
 		$expr = $db->quoteExpression($expression, $arguments);
 		$conditions[] = "\t({$expr})";
 		return $conditions;

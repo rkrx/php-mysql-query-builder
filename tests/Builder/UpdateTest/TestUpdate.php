@@ -6,7 +6,7 @@ use Kir\MySQL\Databases\TestDB;
 
 class TestUpdate extends Update {
 	/**
-	 * @return $this
+	 * @return TestUpdate
 	 */
 	public static function create() {
 		$db = new TestDB();
@@ -14,9 +14,16 @@ class TestUpdate extends Update {
 	}
 
 	/**
+	 * @inheritDoc
+	 */
+	public function run(array $params = []): int {
+		return 0;
+	}
+
+	/**
 	 * @return string
 	 */
-	public function asString() {
+	public function asString(): string {
 		return $this->__toString();
 	}
 }

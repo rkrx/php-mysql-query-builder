@@ -18,10 +18,10 @@ class AliasReplacer {
 	 */
 	public function replace(string $name): string {
 		$fn = function($values) {
-			list(, $alias, $part) = $values;
+			[, $alias, $part] = $values;
 			$string = $this->aliasRegistry->get($alias);
 			return $string.$part;
 		};
-		return preg_replace_callback('/^(\\w+)#(\\w+)$/', $fn, $name);
+		return (string) preg_replace_callback('/^(\\w+)#(\\w+)$/', $fn, $name);
 	}
 }

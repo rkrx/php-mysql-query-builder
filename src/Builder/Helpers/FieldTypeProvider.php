@@ -6,12 +6,12 @@ use Kir\MySQL\Builder\QueryStatement;
 abstract class FieldTypeProvider {
 	/**
 	 * @param QueryStatement $statement
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public static function getFieldTypes(QueryStatement $statement): array {
 		$fieldTypes = [];
 		for($i = 0; $column = $statement->getColumnMeta($i); $i++) {
-			$fieldTypes[$column['name']] = self::getTypeFromNativeType($column['native_type']);
+			$fieldTypes[(string) $column['name']] = self::getTypeFromNativeType($column['native_type']);
 		}
 		return $fieldTypes;
 	}

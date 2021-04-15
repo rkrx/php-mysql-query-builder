@@ -6,20 +6,15 @@ use Kir\MySQL\Databases\TestDB;
 
 class TestDelete extends Delete {
 	/**
-	 * @return static
+	 * @return TestDelete
 	 */
-	public static function create() {
-		$functions = array(
-			'getTableFields' => function ($tableName) {
-				return array(
-					'id',
-					'name',
-					'last_update'
-				);
-			}
-		);
-		$db = new TestDB($functions);
+	public static function create(): TestDelete {
+		$db = new TestDB();
 		return new static($db);
+	}
+
+	public function run(array $params = []) {
+		return 0;
 	}
 
 	/**

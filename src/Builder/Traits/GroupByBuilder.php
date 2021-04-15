@@ -1,10 +1,12 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
+use Kir\MySQL\Builder;
+
 trait GroupByBuilder {
 	use AbstractDB;
 
-	/** @var array */
+	/** @var array<int, string> */
 	private $groupBy = [];
 
 	/**
@@ -17,11 +19,7 @@ trait GroupByBuilder {
 				if(!count($expression)) {
 					continue;
 				}
-				$arguments = [
-					$expression[0],
-					array_slice($expression, 1)
-				];
-				$expression = $this->quoteExpr($arguments);
+				$expression = $this->quoteExpr($expression[0], array_slice($expression, 1));
 			}
 			$this->groupBy[] = $expression;
 		}
@@ -45,10 +43,11 @@ trait GroupByBuilder {
 	}
 
 	/**
-	 * @param array $arguments
-	 * @return mixed
+	 * @param string $expression
+	 * @param array<int, null|int|float|string|array<int, string>|Builder\DBExpr|Builder\Select> $arguments
+	 * @return string
 	 */
-	protected function quoteExpr(array $arguments) {
-		return call_user_func_array([$this->db(), 'quoteExpression'], $arguments);
+	protected function quoteExpr(string $expression, array $arguments): string {
+		return $this->db()->quoteExpression($expression, $arguments);
 	}
 }

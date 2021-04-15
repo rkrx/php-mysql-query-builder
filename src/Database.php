@@ -3,8 +3,20 @@ namespace Kir\MySQL;
 
 use Kir\MySQL\Builder\QueryStatement;
 use Kir\MySQL\Database\DatabaseStatement;
+use Kir\MySQL\Tools\AliasRegistry;
+use Kir\MySQL\Tools\VirtualTables;
 
 interface Database {
+	/**
+	 * @return AliasRegistry
+	 */
+	public function getAliasRegistry(): AliasRegistry;
+
+	/**
+	 * @return VirtualTables
+	 */
+	public function getVirtualTables(): VirtualTables;
+
 	/**
 	 * @param string $query
 	 * @return DatabaseStatement
@@ -19,7 +31,7 @@ interface Database {
 
 	/**
 	 * @param string $query
-	 * @param array $params
+	 * @param array<string, mixed> $params
 	 * @return int
 	 */
 	public function exec(string $query, array $params = []): int;
@@ -32,16 +44,16 @@ interface Database {
 
 	/**
 	 * @param string $table
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public function getTableFields(string $table): array;
 
 	/**
-	 * @param mixed $expression
-	 * @param array $arguments
+	 * @param string $expression
+	 * @param array<int, null|int|float|string|array<int, string>|Builder\DBExpr|Builder\Select> $arguments
 	 * @return string
 	 */
-	public function quoteExpression($expression, array $arguments = []): string;
+	public function quoteExpression(string $expression, array $arguments = []): string;
 
 	/**
 	 * @param mixed $value
@@ -56,27 +68,27 @@ interface Database {
 	public function quoteField(string $field): string;
 
 	/**
-	 * @param array|null $fields
-	 * @return Builder\RunnableSelect
+	 * @param array<int|string, string>|null $fields
+	 * @return Builder\Select
 	 */
-	public function select(array $fields = null): Builder\RunnableSelect;
+	public function select(?array $fields = null);
 
 	/**
-	 * @param array|null $fields
-	 * @return Builder\RunnableInsert
+	 * @param array<string, string>|null $fields
+	 * @return Builder\Insert
 	 */
-	public function insert(array $fields = null): Builder\RunnableInsert;
+	public function insert(?array $fields = null);
 
 	/**
-	 * @param array|null $fields
-	 * @return Builder\RunnableUpdate
+	 * @param array<string, string>|null $fields
+	 * @return Builder\Update
 	 */
-	public function update(array $fields = null): Builder\RunnableUpdate;
+	public function update(?array $fields = null);
 
 	/**
-	 * @return Builder\RunnableDelete
+	 * @return Builder\Delete
 	 */
-	public function delete(): Builder\RunnableDelete;
+	public function delete();
 
 	/**
 	 * @return $this
@@ -94,14 +106,16 @@ interface Database {
 	public function transactionRollback();
 
 	/**
-	 * @param callable|null $callback
-	 * @return mixed
+	 * @template T
+	 * @param callable(self): T $callback
+	 * @return T
 	 */
-	public function transaction(callable $callback = null);
+	public function transaction(callable $callback);
 
 	/**
-	 * @param callable|null $callback
-	 * @return mixed
+	 * @template T
+	 * @param callable(self): T $callback
+	 * @return T
 	 */
-	public function dryRun($callback = null);
+	public function dryRun(callable $callback);
 }

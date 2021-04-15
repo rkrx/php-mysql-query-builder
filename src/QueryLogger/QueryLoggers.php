@@ -8,19 +8,17 @@ class QueryLoggers {
 	/**
 	 * @param QueryLogger $queryLogger
 	 */
-	public function add(QueryLogger $queryLogger) {
+	public function add(QueryLogger $queryLogger): void {
 		$this->queryLoggers[] = $queryLogger;
 	}
 
 	/**
 	 * @param string $query
 	 * @param float $duration
-	 * @return $this
 	 */
-	public function log(string $query, float $duration) {
+	public function log(string $query, float $duration): void {
 		foreach ($this->queryLoggers as $queryLogger) {
 			$queryLogger->log($query, $duration);
 		}
-		return $this;
 	}
 }

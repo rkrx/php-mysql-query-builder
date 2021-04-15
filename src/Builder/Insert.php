@@ -3,12 +3,13 @@ namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Tools\AliasReplacer;
 use RuntimeException;
+use Traversable;
 use UnexpectedValueException;
 
-class Insert extends InsertUpdateStatement {
-	/** @var array */
+abstract class Insert extends InsertUpdateStatement {
+	/** @var array<string|int, mixed> */
 	private $fields = [];
-	/** @var array */
+	/** @var array<string|int, mixed> */
 	private $update = [];
 	/** @var string */
 	private $table;
@@ -39,7 +40,8 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * Legt den Primaerschluessel fest.
-	 * Wenn bei einem Insert der Primaerschluessel mitgegeben wird, dann wird dieser statt der LastInsertId zurueckgegeben
+	 * Wenn bei einem Insert der Primaerschluessel mitgegeben wird, dann wird dieser statt der LastInsertId
+	 * zurueckgegeben
 	 *
 	 * @param string $field
 	 * @return $this
@@ -51,7 +53,7 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $field
-	 * @param bool|int|float|string $value
+	 * @param null|bool|int|float|string $value
 	 * @return $this
 	 */
 	public function add(string $field, $value) {
@@ -61,7 +63,7 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $field
-	 * @param bool|int|float|string $value
+	 * @param null|bool|int|float|string $value
 	 * @return $this
 	 */
 	public function update(string $field, $value) {
@@ -71,7 +73,7 @@ class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $field
-	 * @param bool|int|float|string $value
+	 * @param null|bool|int|float|string $value
 	 * @return $this
 	 */
 	public function addOrUpdate(string $field, $value) {
@@ -125,9 +127,9 @@ class Insert extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @param array $data
-	 * @param array|null $mask
-	 * @param array|null $excludeFields
+	 * @param array<string, mixed> $data
+	 * @param array<int, string>|null $mask
+	 * @param array<int, string>|null $excludeFields
 	 * @return $this
 	 */
 	public function addAll(array $data, array $mask = null, array $excludeFields = null) {
@@ -138,14 +140,14 @@ class Insert extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @param array $data
-	 * @param array|null $mask
-	 * @param array|null $excludeFields
+	 * @param array<string, mixed> $data
+	 * @param array<int, string>|null $mask
+	 * @param array<int, string>|null $excludeFields
 	 * @return $this
 	 */
 	public function updateAll(array $data, array $mask = null, array $excludeFields = null) {
 		$this->addAllTo($data, $mask, $excludeFields, function ($field, $value) {
-			if ($field !== $this->keyField) {
+			if($field !== $this->keyField) {
 				$this->update($field, $value);
 			}
 		});
@@ -153,9 +155,9 @@ class Insert extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @param array $data
-	 * @param array|null $mask
-	 * @param array|null $excludeFields
+	 * @param array<string, mixed> $data
+	 * @param array<int, string>|null $mask
+	 * @param array<int, string>|null $excludeFields
 	 * @return $this
 	 */
 	public function addOrUpdateAll(array $data, array $mask = null, array $excludeFields = null) {
@@ -174,10 +176,22 @@ class Insert extends InsertUpdateStatement {
 	}
 
 	/**
+	 * @param array<int, array<string, mixed>>|Traversable<int, array<string, mixed>> $rows
+	 * @return int[] Insert IDs
+	 */
+	abstract public function insertRows($rows);
+
+	/**
+	 * @param array<string, mixed> $params
+	 * @return int
+	 */
+	abstract public function run(array $params = []): int;
+
+	/**
 	 * @return string
 	 */
 	public function __toString(): string {
-		if ($this->table === null) {
+		if($this->table === null) {
 			throw new RuntimeException('Specify a table-name');
 		}
 
@@ -194,7 +208,7 @@ class Insert extends InsertUpdateStatement {
 		} else {
 			$fields = $this->fields;
 			$insertData = $this->buildFieldList($fields);
-			if (!count($insertData)) {
+			if(!count($insertData)) {
 				throw new RuntimeException('No field-data found');
 			}
 			$queryArr[] = sprintf("SET\n%s\n", implode(",\n", $insertData));
@@ -209,13 +223,13 @@ class Insert extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @param array $fields
+	 * @param array<string|int, mixed> $fields
 	 * @param string $field
-	 * @param bool|int|float|string $value
-	 * @return array
+	 * @param null|bool|int|float|string $value
+	 * @return array<string|int, mixed>
 	 */
-	private function addTo(array $fields, string $field, $value) {
-		if ($this->isFieldNameValid($field)) {
+	private function addTo(array $fields, string $field, $value): array {
+		if(!$this->isFieldNameValid($field)) {
 			throw new UnexpectedValueException('Field name is invalid');
 		}
 		$sqlField = $field;
@@ -225,13 +239,12 @@ class Insert extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @param array $data
-	 * @param array|null $mask
-	 * @param array|null $excludeFields
-	 * @param callable $fn
-	 * @return $this
+	 * @param array<string, mixed> $data
+	 * @param array<int, string>|null $mask
+	 * @param array<int, string>|null $excludeFields
+	 * @param callable(string, mixed): void $fn
 	 */
-	private function addAllTo(array $data, ?array $mask = null, ?array $excludeFields = null, $fn = null) {
+	private function addAllTo(array $data, ?array $mask, ?array $excludeFields, callable $fn): void {
 		if($mask !== null) {
 			$data = array_intersect_key($data, array_combine($mask, $mask));
 		}
@@ -243,10 +256,9 @@ class Insert extends InsertUpdateStatement {
 			}
 		}
 		$data = $this->clearValues($data);
-		foreach ($data as $field => $value) {
+		foreach($data as $field => $value) {
 			$fn($field, $value);
 		}
-		return $this;
 	}
 
 	/**
@@ -272,12 +284,12 @@ class Insert extends InsertUpdateStatement {
 	 * @return bool
 	 */
 	private function isFieldNameValid(string $fieldName): bool {
-		return is_numeric($fieldName) || !is_scalar($fieldName);
+		return !(is_numeric($fieldName) || !is_scalar($fieldName));
 	}
 
 	/**
-	 * @param array $values
-	 * @return array
+	 * @param array<string, mixed> $values
+	 * @return array<string, mixed>
 	 */
 	private function clearValues(array $values): array {
 		if(!count($values)) {
@@ -288,7 +300,7 @@ class Insert extends InsertUpdateStatement {
 		$fields = $this->db()->getTableFields($tableName);
 		$result = [];
 
-		foreach ($values as $fieldName => $fieldValue) {
+		foreach($values as $fieldName => $fieldValue) {
 			if(in_array($fieldName, $fields)) {
 				$result[$fieldName] = $fieldValue;
 			}

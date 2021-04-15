@@ -2,7 +2,7 @@
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Builder\Select;
-use Kir\MySQL\Databases\MySQL;
+use Kir\MySQL\Database;
 use Kir\MySQL\Tools\VirtualTable;
 
 trait TableNameBuilder {
@@ -10,7 +10,7 @@ trait TableNameBuilder {
 
 	/**
 	 * @param string|null $alias
-	 * @param string|array|object|Select|VirtualTable $name
+	 * @param string|array<int, mixed|array<string, mixed>>|object|Select|VirtualTable $name
 	 * @return string
 	 */
 	protected function buildTableName(?string $alias, $name): string {
@@ -36,11 +36,11 @@ trait TableNameBuilder {
 			}
 			$name = '(' . implode("\n\tUNION\n\t", $parts) . ')';
 		}
-		if($this->db()->getVirtualTables()->has($name)) {
+		if((is_string($name) || $name instanceof VirtualTable) && $this->db()->getVirtualTables()->has($name)) {
 			$select = (string) $this->db()->getVirtualTables()->get($name);
 			$name = sprintf('(%s)', implode("\n\t", explode("\n", trim($select))));
 		}
-		$name = $this->aliasReplacer()->replace($name);
+		$name = $this->aliasReplacer()->replace((string) $name);
 		if($alias !== null) {
 			return sprintf("%s %s", $name, $alias);
 		}
@@ -48,7 +48,7 @@ trait TableNameBuilder {
 	}
 
 	/**
-	 * @return MySQL
+	 * @return Database
 	 */
 	abstract protected function db();
 }

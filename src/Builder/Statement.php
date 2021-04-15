@@ -1,22 +1,24 @@
 <?php
+
 namespace Kir\MySQL\Builder;
 
-use Kir\MySQL\Databases\MySQL;
+use Kir\MySQL\Builder\Internal\StatementInterface;
+use Kir\MySQL\Database;
 use Kir\MySQL\Tools\AliasReplacer;
 
-abstract class Statement {
-	/** @var MySQL */
+abstract class Statement implements StatementInterface {
+	/** @var Database */
 	private $db;
 	/** @var AliasReplacer */
 	private $aliasReplacer;
-	/** @var array */
+	/** @var array<string, mixed> */
 	private $options;
 
 	/**
-	 * @param MySQL $db
-	 * @param array $options
+	 * @param Database $db
+	 * @param array<string, mixed> $options
 	 */
-	public function __construct(MySQL $db, array $options = []) {
+	public function __construct($db, array $options = []) {
 		$this->db = $db;
 		$this->aliasReplacer = new AliasReplacer($db->getAliasRegistry());
 		$this->options = $options;
@@ -27,12 +29,14 @@ abstract class Statement {
 	 * @return $this
 	 */
 	public function debug($stop = true) {
-		if (PHP_SAPI === 'cli') {
+		if(array_key_exists('debug_formatter', $this->options)) {
+			$this->options['debug_formatter']();
+		} elseif(PHP_SAPI === 'cli') {
 			echo "\n{$this->__toString()}\n";
 		} else {
 			echo "<pre>{$this->__toString()}</pre>";
 		}
-		if ($stop) {
+		if($stop) {
 			exit;
 		}
 		return $this;
@@ -53,7 +57,7 @@ abstract class Statement {
 	}
 
 	/**
-	 * @return MySQL
+	 * @return Database
 	 */
 	protected function db() {
 		return $this->db;

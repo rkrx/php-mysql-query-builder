@@ -2,44 +2,46 @@
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Builder\Select;
+use Kir\MySQL\Builder;
+use Kir\MySQL\Tools\VirtualTable;
 
 trait JoinBuilder {
 	use AbstractDB;
 	use AbstractTableNameBuilder;
 
-	/** @var array[] */
+	/** @var array<int, array{type: string, alias: string, name: string|array<int, array<string, mixed>>|Select|VirtualTable, expression: string|null, arguments: array<int, null|string|array<int, string>|Builder\DBExpr|Builder\Select>}> */
 	private $joinTables = [];
 
 	/**
 	 * @param string $alias
-	 * @param string|array[]|Select $table
+	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $table
 	 * @param string|null $expression
-	 * @param array<int, mixed> $args
+	 * @param null|int|float|string|array<int, string>|Builder\DBExpr|Builder\Select ...$args
 	 * @return $this
 	 */
-	public function joinInner(string $alias, $table, ?string $expression = null, ...$args) {
+	public function joinInner(string $alias, $table, ?string $expression = null, ...$args): self {
 		return $this->addJoin('INNER', $alias, $table, $expression, $args);
 	}
 
 	/**
 	 * @param string $alias
-	 * @param string|array[]|Select $table
+	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $table
 	 * @param string $expression
-	 * @param array<int, mixed> $args
+	 * @param string|int|float|array<int, string>|Builder\DBExpr|Builder\Select ...$args
 	 * @return $this
 	 */
-	public function joinLeft(string $alias, $table, string $expression, ...$args) {
+	public function joinLeft(string $alias, $table, string $expression, ...$args): self {
 		return $this->addJoin('LEFT', $alias, $table, $expression, $args);
 	}
 
 	/**
 	 * @param string $alias
-	 * @param string|array[]|Select $table
+	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $table
 	 * @param string $expression
-	 * @param array<int, mixed> $args
+	 * @param string|int|float|array<int, string>|Builder\DBExpr|Builder\Select ...$args
 	 * @return $this
 	 */
-	public function joinRight(string $alias, $table, string $expression, ...$args) {
+	public function joinRight(string $alias, $table, string $expression, ...$args): self {
 		return $this->addJoin('RIGHT', $alias, $table, $expression, $args);
 	}
 
@@ -66,7 +68,7 @@ trait JoinBuilder {
 	/**
 	 * @param string $type
 	 * @param string $alias
-	 * @param string|array[] $name
+	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $name
 	 * @param string|null $expression
 	 * @param array<int, mixed> $arguments
 	 * @return $this

@@ -2,14 +2,18 @@
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\Internal\DDLPreparable;
+use Kir\MySQL\Builder\Internal\DDLRunnable;
 use Kir\MySQL\Builder\Traits\CreateDDLRunnable;
 
+/**
+ * @implements DDLPreparable<int>
+ */
 class RunnableUpdate extends Update implements DDLPreparable {
+	/** @use CreateDDLRunnable<int> */
 	use CreateDDLRunnable;
 
 	/**
-	 * @param array $params
-	 * @return int
+	 * @inheritDoc
 	 */
 	public function run(array $params = []): int {
 		$query = $this->__toString();
@@ -17,9 +21,9 @@ class RunnableUpdate extends Update implements DDLPreparable {
 	}
 
 	/**
-	 * @return Internal\DDLRunnable
+	 * @return DDLRunnable<int>
 	 */
-	public function prepare(): Internal\DDLRunnable {
+	public function prepare(): DDLRunnable {
 		return $this->createPreparable($this->db()->prepare($this));
 	}
 }

@@ -6,11 +6,11 @@ use Kir\MySQL\Builder\Select;
 trait UnionBuilder {
 	use AbstractDB;
 
-	/** @var array */
+	/** @var array<int, array{''|'ALL', string|Select}> */
 	private $unions = [];
 
 	/**
-	 * @param array<int, string|Select> $queries
+	 * @param string|Select ...$queries
 	 * @return $this
 	 */
 	public function union(...$queries) {
@@ -21,7 +21,7 @@ trait UnionBuilder {
 	}
 
 	/**
-	 * @param array<int, string|Select> $queries
+	 * @param string|Select ...$queries
 	 * @return $this
 	 */
 	public function unionAll(...$queries) {

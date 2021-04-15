@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Databases;
 
+use Exception;
 use PDO;
 use PDOException;
 use RuntimeException;
@@ -17,8 +18,8 @@ use Kir\MySQL\Tools\VirtualTables;
 /**
  */
 class MySQL implements Database {
-	/** @var array */
-	private static $tableFields = [];
+	/** @var array<string, array<int, string>> */
+	private $tableFields = [];
 	/** @var PDO */
 	private $pdo;
 	/** @var bool */
@@ -33,12 +34,12 @@ class MySQL implements Database {
 	private $virtualTables;
 	/** @var MySQLExceptionInterpreter */
 	private $exceptionInterpreter;
-	/** @var array */
+	/** @var array<string, mixed> */
 	private $options;
 
 	/**
 	 * @param PDO $pdo
-	 * @param array $options
+	 * @param array<string, mixed> $options
 	 */
 	public function __construct(PDO $pdo, array $options = []) {
 		if($pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_SILENT) {
@@ -96,14 +97,14 @@ class MySQL implements Database {
 	 * @return QueryStatement
 	 */
 	public function prepare(string $query) {
-		return $this->buildQueryStatement((string) $query, function ($query) {
+		return $this->buildQueryStatement($query, function ($query) {
 			return $this->pdo->prepare($query);
 		});
 	}
 
 	/**
 	 * @param string $query
-	 * @param array $params
+	 * @param array<string, mixed> $params
 	 * @return int
 	 */
 	public function exec(string $query, array $params = []): int {
@@ -128,26 +129,29 @@ class MySQL implements Database {
 
 	/**
 	 * @param string $table
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public function getTableFields(string $table): array {
 		$table = $this->select()->aliasReplacer()->replace($table);
-		if(array_key_exists($table, self::$tableFields)) {
-			return self::$tableFields[$table];
+		if(array_key_exists($table, $this->tableFields)) {
+			return $this->tableFields[$table];
 		}
 		$stmt = $this->pdo->query("DESCRIBE {$table}");
+		if($stmt === false) {
+			throw new RuntimeException('Invalid return type');
+		}
 		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		self::$tableFields[$table] = array_map(static function ($row) { return $row['Field']; }, $rows);
+		$this->tableFields[$table] = array_map(static function ($row) { return $row['Field']; }, $rows ?: []);
 		$stmt->closeCursor();
-		return self::$tableFields[$table];
+		return $this->tableFields[$table];
 	}
 
 	/**
-	 * @param mixed $expression
-	 * @param array $arguments
+	 * @param string $expression
+	 * @param array<int, null|int|float|string|array<int, string>|Builder\DBExpr|Builder\Select> $arguments
 	 * @return string
 	 */
-	public function quoteExpression($expression, array $arguments = []): string {
+	public function quoteExpression(string $expression, array $arguments = []): string {
 		$index = -1;
 		$func = function () use ($arguments, &$index) {
 			$index++;
@@ -168,7 +172,7 @@ class MySQL implements Database {
 	}
 
 	/**
-	 * @param mixed $value
+	 * @param null|int|float|string|array<int, string>|Builder\DBExpr|Builder\Select $value
 	 * @return string
 	 */
 	public function quote($value): string {
@@ -180,6 +184,8 @@ class MySQL implements Database {
 			$result = sprintf('(%s)', (string) $value);
 		} elseif(is_array($value)) {
 			$result = implode(', ', array_map(function ($value) { return $this->quote($value); }, $value));
+		} elseif(is_int($value) || is_float($value)) {
+			$result = (string) $value;
 		} else {
 			$result = $this->pdo->quote($value);
 		}
@@ -202,10 +208,10 @@ class MySQL implements Database {
 	}
 
 	/**
-	 * @param array|null $fields
+	 * @param array<string|int, string>|null $fields
 	 * @return Builder\RunnableSelect
 	 */
-	public function select(array $fields = null): Builder\RunnableSelect {
+	public function select(array $fields = null) {
 		$select = array_key_exists('select-factory', $this->options)
 			? call_user_func($this->options['select-factory'], $this, $this->options['select-options'])
 			: new Builder\RunnableSelect($this, $this->options['select-options']);
@@ -216,10 +222,10 @@ class MySQL implements Database {
 	}
 
 	/**
-	 * @param array|null $fields
+	 * @param null|array<string|int, string> $fields
 	 * @return Builder\RunnableInsert
 	 */
-	public function insert(array $fields = null): Builder\RunnableInsert {
+	public function insert(array $fields = null) {
 		$insert = array_key_exists('insert-factory', $this->options)
 			? call_user_func($this->options['insert-factory'], $this, $this->options['insert-options'])
 			: new Builder\RunnableInsert($this, $this->options['insert-options']);
@@ -230,10 +236,10 @@ class MySQL implements Database {
 	}
 
 	/**
-	 * @param array|null $fields
+	 * @param array<string|int, string>|null $fields
 	 * @return Builder\RunnableUpdate
 	 */
-	public function update(array $fields = null): Builder\RunnableUpdate {
+	public function update(array $fields = null) {
 		$update = array_key_exists('update-factory', $this->options)
 			? call_user_func($this->options['update-factory'], $this, $this->options['update-options'])
 			: new Builder\RunnableUpdate($this, $this->options['update-options']);
@@ -246,7 +252,7 @@ class MySQL implements Database {
 	/**
 	 * @return Builder\RunnableDelete
 	 */
-	public function delete(): Builder\RunnableDelete {
+	public function delete() {
 		return array_key_exists('delete-factory', $this->options)
 			? call_user_func($this->options['delete-factory'], $this, $this->options['delete-options'])
 			: new Builder\RunnableDelete($this, $this->options['delete-options']);
@@ -286,10 +292,11 @@ class MySQL implements Database {
 	}
 
 	/**
-	 * @param callable|null $callback
-	 * @return mixed
+	 * @template T
+	 * @param callable(MySQL): T $callback
+	 * @return T
 	 */
-	public function dryRun($callback = null) {
+	public function dryRun(callable $callback) {
 		if(!$this->pdo->inTransaction()) {
 			$this->transactionStart();
 			try {
@@ -309,11 +316,12 @@ class MySQL implements Database {
 	}
 
 	/**
-	 * @param callable|null $callback
-	 * @return mixed
+	 * @template T
+	 * @param callable(MySQL): T $callback
+	 * @return T
+	 * @throws Throwable
 	 */
-	public function transaction(callable $callback = null) {
-		$result = null;
+	public function transaction(callable $callback) {
 		if(!$this->pdo->inTransaction()) {
 			$this->transactionStart();
 			try {
@@ -340,10 +348,10 @@ class MySQL implements Database {
 	}
 
 	/**
-	 * @param callable $fn
+	 * @param callable(): void $fn
 	 * @return $this
 	 */
-	private function transactionEnd(callable $fn) {
+	private function transactionEnd(callable $fn): self {
 		$this->transactionLevel--;
 		if($this->transactionLevel < 0) {
 			throw new RuntimeException("Transaction-Nesting-Problem: Trying to invoke commit on a already closed transaction");
@@ -357,6 +365,7 @@ class MySQL implements Database {
 		}
 		return $this;
 	}
+
 
 	/**
 	 * @param string $query
@@ -389,15 +398,20 @@ class MySQL implements Database {
 	 */
 	private function genUniqueId(): string {
 		// Generate a unique id from a former random-uuid-generator
-		return sprintf('ID%04x%04x%04x%04x%04x%04x%04x%04x',
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0x0fff) | 0x4000,
-			mt_rand(0, 0x3fff) | 0x8000,
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff)
-		);
+		try {
+			return sprintf('ID%04x%04x%04x%04x%04x%04x%04x%04x',
+				random_int(0, 0xffff),
+				random_int(0, 0xffff),
+				random_int(0, 0xffff),
+				random_int(0, 0x0fff) | 0x4000,
+				random_int(0, 0x3fff) | 0x8000,
+				random_int(0, 0xffff),
+				random_int(0, 0xffff),
+				random_int(0, 0xffff)
+			);
+		} catch (Exception $e) {
+			// Should not throw an excepion under normal conditions
+			throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
+		}
 	}
 }

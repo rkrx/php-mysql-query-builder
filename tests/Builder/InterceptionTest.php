@@ -6,7 +6,7 @@ use Kir\MySQL\QueryLogger\ClosureQueryLogger;
 use PHPUnit\Framework\TestCase;
 
 class InterceptionTest extends TestCase {
-	public function testQuery() {
+	public function testQuery(): void {
 		$db = new TestDB();
 		$db->exec('USE mysql');
 		$queries = [];

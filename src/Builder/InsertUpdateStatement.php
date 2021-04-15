@@ -2,20 +2,21 @@
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\Internal\DefaultValue;
+use Kir\MySQL\Builder;
 
 abstract class InsertUpdateStatement extends Statement {
-	/** @var array */
+	/** @var array<int, string> */
 	private $mask;
 
 	/**
-	 * @return array|null
+	 * @return array<int, string>|null
 	 */
 	public function getMask(): ?array {
 		return $this->mask;
 	}
 
 	/**
-	 * @param array $mask
+	 * @param array<int, string> $mask
 	 * @return $this
 	 */
 	public function setMask(array $mask) {
@@ -24,25 +25,28 @@ abstract class InsertUpdateStatement extends Statement {
 	}
 
 	/**
-	 * @param array $fields
-	 * @param array $query
+	 * @param array<int|string, null|string|array<int, string>|Builder\DBExpr|Builder\Select|DefaultValue> $fields
+	 * @param array<int, string> $query
 	 * @return string[]
 	 */
 	protected function buildFieldList(array $fields, array $query = []): array {
 		foreach ($fields as $fieldName => $fieldValue) {
-			if ($fieldValue instanceof DefaultValue) {
+			if($fieldValue instanceof DefaultValue) {
 				$fieldValue = 'DEFAULT';
 			}
-			if (is_array($this->mask) && !in_array($fieldName, $this->mask)) {
+			if(is_array($this->mask) && !in_array($fieldName, $this->mask, true)) {
 				continue;
 			}
-			if (is_int($fieldName)) {
+			if(is_int($fieldName)) {
 				if (is_array($fieldValue)) {
 					$fieldValue = $this->db()->quoteExpression($fieldValue[0], array_slice($fieldValue, 1));
 				}
 				$query[] = "\t{$fieldValue}";
 			} else {
 				$fieldName = $this->db()->quoteField($fieldName);
+				if (is_array($fieldValue)) {
+					$fieldValue = $this->db()->quoteExpression($fieldValue[0], array_slice($fieldValue, 1));
+				}
 				$query[] = "\t{$fieldName}={$fieldValue}";
 			}
 		}
@@ -51,7 +55,7 @@ abstract class InsertUpdateStatement extends Statement {
 
 	/**
 	 * @param string $fieldName
-	 * @param array $tableFields
+	 * @param array<int, string> $tableFields
 	 * @return bool
 	 */
 	protected function isFieldAccessible(string $fieldName, array $tableFields): bool {
@@ -61,6 +65,6 @@ abstract class InsertUpdateStatement extends Statement {
 		if (!is_array($this->mask)) {
 			return true;
 		}
-		return in_array($fieldName, $this->mask);
+		return in_array($fieldName, $this->mask, true);
 	}
 }

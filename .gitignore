@@ -8,6 +8,6 @@
 !/.travis.yml
 !/.scrutinizer.yml
 !/composer.json
-!/composer-nodev.json
+!/phpstan.neon
 !/README.md
 !/tests.xml

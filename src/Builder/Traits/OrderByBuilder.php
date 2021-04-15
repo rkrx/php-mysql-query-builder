@@ -6,15 +6,15 @@ use Kir\MySQL\Builder\Expr\OrderBySpecification;
 trait OrderByBuilder {
 	use AbstractDB;
 
-	/** @var array */
+	/** @var array<int, array{string, string}> */
 	private $orderBy = [];
 
 	/**
 	 * @param string|OrderBySpecification $expression
-	 * @param string $direction
+	 * @param string&('ASC'|'DESC') $direction
 	 * @return $this
 	 */
-	public function orderBy($expression, string $direction = 'asc') {
+	public function orderBy($expression, string $direction = 'ASC'): self {
 		if($expression instanceof OrderBySpecification) {
 			foreach($expression->getFields() as $field) {
 				$this->addOrder($field[0], $field[1]);
@@ -27,10 +27,10 @@ trait OrderByBuilder {
 
 	/**
 	 * @param string $fieldName
-	 * @param array $values
+	 * @param array<int, int|float|string> $values
 	 * @return $this
 	 */
-	public function orderByValues(string $fieldName, array $values) {
+	public function orderByValues(string $fieldName, array $values): self {
 		$expr = [];
 		foreach(array_values($values) as $idx => $value) {
 			$expr[] = $this->db()->quoteExpression("WHEN ? THEN ?", [$value, $idx]);
@@ -49,34 +49,31 @@ trait OrderByBuilder {
 		}
 		$query .= "ORDER BY\n";
 		$arr = [];
-		foreach($this->orderBy as list($expression, $direction)) {
+		foreach($this->orderBy as [$expression, $direction]) {
 			$arr[] = sprintf("\t%s %s", $expression, strtoupper($direction));
 		}
 		return $query.implode(",\n", $arr)."\n";
 	}
 
 	/**
-	 * @param string|array $expression
-	 * @param string $direction
+	 * @param string|array<int, mixed> $expression
+	 * @param string&('ASC'|'DESC') $direction
 	 */
-	private function addOrder($expression, string $direction) {
+	private function addOrder($expression, string $direction): void {
 		$direction = $this->fixDirection($direction);
 		if(is_array($expression)) {
-			if(!count($expression)) {
+			if(count($expression) < 1) {
 				return;
 			}
-			$arguments = [
-				$expression[0],
-				array_slice($expression, 1)
-			];
-			$expression = call_user_func_array([$this->db(), 'quoteExpression'], $arguments);
+			$expr = (string) $expression[0];
+			$expression = $this->db()->quoteExpression($expr, array_slice($expression, 1));
 		}
 		$this->orderBy[] = [$expression, $direction];
 	}
 
 	/**
 	 * @param string $direction
-	 * @return string
+	 * @return string&('ASC'|'DESC')
 	 */
 	private function fixDirection(string $direction): string {
 		return strtoupper($direction) !== 'ASC' ? 'DESC' : 'ASC';

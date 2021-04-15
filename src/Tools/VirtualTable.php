@@ -4,12 +4,12 @@ namespace Kir\MySQL\Tools;
 class VirtualTable {
 	/** @var string */
 	private $tableName;
-	/** @var array */
+	/** @var array<string, mixed> */
 	private $params;
 
 	/**
 	 * @param string $tableName
-	 * @param array $params
+	 * @param array<string, mixed> $params
 	 */
 	public function __construct(string $tableName, array $params = []) {
 		$this->tableName = $tableName;
@@ -24,7 +24,7 @@ class VirtualTable {
 	}
 
 	/**
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function getParams(): array {
 		return $this->params;
