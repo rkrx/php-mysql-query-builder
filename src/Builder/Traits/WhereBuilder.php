@@ -10,12 +10,12 @@ use Kir\MySQL\Builder\Internal\ConditionBuilder;
 trait WhereBuilder {
 	use AbstractDB;
 
-	/** @var array<int, array{string|array<string, mixed>|object|OptionalExpression, array<int, null|string|array<int, string>|DBExpr|Select>}> */
+	/** @var array<int, array{string|array<string, mixed>|object|OptionalExpression, array<int, null|string|array<int, null|scalar>|DBExpr|Select>}> */
 	private $where = [];
 
 	/**
 	 * @param string|array<string, mixed>|object|OptionalExpression $expression
-	 * @param null|scalar|array<int, string>|DBExpr|Select ...$args
+	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select ...$args
 	 * @return $this
 	 */
 	public function where($expression, ...$args) {

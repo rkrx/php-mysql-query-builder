@@ -50,7 +50,7 @@ interface Database {
 
 	/**
 	 * @param string $expression
-	 * @param array<int, null|int|float|string|array<int, string>|Builder\DBExpr|Builder\Select> $arguments
+	 * @param array<int, null|int|float|string|array<int, null|scalar>|Builder\DBExpr|Builder\Select> $arguments
 	 * @return string
 	 */
 	public function quoteExpression(string $expression, array $arguments = []): string;

@@ -8,7 +8,7 @@ final class ConditionBuilder {
 	/**
 	 * @param Database $db
 	 * @param string $query
-	 * @param array<int, array{string|array<string, mixed>|object|OptionalExpression, array<int, null|string|array<int, string>|Builder\DBExpr|Builder\Select>}> $conditions
+	 * @param array<int, array{string|array<string, mixed>|object|OptionalExpression, array<int, null|string|array<int, null|scalar>|Builder\DBExpr|Builder\Select>}> $conditions
 	 * @param string $token
 	 * @return string
 	 */
@@ -38,7 +38,7 @@ final class ConditionBuilder {
 	/**
 	 * @param array<int, string> $conditions
 	 * @param string $expression
-	 * @param array<int, null|string|array<int, string>|Builder\DBExpr|Builder\Select> $arguments
+	 * @param array<int, null|string|array<int, null|scalar>|Builder\DBExpr|Builder\Select> $arguments
 	 * @param Database $db
 	 * @return array<int, string>
 	 */
