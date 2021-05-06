@@ -69,24 +69,24 @@ interface Database {
 
 	/**
 	 * @param array<int|string, string>|null $fields
-	 * @return Builder\Select
+	 * @return Builder\RunnableSelect
 	 */
 	public function select(?array $fields = null);
 
 	/**
 	 * @param array<string, string>|null $fields
-	 * @return Builder\Insert
+	 * @return Builder\RunnableInsert
 	 */
 	public function insert(?array $fields = null);
 
 	/**
 	 * @param array<string, string>|null $fields
-	 * @return Builder\Update
+	 * @return Builder\RunnableUpdate
 	 */
 	public function update(?array $fields = null);
 
 	/**
-	 * @return Builder\Delete
+	 * @return Builder\RunnableDelete
 	 */
 	public function delete();
 

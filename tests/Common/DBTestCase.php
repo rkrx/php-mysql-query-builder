@@ -3,7 +3,7 @@ namespace Kir\MySQL\Common;
 
 use Kir\MySQL\Builder\DeleteTest\TestDelete;
 use Kir\MySQL\Builder\InsertTest\TestInsert;
-use Kir\MySQL\Builder\SelectTest\TestSelect;
+use Kir\MySQL\Builder\SelectTest\TestSelectMySQL;
 use Kir\MySQL\Builder\UpdateTest\TestUpdate;
 use Kir\MySQL\Databases\TestDB;
 use PHPUnit\Framework\TestCase;
@@ -53,8 +53,8 @@ class DBTestCase extends TestCase {
 		return $this->db;
 	}
 
-	protected function select(): TestSelect {
-		return new TestSelect($this->getDB());
+	protected function select(): TestSelectMySQL {
+		return new TestSelectMySQL($this->getDB());
 	}
 
 	protected function insert(): TestInsert {

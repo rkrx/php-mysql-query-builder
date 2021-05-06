@@ -6,7 +6,7 @@ use Kir\MySQL\Builder\Expr\DBExprOrderBySpec;
 use Kir\MySQL\Builder\Expr\OptionalDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredValueNotFoundException;
-use Kir\MySQL\Builder\SelectTest\TestSelect;
+use Kir\MySQL\Builder\SelectTest\TestSelectMySQL;
 use Kir\MySQL\Common\DBTestCase;
 use Kir\MySQL\Databases\TestDB;
 use Kir\MySQL\Tools\VirtualTable;
@@ -449,7 +449,7 @@ class SelectTest extends DBTestCase {
 			->from('a', 'tableA');
 		});
 
-		$query = TestSelect::create($db)
+		$query = TestSelectMySQL::create($db)
 		->field('t.field1')
 		->field('t.field2')
 		->from('t', 'test')
@@ -474,7 +474,7 @@ class SelectTest extends DBTestCase {
 			->where(new DBExprFilter('a.active=?', $args, 'active'));
 		});
 
-		$query = TestSelect::create($db)
+		$query = TestSelectMySQL::create($db)
 		->field('t.field1')
 		->field('t.field2')
 		->from('t', 'test')

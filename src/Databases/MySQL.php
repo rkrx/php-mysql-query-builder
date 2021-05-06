@@ -2,6 +2,7 @@
 namespace Kir\MySQL\Databases;
 
 use Exception;
+use Kir\MySQL\Builder\RunnableSelect;
 use PDO;
 use PDOException;
 use RuntimeException;
@@ -209,12 +210,12 @@ class MySQL implements Database {
 
 	/**
 	 * @param array<string|int, string>|null $fields
-	 * @return Builder\RunnableSelect
+	 * @return RunnableSelect
 	 */
 	public function select(array $fields = null) {
 		$select = array_key_exists('select-factory', $this->options)
 			? call_user_func($this->options['select-factory'], $this, $this->options['select-options'])
-			: new Builder\RunnableSelect($this, $this->options['select-options']);
+			: new MySQL\MySQLRunnableSelect($this, $this->options['select-options']);
 		if($fields !== null) {
 			$select->fields($fields);
 		}

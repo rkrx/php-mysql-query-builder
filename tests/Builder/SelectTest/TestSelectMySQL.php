@@ -1,16 +1,16 @@
 <?php
 namespace Kir\MySQL\Builder\SelectTest;
 
-use Kir\MySQL\Builder\RunnableSelect;
+use Kir\MySQL\Databases\MySQL\MySQLRunnableSelect;
 use Kir\MySQL\Databases\MySQL;
 use Kir\MySQL\Databases\TestDB;
 
-class TestSelect extends RunnableSelect {
+class TestSelectMySQL extends MySQLRunnableSelect {
 	/**
 	 * @param MySQL|null $db
-	 * @return TestSelect
+	 * @return TestSelectMySQL
 	 */
-	public static function create(MySQL $db = null): TestSelect {
+	public static function create(MySQL $db = null): TestSelectMySQL {
 		if($db === null) {
 			$db = new TestDB();
 		}
