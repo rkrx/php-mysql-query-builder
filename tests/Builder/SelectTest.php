@@ -498,7 +498,7 @@ class SelectTest extends DBTestCase {
 			->from('a', 'tableA');
 		});
 
-		$query = TestSelectMySQL::create($db)
+		$query = TestSelect::create($db)
 		->field('t.field1')
 		->field('t.field2')
 		->from('t', 'test')
@@ -523,7 +523,7 @@ class SelectTest extends DBTestCase {
 			->where(new DBExprFilter('a.active=?', $args, 'active'));
 		});
 
-		$query = TestSelectMySQL::create($db)
+		$query = TestSelect::create($db)
 		->field('t.field1')
 		->field('t.field2')
 		->from('t', 'test')
