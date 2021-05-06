@@ -3,7 +3,6 @@ namespace Kir\MySQL\Builder;
 
 use Closure;
 use Generator;
-use IteratorAggregate;
 use Kir\MySQL\Builder\Helpers\DBIgnoreRow;
 use Kir\MySQL\Builder\Helpers\FieldTypeProvider;
 use Kir\MySQL\Builder\Helpers\FieldValueConverter;
@@ -13,9 +12,8 @@ use stdClass;
 use Throwable;
 
 /**
- * @implements IteratorAggregate<int, array<string, mixed>>
  */
-class RunnableSelect extends Select implements IteratorAggregate {
+class RunnableSelect extends Select {
 	/** @var array<string, mixed> */
 	private $values = [];
 	/** @var bool */

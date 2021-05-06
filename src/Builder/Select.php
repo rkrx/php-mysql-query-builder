@@ -2,6 +2,7 @@
 namespace Kir\MySQL\Builder;
 
 use Generator;
+use IteratorAggregate;
 use Kir\MySQL\Builder\Helpers\DBIgnoreRow;
 use Kir\MySQL\Builder\Traits\GroupByBuilder;
 use Kir\MySQL\Builder\Traits\HavingBuilder;
@@ -16,7 +17,10 @@ use Kir\MySQL\Builder\Traits\WhereBuilder;
 use Kir\MySQL\Tools\VirtualTable;
 use RuntimeException;
 
-abstract class Select extends Statement {
+/**
+ * @implements IteratorAggregate<int, array<string, mixed>>
+ */
+abstract class Select extends Statement implements IteratorAggregate {
 	use TableNameBuilder;
 	use TableBuilder;
 	use JoinBuilder;
