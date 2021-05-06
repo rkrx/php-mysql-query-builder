@@ -57,7 +57,7 @@ interface Select {
 	 * @param string $alias
 	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $table
 	 * @param string|null $expression
-	 * @param null|int|float|string|array<int, string>|Builder\DBExpr|Select ...$args
+	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select ...$args
 	 * @return $this
 	 */
 	public function joinInner(string $alias, $table, ?string $expression = null, ...$args);
@@ -66,7 +66,7 @@ interface Select {
 	 * @param string $alias
 	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $table
 	 * @param string $expression
-	 * @param string|int|float|array<int, string>|Builder\DBExpr|Select ...$args
+	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select ...$args
 	 * @return $this
 	 */
 	public function joinLeft(string $alias, $table, string $expression, ...$args);
@@ -75,7 +75,7 @@ interface Select {
 	 * @param string $alias
 	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $table
 	 * @param string $expression
-	 * @param string|int|float|array<int, string>|Builder\DBExpr|Select ...$args
+	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select ...$args
 	 * @return $this
 	 */
 	public function joinRight(string $alias, $table, string $expression, ...$args);
@@ -94,14 +94,14 @@ interface Select {
 
 	/**
 	 * @param string|array<string, mixed>|object|OptionalExpression $expression
-	 * @param null|scalar|array<int, string>|DBExpr|Select ...$args
+	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select ...$args
 	 * @return $this
 	 */
 	public function where($expression, ...$args);
 
 	/**
 	 * @param string|array<string, mixed>|object|OptionalExpression $expression
-	 * @param null|scalar|array<int, string>|DBExpr|Select ...$args
+	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select ...$args
 	 * @return $this
 	 */
 	public function having($expression, ...$args);
