@@ -14,7 +14,7 @@ trait OrderByBuilder {
 	 * @param string&('ASC'|'DESC') $direction
 	 * @return $this
 	 */
-	public function orderBy($expression, string $direction = 'ASC'): self {
+	public function orderBy($expression, string $direction = 'ASC') {
 		if($expression instanceof OrderBySpecification) {
 			foreach($expression->getFields() as $field) {
 				$this->addOrder($field[0], $field[1]);
@@ -30,7 +30,7 @@ trait OrderByBuilder {
 	 * @param array<int, int|float|string> $values
 	 * @return $this
 	 */
-	public function orderByValues(string $fieldName, array $values): self {
+	public function orderByValues(string $fieldName, array $values) {
 		$expr = [];
 		foreach(array_values($values) as $idx => $value) {
 			$expr[] = $this->db()->quoteExpression("WHEN ? THEN ?", [$value, $idx]);

@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Kir\MySQL\Databases\MySQL\MySQLSelect;
 use Kir\MySQL\Tools\AliasReplacer;
 use RuntimeException;
 use Traversable;

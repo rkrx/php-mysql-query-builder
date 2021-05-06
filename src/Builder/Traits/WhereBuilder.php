@@ -18,7 +18,7 @@ trait WhereBuilder {
 	 * @param null|scalar|array<int, string>|DBExpr|Select ...$args
 	 * @return $this
 	 */
-	public function where($expression, ...$args): self {
+	public function where($expression, ...$args) {
 		$fn = function ($expression, $args) { $this->where[] = [$expression, $args]; };
 		ConditionAddHelper::addCondition($fn, $expression, $args);
 		return $this;

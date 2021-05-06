@@ -2,7 +2,8 @@
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\Internal\DefaultValue;
-use Kir\MySQL\Builder;
+use Kir\MySQL\Builder\DBExpr;
+use Kir\MySQL\Builder\Select;
 
 abstract class InsertUpdateStatement extends Statement {
 	/** @var array<int, string> */
@@ -25,7 +26,7 @@ abstract class InsertUpdateStatement extends Statement {
 	}
 
 	/**
-	 * @param array<int|string, null|string|array<int, string>|Builder\DBExpr|Builder\Select|DefaultValue> $fields
+	 * @param array<int|string, null|string|array<int, string>|DBExpr|Select|DefaultValue> $fields
 	 * @param array<int, string> $query
 	 * @return string[]
 	 */

@@ -2,24 +2,24 @@
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Builder\Select;
-use Kir\MySQL\Builder;
+use Kir\MySQL\Builder\DBExpr;
 use Kir\MySQL\Tools\VirtualTable;
 
 trait JoinBuilder {
 	use AbstractDB;
 	use AbstractTableNameBuilder;
 
-	/** @var array<int, array{type: string, alias: string, name: string|array<int, array<string, mixed>>|Select|VirtualTable, expression: string|null, arguments: array<int, null|string|array<int, string>|Builder\DBExpr|Builder\Select>}> */
+	/** @var array<int, array{type: string, alias: string, name: string|array<int, array<string, mixed>>|Select|VirtualTable, expression: string|null, arguments: array<int, null|string|array<int, string>|DBExpr|Select>}> */
 	private $joinTables = [];
 
 	/**
 	 * @param string $alias
 	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $table
 	 * @param string|null $expression
-	 * @param null|int|float|string|array<int, string>|Builder\DBExpr|Builder\Select ...$args
+	 * @param null|int|float|string|array<int, string>|DBExpr|Select ...$args
 	 * @return $this
 	 */
-	public function joinInner(string $alias, $table, ?string $expression = null, ...$args): self {
+	public function joinInner(string $alias, $table, ?string $expression = null, ...$args) {
 		return $this->addJoin('INNER', $alias, $table, $expression, $args);
 	}
 
@@ -27,10 +27,10 @@ trait JoinBuilder {
 	 * @param string $alias
 	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $table
 	 * @param string $expression
-	 * @param string|int|float|array<int, string>|Builder\DBExpr|Builder\Select ...$args
+	 * @param string|int|float|array<int, string>|DBExpr|Select ...$args
 	 * @return $this
 	 */
-	public function joinLeft(string $alias, $table, string $expression, ...$args): self {
+	public function joinLeft(string $alias, $table, string $expression, ...$args) {
 		return $this->addJoin('LEFT', $alias, $table, $expression, $args);
 	}
 
@@ -38,10 +38,10 @@ trait JoinBuilder {
 	 * @param string $alias
 	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $table
 	 * @param string $expression
-	 * @param string|int|float|array<int, string>|Builder\DBExpr|Builder\Select ...$args
+	 * @param string|int|float|array<int, string>|DBExpr|Select ...$args
 	 * @return $this
 	 */
-	public function joinRight(string $alias, $table, string $expression, ...$args): self {
+	public function joinRight(string $alias, $table, string $expression, ...$args) {
 		return $this->addJoin('RIGHT', $alias, $table, $expression, $args);
 	}
 

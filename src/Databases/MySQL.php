@@ -2,7 +2,8 @@
 namespace Kir\MySQL\Databases;
 
 use Exception;
-use Kir\MySQL\Builder\RunnableSelect;
+use Kir\MySQL\Builder\Select;
+use Kir\MySQL\Databases\MySQL\MySQLRunnableSelect;
 use PDO;
 use PDOException;
 use RuntimeException;
@@ -173,7 +174,7 @@ class MySQL implements Database {
 	}
 
 	/**
-	 * @param null|int|float|string|array<int, string>|Builder\DBExpr|Builder\Select $value
+	 * @param null|int|float|string|array<int, string>|Builder\DBExpr|Select $value
 	 * @return string
 	 */
 	public function quote($value): string {
@@ -210,7 +211,7 @@ class MySQL implements Database {
 
 	/**
 	 * @param array<string|int, string>|null $fields
-	 * @return RunnableSelect
+	 * @return MySQLRunnableSelect
 	 */
 	public function select(array $fields = null) {
 		$select = array_key_exists('select-factory', $this->options)

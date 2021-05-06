@@ -15,7 +15,7 @@ trait TableBuilder {
 	 * @param string|Select|VirtualTable|array<int, null|int|float|string|array<string, mixed>> $table
 	 * @return $this
 	 */
-	protected function addTable(?string $alias, $table): self {
+	protected function addTable(?string $alias, $table) {
 		$this->tables[] = ['alias' => $alias, 'name' => $table];
 		return $this;
 	}

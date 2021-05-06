@@ -18,7 +18,7 @@ trait HavingBuilder {
 	 * @param null|scalar|array<int, string>|DBExpr|Select ...$args
 	 * @return $this
 	 */
-	public function having($expression, ...$args): self {
+	public function having($expression, ...$args) {
 		$fn = function ($expression, $args) { $this->having[] = [$expression, $args]; };
 		ConditionAddHelper::addCondition($fn, $expression, $args);
 		return $this;

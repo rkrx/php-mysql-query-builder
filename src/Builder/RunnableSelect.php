@@ -1,5 +1,4 @@
 <?php
-
 namespace Kir\MySQL\Builder;
 
 use Generator;
@@ -10,7 +9,7 @@ use Kir\MySQL\Builder\Helpers\DBIgnoreRow;
 /**
  * @extends IteratorAggregate<int, array<string, mixed>>
  */
-interface RunnableSelect extends IteratorAggregate {
+interface RunnableSelect extends Select, IteratorAggregate {
 	/**
 	 * @return AliasReplacer
 	 */

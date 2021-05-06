@@ -8,7 +8,6 @@ use Kir\MySQL\Builder\Helpers\FieldTypeProvider;
 use Kir\MySQL\Builder\Helpers\FieldValueConverter;
 use Kir\MySQL\Builder\QueryStatement;
 use Kir\MySQL\Builder\RunnableSelect;
-use Kir\MySQL\Builder\Select;
 use Kir\MySQL\Databases\MySQL;
 use PDO;
 use stdClass;
@@ -16,7 +15,7 @@ use Throwable;
 
 /**
  */
-class MySQLRunnableSelect extends Select implements RunnableSelect {
+class MySQLRunnableSelect extends MySQLSelect implements RunnableSelect {
 	/** @var array<string, mixed> */
 	private $values = [];
 	/** @var bool */

@@ -5,12 +5,12 @@ use Kir\MySQL\Databases\MySQL\MySQLRunnableSelect;
 use Kir\MySQL\Databases\MySQL;
 use Kir\MySQL\Databases\TestDB;
 
-class TestSelectMySQL extends MySQLRunnableSelect {
+class TestSelect extends MySQLRunnableSelect {
 	/**
 	 * @param MySQL|null $db
-	 * @return TestSelectMySQL
+	 * @return TestSelect
 	 */
-	public static function create(MySQL $db = null): TestSelectMySQL {
+	public static function create(MySQL $db = null): TestSelect {
 		if($db === null) {
 			$db = new TestDB();
 		}

@@ -6,14 +6,16 @@ use Kir\MySQL\Builder\Expr\DBExprOrderBySpec;
 use Kir\MySQL\Builder\Expr\OptionalDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredValueNotFoundException;
-use Kir\MySQL\Builder\SelectTest\TestSelectMySQL;
+use Kir\MySQL\Builder\SelectTest\TestSelect;
 use Kir\MySQL\Common\DBTestCase;
 use Kir\MySQL\Databases\TestDB;
 use Kir\MySQL\Tools\VirtualTable;
 
 class SelectTest extends DBTestCase {
 	public function testAddition(): void {
-		$str = $this->select()->field('1+2')->asString();
+		$str = $this->select()
+		->field('1+2')
+		->asString();
 		self::assertEquals("SELECT\n\t1+2\n", $str);
 	}
 
@@ -449,7 +451,7 @@ class SelectTest extends DBTestCase {
 			->from('a', 'tableA');
 		});
 
-		$query = TestSelectMySQL::create($db)
+		$query = TestSelect::create($db)
 		->field('t.field1')
 		->field('t.field2')
 		->from('t', 'test')
@@ -474,7 +476,7 @@ class SelectTest extends DBTestCase {
 			->where(new DBExprFilter('a.active=?', $args, 'active'));
 		});
 
-		$query = TestSelectMySQL::create($db)
+		$query = TestSelect::create($db)
 		->field('t.field1')
 		->field('t.field2')
 		->from('t', 'test')
