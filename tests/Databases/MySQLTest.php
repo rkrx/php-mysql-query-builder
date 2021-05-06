@@ -1,7 +1,7 @@
 <?php
 namespace Kir\MySQL\Databases;
 
-use Kir\MySQL\Builder\SelectTest\TestSelect;
+use Kir\MySQL\Builder\SelectTest\TestSelectMySQL;
 use Kir\MySQL\Common\DBTestCase;
 use RuntimeException;
 
@@ -26,7 +26,7 @@ class MySQLTest extends DBTestCase {
 
 	public function testFetchRow(): void {
 		// Closure w/o return, but with reference
-		$row = TestSelect::create()
+		$row = TestSelectMySQL::create()
 		->field('t.id')
 		->from('t', 'test#test1')
 		->where('t.id=?', 1)
@@ -36,7 +36,7 @@ class MySQLTest extends DBTestCase {
 		self::assertEquals(['id' => 1, 'test' => 10], $row);
 
 		// Closure with return
-		$row = TestSelect::create()
+		$row = TestSelectMySQL::create()
 		->field('t.id')
 		->from('t', 'test#test1')
 		->where('t.id=?', 1)
@@ -49,7 +49,7 @@ class MySQLTest extends DBTestCase {
 
 	public function testFetchRows(): void {
 		// Closure w/o return, but with reference
-		$rows = TestSelect::create()
+		$rows = TestSelectMySQL::create()
 		->field('t.id')
 		->from('t', 'test#test1')
 		->where('t.id=?', 1)
@@ -60,7 +60,7 @@ class MySQLTest extends DBTestCase {
 		self::assertEquals([['id' => 1, 'test' => 10]], $rows);
 
 		// Closure with return
-		$rows = TestSelect::create()
+		$rows = TestSelectMySQL::create()
 		->field('t.id')
 		->from('t', 'test#test1')
 		->where('t.id=?', 1)
@@ -74,7 +74,7 @@ class MySQLTest extends DBTestCase {
 
 	public function testFetchRowsLazy(): void {
 		// Closure w/o return, but with reference
-		$rows = TestSelect::create()
+		$rows = TestSelectMySQL::create()
 		->field('t.id')
 		->from('t', 'test#test1')
 		->where('t.id=?', 1)
@@ -85,7 +85,7 @@ class MySQLTest extends DBTestCase {
 		self::assertEquals([['id' => 1, 'test' => 10]], $rows);
 
 		// Closure with return
-		$rows = TestSelect::create()
+		$rows = TestSelectMySQL::create()
 		->field('t.id')
 		->from('t', 'test#test1')
 		->where('t.id=?', 1)
@@ -97,7 +97,7 @@ class MySQLTest extends DBTestCase {
 		self::assertEquals([['id' => 1, 'test' => 10]], $rows);
 
 		// IgnoredRow
-		$rows = TestSelect::create()
+		$rows = TestSelectMySQL::create()
 		->field('t.id')
 		->from('t', 'test#test1')
 		->where('t.id=?', 1)

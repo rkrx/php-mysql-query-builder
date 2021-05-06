@@ -2,7 +2,7 @@
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\InsertTest\TestInsert;
-use Kir\MySQL\Builder\SelectTest\TestSelect;
+use Kir\MySQL\Builder\SelectTest\TestSelectMySQL;
 use Kir\MySQL\Common\DBTestCase;
 
 class InsertTest extends DBTestCase {
@@ -23,7 +23,7 @@ class InsertTest extends DBTestCase {
 	}
 
 	public function testMassInsert(): void {
-		$select = TestSelect::create()
+		$select = TestSelectMySQL::create()
 		->fields(['a' => 'b'])
 		->from('oi', 'travis#test1')
 		->where('1!=2');
