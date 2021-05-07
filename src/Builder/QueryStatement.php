@@ -77,13 +77,13 @@ class QueryStatement implements DatabaseStatement {
 	/**
 	 * @param int $fetchStyle
 	 * @param mixed|null $fetchArgument
-	 * @param array<mixed, mixed> $ctorArgs
+	 * @param mixed[] $ctorArgs
 	 * @return array<mixed, mixed>
 	 */
 	public function fetchAll($fetchStyle = PDO::FETCH_ASSOC, $fetchArgument = null, array $ctorArgs = []): array {
 		return $this->exceptionHandler(function() use ($fetchStyle, $fetchArgument, $ctorArgs) {
 			if($fetchArgument !== null) {
-				return $this->statement->fetchAll($fetchStyle, $fetchArgument, $ctorArgs);
+				return $this->statement->fetchAll($fetchStyle, $fetchArgument, ...$ctorArgs);
 			}
 			return $this->statement->fetchAll($fetchStyle);
 		});
