@@ -131,9 +131,9 @@ class QueryStatement implements DatabaseStatement {
 
 	/**
 	 * @param int $columnNo
-	 * @return array<string, mixed>
+	 * @return null|array<string, mixed>
 	 */
-	public function getColumnMeta(int $columnNo): array {
+	public function getColumnMeta(int $columnNo): ?array {
 		return $this->exceptionHandler(function() use ($columnNo) {
 			return $this->statement->getColumnMeta($columnNo);
 		});

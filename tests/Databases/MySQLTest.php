@@ -108,4 +108,21 @@ class MySQLTest extends DBTestCase {
 		$rows = iterator_to_array($rows);
 		self::assertEquals([['id' => 1, 'test' => 10]], $rows);
 	}
+
+	public function testFetchValue(): void {
+		// Closure w/o return, but with reference
+		$value = TestSelect::create()
+		->field('t.id')
+		->from('t', 'test#test1')
+		->where('t.id=?', 1)
+		->fetchValue();
+		self::assertEquals(1, $value);
+
+		$value = TestSelect::create()
+		->field('t.id')
+		->from('t', 'test#test1')
+		->where('t.id=?', 1)
+		->fetchValue(null, 'strval');
+		self::assertEquals('1', $value);
+	}
 }

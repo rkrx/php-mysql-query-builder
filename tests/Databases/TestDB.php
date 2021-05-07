@@ -8,15 +8,15 @@ use PDOException;
 
 class TestDB extends MySQL {
 	/** @var PDO|null */
-	private $pdo = null;
+	private $pdo;
 
 	/**
 	 * @template T
 	 * @param callable(TestDB): T $fn
 	 * @return T
 	 */
-	public static function use(callable $fn) {
-		$inst = new static();
+	public static function use($fn) {
+		$inst = new TestDB();
 		try {
 			return $fn($inst);
 		} finally {
