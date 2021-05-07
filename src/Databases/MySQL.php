@@ -1,21 +1,25 @@
 <?php
 namespace Kir\MySQL\Databases;
 
-use Exception;
+use Kir\MySQL\Builder;
+use Kir\MySQL\Builder\DBExpr;
+use Kir\MySQL\Builder\QueryStatement;
 use Kir\MySQL\Builder\Select;
+use Kir\MySQL\Database;
+use Kir\MySQL\Databases\MySQL\MySQLExceptionInterpreter;
+use Kir\MySQL\Databases\MySQL\MySQLExpressionQuoter;
+use Kir\MySQL\Databases\MySQL\MySQLFieldQuoter;
 use Kir\MySQL\Databases\MySQL\MySQLRunnableSelect;
+use Kir\MySQL\Databases\MySQL\MySQLUUIDGenerator;
+use Kir\MySQL\Databases\MySQL\MySQLValueQuoter;
+use Kir\MySQL\QueryLogger\QueryLoggers;
+use Kir\MySQL\Tools\AliasRegistry;
+use Kir\MySQL\Tools\VirtualTables;
 use PDO;
 use PDOException;
 use RuntimeException;
 use Throwable;
-use UnexpectedValueException;
-use Kir\MySQL\Builder;
-use Kir\MySQL\Builder\QueryStatement;
-use Kir\MySQL\Database;
-use Kir\MySQL\Databases\MySQL\MySQLExceptionInterpreter;
-use Kir\MySQL\QueryLogger\QueryLoggers;
-use Kir\MySQL\Tools\AliasRegistry;
-use Kir\MySQL\Tools\VirtualTables;
+use phpDocumentor\Reflection\Types\Scalar;
 
 /**
  */
@@ -150,48 +154,19 @@ class MySQL implements Database {
 
 	/**
 	 * @param string $expression
-	 * @param array<int, null|int|float|string|array<int, string>|Builder\DBExpr|Builder\Select> $arguments
+	 * @param array<int, null|scalar|array<int, string>|DBExpr|Select> $arguments
 	 * @return string
 	 */
 	public function quoteExpression(string $expression, array $arguments = []): string {
-		$index = -1;
-		$func = function () use ($arguments, &$index) {
-			$index++;
-			if(array_key_exists($index, $arguments)) {
-				$argument = $arguments[$index];
-				$value = $this->quote($argument);
-			} elseif(count($arguments) > 0) {
-				$args = $arguments;
-				$value = array_pop($args);
-				$value = $this->quote($value);
-			} else {
-				$value = 'NULL';
-			}
-			return $value;
-		};
-		$result = preg_replace_callback('/(\\?)/', $func, $expression);
-		return (string) $result;
+		return MySQLExpressionQuoter::quoteExpression($this->pdo, $expression, $arguments);
 	}
 
 	/**
-	 * @param null|int|float|string|array<int, string>|Builder\DBExpr|Select $value
+	 * @param null|scalar|array<int, string>|DBExpr|Select $value
 	 * @return string
 	 */
 	public function quote($value): string {
-		if(is_null($value)) {
-			$result = 'NULL';
-		} elseif($value instanceof Builder\DBExpr) {
-			$result = $value->getExpression();
-		} elseif($value instanceof Builder\Select) {
-			$result = sprintf('(%s)', (string) $value);
-		} elseif(is_array($value)) {
-			$result = implode(', ', array_map(function ($value) { return $this->quote($value); }, $value));
-		} elseif(is_int($value) || is_float($value)) {
-			$result = (string) $value;
-		} else {
-			$result = $this->pdo->quote($value);
-		}
-		return $result;
+		return MySQLValueQuoter::quote($this->pdo, $value);
 	}
 
 	/**
@@ -199,14 +174,7 @@ class MySQL implements Database {
 	 * @return string
 	 */
 	public function quoteField(string $field): string {
-		if (is_numeric($field) || !is_string($field)) {
-			throw new UnexpectedValueException('Field name is invalid');
-		}
-		if(strpos($field, '`') !== false) {
-			return $field;
-		}
-		$parts = explode('.', $field);
-		return '`'.implode('`.`', $parts).'`';
+		return MySQLFieldQuoter::quoteField($field);
 	}
 
 	/**
@@ -307,7 +275,7 @@ class MySQL implements Database {
 				$this->transactionRollback();
 			}
 		} else {
-			$uniqueId = $this->genUniqueId();
+			$uniqueId = MySQLUUIDGenerator::genUUIDv4();
 			$this->exec("SAVEPOINT {$uniqueId}");
 			try {
 				return $callback($this);
@@ -337,7 +305,7 @@ class MySQL implements Database {
 				throw $e;
 			}
 		}
-		$uniqueId = $this->genUniqueId();
+		$uniqueId = MySQLUUIDGenerator::genUUIDv4();
 		$this->exec("SAVEPOINT {$uniqueId}");
 		try {
 			$result = $callback($this);
@@ -393,27 +361,5 @@ class MySQL implements Database {
 			$this->exceptionInterpreter->throwMoreConcreteException($e);
 		}
 		return null;
-	}
-
-	/**
-	 * @return string
-	 */
-	private function genUniqueId(): string {
-		// Generate a unique id from a former random-uuid-generator
-		try {
-			return sprintf('ID%04x%04x%04x%04x%04x%04x%04x%04x',
-				random_int(0, 0xffff),
-				random_int(0, 0xffff),
-				random_int(0, 0xffff),
-				random_int(0, 0x0fff) | 0x4000,
-				random_int(0, 0x3fff) | 0x8000,
-				random_int(0, 0xffff),
-				random_int(0, 0xffff),
-				random_int(0, 0xffff)
-			);
-		} catch (Exception $e) {
-			// Should not throw an excepion under normal conditions
-			throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
-		}
 	}
 }

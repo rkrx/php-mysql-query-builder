@@ -484,7 +484,7 @@ class SelectTest extends DBTestCase {
 		->joinInner('vt2', new VirtualTable('virt_table2', ['active' => true]), 'vt2.field2=t.field2')
 		->asString();
 
-		self::assertEquals("SELECT\n\tt.field1,\n\tt.field2\nFROM\n\ttest t\nINNER JOIN\n\t(SELECT\n\t\ta.field1\n\tFROM\n\t\ttableA a) vt1 ON vt1.field1=t.field1\nINNER JOIN\n\t(SELECT\n\t\ta.field1\n\tFROM\n\t\ttableA a\n\tWHERE\n\t\t(a.active='1')) vt2 ON vt2.field2=t.field2\n", $query);
+		self::assertEquals("SELECT\n\tt.field1,\n\tt.field2\nFROM\n\ttest t\nINNER JOIN\n\t(SELECT\n\t\ta.field1\n\tFROM\n\t\ttableA a) vt1 ON vt1.field1=t.field1\nINNER JOIN\n\t(SELECT\n\t\ta.field1\n\tFROM\n\t\ttableA a\n\tWHERE\n\t\t(a.active=1)) vt2 ON vt2.field2=t.field2\n", $query);
 	}
 
 	public function testArrayTables(): void {
