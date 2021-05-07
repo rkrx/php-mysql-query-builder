@@ -9,8 +9,17 @@ php:
 
 matrix:
   fast_finish: true
-  allow_failures:
-    - php: nightly
+  include:
+    - php: 8.0
+      env: PHPUNIT_VERSION="9"
+    - php: 7.4
+      env: PHPUNIT_VERSION=""
+    - php: 7.3
+      env: PHPUNIT_VERSION=""
+    - php: 7.2
+      env: PHPUNIT_VERSION=""
+    - php: 7.1
+      env: PHPUNIT_VERSION=""
 
 services:
   - mysql
@@ -18,7 +27,7 @@ services:
 install:
   - |
       # Install PHPUnit v9 on PHP 8
-      if [ "${TRAVIS_PHP_VERSION}" == nightly ] || [ dpkg --compare-versions "${TRAVIS_PHP_VERSION}" ge 8.0 ]; then
+      if [ "${PHPUNIT_VERSION}" == "9" ]; then
           travis_retry composer require --no-interaction --prefer-dist --dev --ignore-platform-reqs "phpunit/phpunit" 9.*
       # Enable test on PHP 7.1+
       else
