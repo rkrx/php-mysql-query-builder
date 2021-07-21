@@ -7,6 +7,7 @@ use Kir\MySQL\Builder\Expr\OptionalDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredValueNotFoundException;
 use Kir\MySQL\Builder\SelectTest\TestSelect;
+use Kir\MySQL\Builder\Value\DBOptionalValue;
 use Kir\MySQL\Common\DBTestCase;
 use Kir\MySQL\Databases\TestDB;
 use Kir\MySQL\Tools\VirtualTable;
@@ -217,6 +218,29 @@ class SelectTest extends DBTestCase {
 		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nLIMIT\n\t100\n", $str);
 	}
 
+	public function testOptionalLimit() {
+		$str = $this->select()
+		->field('a')
+		->from('t', 'test')
+		->limit(new DBOptionalValue(['x' => 100], 'x'))
+		->asString();
+		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nLIMIT\n\t100\n", $str);
+
+		$str = $this->select()
+		->field('a')
+		->from('t', 'test')
+		->limit(new DBOptionalValue(['x' => 100], 'y'))
+		->asString();
+		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\n", $str);
+
+		$str = $this->select()
+		->field('a')
+		->from('t', 'test')
+		->limit(new DBOptionalValue(['x' => 100], 'y'))
+		->asString();
+		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\n", $str);
+	}
+
 	public function testOffset() {
 		$str = $this->select()
 		->field('a')
@@ -234,6 +258,24 @@ class SelectTest extends DBTestCase {
 		->offset(50)
 		->asString();
 		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nLIMIT\n\t18446744073709551615\nOFFSET\n\t50\n", $str);
+	}
+
+	public function testOptionalOffset() {
+		$str = $this->select()
+		->field('a')
+		->from('t', 'test')
+		->limit(100)
+		->offset(new DBOptionalValue(['a' => ['b' => ['c' => 50]]], 'a.b.c'))
+		->asString();
+		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nLIMIT\n\t100\nOFFSET\n\t50\n", $str);
+
+		$str = $this->select()
+		->field('a')
+		->from('t', 'test')
+		->limit(100)
+		->offset(new DBOptionalValue(['a' => ['b' => ['c' => 50]]], 'a.b.d'))
+		->asString();
+		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nLIMIT\n\t100\n", $str);
 	}
 
 	public function testForUpdate() {
@@ -369,6 +411,12 @@ class SelectTest extends DBTestCase {
 
 		self::assertEquals("SELECT\n\tt.field\nFROM\n\ttest t\nWHERE\n\t(t.field IN ('1', '2', '3'))\n", $query);
 
+	}
+
+	public function testOptionalExpressions2() {
+		$filter = ['filter' => ['name' => 'aaa', 'ids' => [1, 2, 3]]];
+		$opt = new OptionalDBFilterMap($filter);
+
 		$query = $this->select()
 		->field('t.field')
 		->from('t', 'test')
@@ -389,7 +437,6 @@ class SelectTest extends DBTestCase {
 		->asString();
 
 		self::assertEquals("SELECT\n\tt.field\nFROM\n\ttest t\nWHERE\n\t(t.field='aaa')\n", $query);
-
 		$this->expectException(RequiredValueNotFoundException::class);
 
 		$this->select()

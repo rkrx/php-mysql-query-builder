@@ -1,6 +1,8 @@
 <?php
 namespace Kir\MySQL\Builder\Expr;
 
+use Kir\MySQL\Builder\Helpers\RecursiveStructureAccess;
+
 class RequiredDBFilterMap {
 	/** @var array */
 	private $map;
@@ -34,10 +36,9 @@ class RequiredDBFilterMap {
 	 * @return DBExprFilter
 	 */
 	public function __invoke($expression, $keyPath, $validator = null) {
-		return new DBExprFilter($expression, $this->map, $keyPath, $validator, static function ($result, array $data) {
-			if(!$result) {
-				throw new RequiredValueNotFoundException(sprintf("Required value %s not found", $data['key']));
-			}
-		});
+		if(!RecursiveStructureAccess::recursiveHas($this->map, $keyPath)) {
+			throw new RequiredValueNotFoundException(sprintf("Required value %s not found", json_encode($keyPath, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
+		}
+		return new DBExprFilter($expression, $this->map, $keyPath, $validator);
 	}
 }

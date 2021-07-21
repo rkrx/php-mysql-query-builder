@@ -1,19 +1,25 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
+use Kir\MySQL\Builder\InvalidValueException;
+use Kir\MySQL\Builder\Value\OptionalValue;
+
 trait LimitBuilder {
-	/** @var int|null */
+	/** @var null|int|OptionalValue */
 	private $limit;
 
 	/**
-	 * @return int|null
+	 * @return null|int
 	 */
 	protected function getLimit() {
+		if($this->limit instanceof OptionalValue) {
+			return $this->limit->getValue();
+		}
 		return $this->limit;
 	}
 
 	/**
-	 * @param int|null $limit
+	 * @param null|int|OptionalValue $limit
 	 * @return $this
 	 */
 	public function limit($limit) {
@@ -27,11 +33,19 @@ trait LimitBuilder {
 	 * @return string
 	 */
 	protected function buildLimit($query, $offset = null) {
-		$limit = $this->limit;
+		$limit = $this->getLimit();
 		if($limit === null && $offset !== null) {
 			$limit = '18446744073709551615';
 		}
-		if($limit !== null) {
+		if($this->limit instanceof OptionalValue) {
+			if($this->limit->isValid()) {
+				$value = $this->limit->getValue();
+				if(!preg_match('{\\d+}', $value)) {
+					throw new InvalidValueException('Value for LIMIT has to be a number');
+				}
+				$query .= "LIMIT\n\t{$this->limit->getValue()}\n";
+			}
+		} elseif($limit !== null) {
 			$query .= "LIMIT\n\t{$limit}\n";
 		}
 		return $query;
