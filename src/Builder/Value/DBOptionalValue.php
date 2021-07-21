@@ -5,6 +5,7 @@ namespace Kir\MySQL\Builder\Value;
 use Kir\MySQL\Builder\Helpers\RecursiveStructureAccess;
 
 class DBOptionalValue implements OptionalValue {
+	/** @var object|array<string, mixed> */
 	private $data;
 	/** @var string|string[] */
 	private $path;
@@ -12,7 +13,7 @@ class DBOptionalValue implements OptionalValue {
 	private $validator;
 
 	/**
-	 * @param object|array<string, mixed>
+	 * @param object|array<string, mixed> $data
 	 * @param string|string[] $path
 	 * @param null|callable(): bool $validator
 	 */

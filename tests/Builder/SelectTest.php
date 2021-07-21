@@ -3,6 +3,7 @@ namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\Expr\DBExprFilter;
 use Kir\MySQL\Builder\Expr\DBExprOrderBySpec;
+use Kir\MySQL\Builder\Expr\DBOrderSpec;
 use Kir\MySQL\Builder\Expr\OptionalDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredValueNotFoundException;
@@ -451,10 +452,10 @@ class SelectTest extends DBTestCase {
 		->field('t.field1')
 		->field('t.field2')
 		->from('t', 'test')
-		->orderBy(new DBExprOrderBySpec(['field1', 'field2' => 'REVERSE(t.field2)'], [['field2', 'ASC'], ['field1', 'DESC'], ['field3' => 'ASC']]))
+		->orderBy(new DBOrderSpec(['field1' => 't.field1', 'field2' => 'REVERSE(t.field2)', 'field4' => 't.field2'], ['field3' => 'ASC', 'field1' => 'ASC', 'field2' => 'ASC', 'field4' => 'ASC']))
 		->asString();
 
-		self::assertEquals("SELECT\n\tt.field1,\n\tt.field2\nFROM\n\ttest t\nORDER BY\n\tREVERSE(t.field2) ASC,\n\tfield1 DESC\n", $query);
+		self::assertEquals("SELECT\n\tt.field1,\n\tt.field2\nFROM\n\ttest t\nORDER BY\n\tt.field1 ASC,\n\tREVERSE(t.field2) ASC,\n\tt.field2 ASC\n", $query);
 	}
 
 	public function testVirtualTables() {
