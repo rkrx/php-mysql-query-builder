@@ -441,9 +441,6 @@ class SelectTest extends DBTestCase {
 
 		self::assertEquals("SELECT\n\tt.field\nFROM\n\ttest t\nWHERE\n\t(t.field IN (1, 2, 3))\n", $query);
 
-	}
-
-	public function testOptionalExpressions2() {
 		$filter = ['filter' => ['name' => 'aaa', 'ids' => [1, 2, 3]]];
 		$opt = new OptionalDBFilterMap($filter);
 

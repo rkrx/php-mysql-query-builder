@@ -243,9 +243,9 @@ abstract class Insert extends InsertUpdateStatement {
 	 * @param array<string, mixed> $data
 	 * @param array<int, string>|null $mask
 	 * @param array<int, string>|null $excludeFields
-	 * @param null|callable(string, mixed): void $fn
+	 * @param callable(string, mixed): void $fn
 	 */
-	private function addAllTo(array $data, ?array $mask = null, ?array $excludeFields = null, $fn = null): void {
+	private function addAllTo(array $data, ?array $mask, ?array $excludeFields, $fn): void {
 		if($mask !== null) {
 			$data = array_intersect_key($data, array_combine($mask, $mask));
 		}
