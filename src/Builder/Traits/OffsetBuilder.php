@@ -1,19 +1,25 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
+use Kir\MySQL\Builder\InvalidValueException;
+use Kir\MySQL\Builder\Value\OptionalValue;
+
 trait OffsetBuilder {
-	/** @var int|null */
-	private $offset = null;
+	/** @var null|int|OptionalValue */
+	private $offset;
 
 	/**
-	 * @return int
+	 * @return null|int
 	 */
 	protected function getOffset(): ?int {
+		if($this->offset instanceof OptionalValue) {
+			return $this->offset->getValue();
+		}
 		return $this->offset;
 	}
 
 	/**
-	 * @param int|null $offset
+	 * @param null|int|OptionalValue $offset
 	 * @return $this
 	 */
 	public function offset(?int $offset = 0) {
@@ -26,7 +32,16 @@ trait OffsetBuilder {
 	 * @return string
 	 */
 	protected function buildOffset(string $query): string {
-		if($this->offset !== null) {
+		$offset = $this->getOffset();
+		if($this->offset instanceof OptionalValue) {
+			if($this->offset->isValid()) {
+				$value = $this->offset->getValue();
+				if(!preg_match('{\\d+}', $value)) {
+					throw new InvalidValueException('Value for OFFSET has to be a number');
+				}
+				$query .= "OFFSET\n\t{$this->offset->getValue()}\n";
+			}
+		} elseif($offset !== null) {
 			$query .= "OFFSET\n\t{$this->offset}\n";
 		}
 		return $query;

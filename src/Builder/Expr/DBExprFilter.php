@@ -1,11 +1,14 @@
 <?php
 namespace Kir\MySQL\Builder\Expr;
 
+use Kir\MySQL\Builder\Helpers\RecursiveStructureAccess;
 use RuntimeException;
 
 class DBExprFilter implements OptionalExpression {
 	/** @var mixed */
 	private $expression;
+	/** @var bool */
+	private $hasValue;
 	/** @var mixed */
 	private $value;
 	/** @var string[] */
@@ -25,19 +28,17 @@ class DBExprFilter implements OptionalExpression {
 	public function __construct(string $expression, array $data, $keyPath, $validator = null, $validationResultHandler = null) {
 		$this->expression = $expression;
 		$this->keyPath = $this->buildKey($keyPath);
-		$this->value = $this->recursiveGet($data, $this->keyPath, null);
+		$this->hasValue = RecursiveStructureAccess::recursiveHas($data, $this->keyPath);
+		$this->value = RecursiveStructureAccess::recursiveGet($data, $this->keyPath, null);
 		if($validator === null) {
-			$validator = function ($data) {
-				if(is_array($data)) {
-					return $this->isValidArray($data);
-				}
-				return (string) $data !== '';
+			$validator = function() {
+				return true;
 			};
 		}
+		$this->validator = $validator;
 		if($validationResultHandler === null) {
 			$validationResultHandler = static function () {};
 		}
-		$this->validator = $validator;
 		$this->validationResultHandler = $validationResultHandler;
 	}
 
@@ -51,16 +52,19 @@ class DBExprFilter implements OptionalExpression {
 	/**
 	 * @return bool
 	 */
-	public function isValid(): bool {
-		$result = true;
+	public function isValid() {
+		if(!$this->hasValue) {
+			return false;
+		}
 		if($this->validator !== null) {
 			$result = call_user_func($this->validator, $this->value);
 			call_user_func($this->validationResultHandler, $result, [
 				'value' => $this->value,
 				'key' => implode('.', $this->keyPath),
 			]);
+			return $result;
 		}
-		return $result;
+		return true;
 	}
 
 	/**
@@ -96,26 +100,5 @@ class DBExprFilter implements OptionalExpression {
 			return (string) $value !== '';
 		});
 		return count($data) > 0;
-	}
-
-	/**
-	 * @param array<string, mixed> $array
-	 * @param array<int, string> $path
-	 * @param mixed $default
-	 * @return mixed
-	 */
-	private function recursiveGet(array $array, array $path, $default) {
-		$count = count($path);
-		if (!$count) {
-			return $default;
-		}
-		foreach($path as $idxValue) {
-			$part = $idxValue;
-			if(!array_key_exists($part, $array)) {
-				return $default;
-			}
-			$array = $array[$part];
-		}
-		return $array;
 	}
 }
