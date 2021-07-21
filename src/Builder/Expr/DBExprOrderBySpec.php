@@ -32,7 +32,7 @@ class DBExprOrderBySpec implements OrderBySpecification {
 						$direction
 					];
 				}
-			} else {
+			} else { // @phpstan-ignore-line
 				foreach($sortFieldSpec as $alias => $direction) {
 					$direction = strtoupper($direction) === 'DESC' ? 'DESC' : 'ASC';
 					if(array_key_exists($alias, $expressions)) {
@@ -47,7 +47,7 @@ class DBExprOrderBySpec implements OrderBySpecification {
 	 * Returns an array[], where each value is a [db-expression, sort-direction]
 	 * The sort-direction can be either ASC or DESC
 	 *
-	 * @return array<int, array{string, 'ASC'|'DESC'}>
+	 * @return array<int, array{string, string&('ASC'|'DESC')}>
 	 */
 	public function getFields(): array {
 		return $this->fields;

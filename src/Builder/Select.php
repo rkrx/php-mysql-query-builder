@@ -5,6 +5,7 @@ namespace Kir\MySQL\Builder;
 use Kir\MySQL\Builder;
 use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Builder\Expr\OrderBySpecification;
+use Kir\MySQL\Builder\Value\OptionalValue;
 use Kir\MySQL\Tools\VirtualTable;
 
 /**
@@ -127,16 +128,16 @@ interface Select {
 	public function orderByValues(string $fieldName, array $values);
 
 	/**
-	 * @param int|null $limit
+	 * @param int|null|OptionalValue $limit
 	 * @return $this
 	 */
-	public function limit(?int $limit);
+	public function limit($limit);
 
 	/**
-	 * @param int|null $offset
+	 * @param int|null|OptionalValue $offset
 	 * @return $this
 	 */
-	public function offset(?int $offset = 0);
+	public function offset($offset = 0);
 
 	/**
 	 * @return bool

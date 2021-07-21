@@ -2,10 +2,12 @@
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\Expr\DBExprFilter;
+use Kir\MySQL\Builder\Expr\DBSortAliasNotFoundException;
 use Kir\MySQL\Builder\Expr\OptionalDBFilterMap;
 use Kir\MySQL\Builder\Expr\DBOrderSpec;
 use Kir\MySQL\Builder\Expr\RequiredDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredValueNotFoundException;
+use Kir\MySQL\Builder\SelectTest\TestSelect;
 use Kir\MySQL\Builder\SelectTest\TestSelectMySQL;
 use Kir\MySQL\Builder\Value\DBOptionalValue;
 use Kir\MySQL\Common\DBTestCase;
@@ -288,7 +290,7 @@ class SelectTest extends DBTestCase {
 		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nLIMIT\n\t18446744073709551615\nOFFSET\n\t50\n", $str);
 	}
 
-	public function testOptionalOffset() {
+	public function testOptionalOffset(): void {
 		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
@@ -306,7 +308,7 @@ class SelectTest extends DBTestCase {
 		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nLIMIT\n\t100\n", $str);
 	}
 
-	public function testForUpdate() {
+	public function testForUpdate(): void {
 		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
@@ -479,10 +481,19 @@ class SelectTest extends DBTestCase {
 		->field('t.field1')
 		->field('t.field2')
 		->from('t', 'test')
-		->orderBy(new DBOrderSpec(['field1' => 't.field1', 'field2' => 'REVERSE(t.field2)', 'field4' => 't.field2'], ['field3' => 'ASC', 'field1' => 'ASC', 'field2' => 'ASC', 'field4' => 'ASC']))
+		->orderBy(new DBOrderSpec(['field1' => 't.field1', 'field2' => 'REVERSE(t.field2)', 'field3' => 't.field2'], ['field3' => 'ASC', 'field1' => 'ASC', 'field2' => 'ASC']))
 		->asString();
 
-		self::assertEquals("SELECT\n\tt.field1,\n\tt.field2\nFROM\n\ttest t\nORDER BY\n\tt.field1 ASC,\n\tREVERSE(t.field2) ASC,\n\tt.field2 ASC\n", $query);
+		self::assertEquals("SELECT\n\tt.field1,\n\tt.field2\nFROM\n\ttest t\nORDER BY\n\tt.field2 ASC,\n\tt.field1 ASC,\n\tREVERSE(t.field2) ASC\n", $query);
+
+		$this->expectException(DBSortAliasNotFoundException::class);
+
+		$query = $this->select()
+		->field('t.field1')
+		->field('t.field2')
+		->from('t', 'test')
+		->orderBy(new DBOrderSpec(['field1' => 't.field1', 'field2' => 'REVERSE(t.field2)', 'field4' => 't.field2'], ['field3' => 'ASC', 'field1' => 'ASC', 'field2' => 'ASC', 'field4' => 'ASC']))
+		->asString();
 	}
 
 	public function testVirtualTables(): void {

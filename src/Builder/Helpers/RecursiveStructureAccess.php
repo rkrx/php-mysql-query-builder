@@ -66,11 +66,16 @@ class RecursiveStructureAccess {
 		if(is_array($path)) {
 			return $path;
 		}
-		return preg_split('{(?<!\\x5C)(?:\\x5C\\x5C)*\\.}', $path);
+		$parts = preg_split('{(?<!\\x5C)(?:\\x5C\\x5C)*\\.}', $path);
+		if($parts === false) {
+			return [$path];
+		}
+		return $parts;
 	}
 
 	/**
 	 * @param mixed $array
+	 * @return array<mixed, mixed>
 	 */
 	private static function ensureArrayIsArray($array): ?array {
 		if($array instanceof ArrayObject) {

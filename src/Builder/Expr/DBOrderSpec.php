@@ -36,9 +36,9 @@ class DBOrderSpec implements DBOrderSpecInterface, OrderBySpecification {
 	}
 
 	/**
-	 * @return array<int, array{string, string}>
+	 * @return array<int, array{string, string&('ASC'|'DESC')}>
 	 */
-	public function getFields() {
+	public function getFields(): array {
 		$fields = [];
 		$max = $this->options['max_sort_instructions'] ?? 16;
 		foreach($this->sortingInstruction as $alias => $direction) {

@@ -10,7 +10,7 @@ use Kir\MySQL\Database\DatabaseStatement;
 use Kir\MySQL\QueryLogger\QueryLoggers;
 
 class QueryStatement implements DatabaseStatement {
-	/** @var PDOStatement */
+	/** @var PDOStatement<mixed> */
 	private $statement;
 	/** @var QueryLoggers */
 	private $queryLoggers;
@@ -20,7 +20,7 @@ class QueryStatement implements DatabaseStatement {
 	private $exceptionInterpreter;
 
 	/**
-	 * @param PDOStatement $stmt
+	 * @param PDOStatement<mixed> $stmt
 	 * @param string $query
 	 * @param MySQLExceptionInterpreter $exceptionInterpreter
 	 * @param QueryLoggers $queryLoggers
@@ -33,7 +33,7 @@ class QueryStatement implements DatabaseStatement {
 	}
 
 	/**
-	 * @return PDOStatement
+	 * @return PDOStatement<mixed>
 	 */
 	public function getStatement(): PDOStatement {
 		return $this->statement;

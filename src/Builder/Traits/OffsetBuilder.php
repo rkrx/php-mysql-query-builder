@@ -22,7 +22,7 @@ trait OffsetBuilder {
 	 * @param null|int|OptionalValue $offset
 	 * @return $this
 	 */
-	public function offset(?int $offset = 0) {
+	public function offset($offset = 0) {
 		$this->offset = $offset;
 		return $this;
 	}

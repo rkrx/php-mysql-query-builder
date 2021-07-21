@@ -9,11 +9,13 @@ use Kir\MySQL\Database\DatabaseStatement;
  */
 trait CreateDDLRunnable {
 	/**
+	 * @template I
+	 * @template T
 	 * @param DatabaseStatement $query
-	 * @param null|callable(): T $callbackFn
+	 * @param callable(scalar=): T $callbackFn
 	 * @return DDLRunnable<T>
 	 */
-	public function createPreparable(DatabaseStatement $query, callable $callbackFn = null): DDLRunnable {
+	public function createPreparable(DatabaseStatement $query, $callbackFn): DDLRunnable {
 		return new DDLRunnable($query, $callbackFn);
 	}
 }

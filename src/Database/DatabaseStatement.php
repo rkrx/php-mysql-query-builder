@@ -7,7 +7,7 @@ use PDOStatement;
 
 interface DatabaseStatement {
 	/**
-	 * @return PDOStatement
+	 * @return PDOStatement<mixed>
 	 */
 	public function getStatement(): PDOStatement;
 

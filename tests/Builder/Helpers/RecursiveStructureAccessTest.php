@@ -5,7 +5,7 @@ namespace Kir\MySQL\Builder\Helpers;
 use PHPUnit\Framework\TestCase;
 
 class RecursiveStructureAccessTest extends TestCase {
-	public function testRecursiveHas() {
+	public function testRecursiveHas(): void {
 		$array = ['a' => ['b' => ['c' => 123]]];
 
 		$result = RecursiveStructureAccess::recursiveHas($array, ['a', 'b', 'c']);
@@ -21,7 +21,7 @@ class RecursiveStructureAccessTest extends TestCase {
 		self::assertFalse($result);
 	}
 
-	public function testRecursiveGet() {
+	public function testRecursiveGet(): void {
 		$array = ['a' => ['b' => ['c' => 123]]];
 
 		$result = RecursiveStructureAccess::recursiveGet($array, ['a', 'b', 'c'], null);

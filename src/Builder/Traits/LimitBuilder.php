@@ -22,7 +22,7 @@ trait LimitBuilder {
 	 * @param null|int|OptionalValue $limit
 	 * @return $this
 	 */
-	public function limit(?int $limit) {
+	public function limit($limit) {
 		$this->limit = $limit;
 		return $this;
 	}

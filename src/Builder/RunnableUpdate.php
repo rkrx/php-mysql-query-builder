@@ -24,6 +24,6 @@ class RunnableUpdate extends Update implements DDLPreparable {
 	 * @return DDLRunnable<int>
 	 */
 	public function prepare(): DDLRunnable {
-		return $this->createPreparable($this->db()->prepare($this));
+		return $this->createPreparable($this->db()->prepare($this), 'intval');
 	}
 }
