@@ -43,11 +43,12 @@ class DBOrderSpec implements DBOrderSpecInterface, OrderBySpecification {
 		$max = $this->options['max_sort_instructions'] ?? 16;
 		foreach($this->sortingInstruction as $alias => $direction) {
 			$direction = strtolower($direction) === 'desc' ? 'DESC' : 'ASC';
-			if(array_key_exists($alias, $this->sortSpecification)) {
-				$fields[] = [$this->sortSpecification[$alias], $direction];
+			if(!array_key_exists($alias, $this->sortSpecification)) {
+				throw new DBSortAliasNotFoundException('Sorting: Alias for DB-Expression not found');
 			}
+			$fields[] = [$this->sortSpecification[$alias], $direction];
 			if($max < 1) {
-				throw new RuntimeException();
+				throw new DBSortTooManyInstructionsException();
 			}
 			$max--;
 		}

@@ -19,9 +19,7 @@ Here a few things to keep in mind:
 ## Some simplified examples
 
 * [Initialization](doc/initialization.md)
-* [Simple select](doc/simple-select.md)
-* [Complex select](doc/complex-select.md)
-* [Optional conditions](doc/optional-conditions.md)
+* [Select](doc/select.md)
 * [Insert](doc/insert.md)
 * [Update](doc/update.md)
 * [Delete](doc/delete.md)
