@@ -246,7 +246,9 @@ class RunnableSelect extends Select implements IteratorAggregate {
 			$data = $statement->fetchAll();
 			if($this->preserveTypes) {
 				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
-				$data = array_map(static function ($row) use ($columnDefinitions) { return FieldValueConverter::convertValues($row, $columnDefinitions); }, $data);
+				$data = array_map(static function ($row) use ($columnDefinitions) {
+					return FieldValueConverter::convertValues($row, $columnDefinitions);
+				}, $data);
 			}
 			if($callback !== null) {
 				return call_user_func(static function ($resultData = []) use ($data, $callback) {
