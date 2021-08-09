@@ -29,7 +29,7 @@ class DDLRunnable {
 		$this->query->execute($params);
 		$response = $this->query->getStatement()->rowCount();
 		if($this->callbackFn !== null) {
-			$response = call_user_func($this->callbackFn);
+			$response = call_user_func($this->callbackFn, $response);
 		}
 		return $response;
 	}
