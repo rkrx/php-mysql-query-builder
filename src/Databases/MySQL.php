@@ -362,21 +362,4 @@ class MySQL implements Database {
 		}
 		return null;
 	}
-
-	/**
-	 * @return string
-	 */
-	private function genUniqueId(): string {
-		// Generate a unique id from a former random-uuid-generator
-		return sprintf('ID%04x%04x%04x%04x%04x%04x%04x%04x',
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0x0fff) | 0x4000,
-			mt_rand(0, 0x3fff) | 0x8000,
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff)
-		);
-	}
 }
