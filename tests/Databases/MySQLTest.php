@@ -14,14 +14,52 @@ class MySQLTest extends DBTestCase {
 	/**
 	 * Test if the outer nested transaction detection works as expected
 	 */
-	public function testNestedTransaction(): void {
-		$this->getDB()->transactionStart();
-		$this->getDB()->transactionStart();
-		$this->getDB()->transactionStart();
-		$this->getDB()->transactionRollback();
-		$this->getDB()->transactionRollback();
-		$this->getDB()->transactionRollback();
-		self::assertTrue(true);
+	public function testNestedDryRun(): void {
+		$this->getDB()->update()->table('test1')->set('field1', 100)->where(['id' => 1])->run();
+		$this->getDB()->dryRun(function () {
+			$this->getDB()->update()->table('test1')->set('field1', 101)->where(['id' => 1])->run();
+			$this->getDB()->dryRun(function () {
+				$this->getDB()->update()->table('test1')->set('field1', 102)->where(['id' => 1])->run();
+				$this->getDB()->dryRun(function () {
+					$this->getDB()->update()->table('test1')->set('field1', 103)->where(['id' => 1])->run();
+					self::assertEquals(103, $this->getDB()->query('SELECT field1 FROM test1 WHERE id=1')->fetchColumn(0));
+				});
+				self::assertEquals(102, $this->getDB()->query('SELECT field1 FROM test1 WHERE id=1')->fetchColumn(0));
+			});
+			self::assertEquals(101, $this->getDB()->query('SELECT field1 FROM test1 WHERE id=1')->fetchColumn(0));
+		});
+		self::assertEquals(100, $this->getDB()->query('SELECT field1 FROM test1 WHERE id=1')->fetchColumn(0));
+	}
+
+	/**
+	 * Test if the outer nested transaction detection works as expected
+	 */
+	public function testNestedTransactionWithException(): void {
+		$this->expectExceptionMessage('TEST');
+		$this->getDB()->update()->table('test1')->set('field1', 100)->where(['id' => 1])->run();
+		$this->getDB()->transaction(function () {
+			try {
+				$this->getDB()->update()->table('test1')->set('field1', 101)->where(['id' => 1])->run();
+				$this->getDB()->transaction(function () {
+					try {
+						$this->getDB()->update()->table('test1')->set('field1', 102)->where(['id' => 1])->run();
+						$this->getDB()->transaction(function () {
+							try {
+								$this->getDB()->update()->table('test1')->set('field1', 103)->where(['id' => 1])->run();
+								throw new RuntimeException('TEST');
+							} finally {
+								self::assertEquals(103, $this->getDB()->query('SELECT field1 FROM test1 WHERE id=1')->fetchColumn(0));
+							}
+						});
+					} finally {
+						self::assertEquals(102, $this->getDB()->query('SELECT field1 FROM test1 WHERE id=1')->fetchColumn(0));
+					}
+				});
+			} finally {
+				self::assertEquals(101, $this->getDB()->query('SELECT field1 FROM test1 WHERE id=1')->fetchColumn(0));
+			}
+		});
+		self::assertEquals(100, $this->getDB()->query('SELECT field1 FROM test1 WHERE id=1')->fetchColumn(0));
 	}
 
 	public function testFetchRow(): void {
