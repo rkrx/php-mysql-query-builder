@@ -3,6 +3,8 @@ namespace Kir\MySQL\Databases;
 
 use Kir\MySQL\Builder\SelectTest\TestSelect;
 use Kir\MySQL\Common\DBTestCase;
+use Kir\MySQL\QueryLogger\ClosureQueryLogger;
+use PDOException;
 use RuntimeException;
 
 class MySQLTest extends DBTestCase {
@@ -162,5 +164,80 @@ class MySQLTest extends DBTestCase {
 		->where('t.id=?', 1)
 		->fetchValue(null, 'strval');
 		self::assertEquals('1', $value);
+	}
+
+	public function testInfoLoggingFromQuery() {
+		$log = (object) ['queries' => []];
+		$db = $this->getDB();
+		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity) use ($log) {
+			$log->queries[] = ['query' => $query, 'durection' => $duration];
+		}));
+		$query = 'SELECT COUNT(*) FROM test1';
+		$db->query($query)->fetchColumn(0);
+		self::assertEquals($query, $log->queries[0]['query'] ?? null);
+	}
+
+	public function testErrorLoggingFromQuery() {
+		$log = (object) ['queries' => []];
+		$db = $this->getDB();
+		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity, PDOException $e) use ($log) {
+			$log->queries[] = ['query' => $query, 'durection' => $duration, 'exception' => $e];
+		}));
+		$query = 'SELECT COUNT(*) FROM test1_';
+		try {
+			$db->query($query)->fetchColumn(0);
+		} catch (PDOException $e) {}
+		self::assertEquals($query, $log->queries[0]['query'] ?? null);
+		self::assertContains('SQLSTATE[42S02]', ($log->queries[0]['exception'] ?? null)->getMessage());
+	}
+
+	public function testInfoLoggingFromExec() {
+		$log = (object) ['queries' => []];
+		$db = $this->getDB();
+		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration) use ($log) {
+			$log->queries[] = ['query' => $query, 'durection' => $duration];
+		}));
+		$query = 'SET @foo = 1';
+		$db->exec($query);
+		self::assertEquals($query, $log->queries[0]['query'] ?? null);
+	}
+
+	public function testErrorLoggingFromExec() {
+		$log = (object) ['queries' => []];
+		$db = $this->getDB();
+		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity, PDOException $e) use ($log) {
+			$log->queries[] = ['query' => $query, 'durection' => $duration, 'exception' => $e];
+		}));
+		$query = 'UPDATE x SET y=1';
+		try {
+			$db->exec($query);
+		} catch (PDOException $e) {}
+		self::assertEquals($query, $log->queries[0]['query'] ?? null);
+		self::assertContains('SQLSTATE[42S02]', ($log->queries[0]['exception'] ?? null)->getMessage());
+	}
+
+	public function testInfoLoggingFromGetTableFields() {
+		$log = (object) ['queries' => []];
+		$db = $this->getDB();
+		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration) use ($log) {
+			$log->queries[] = ['query' => $query, 'durection' => $duration];
+		}));
+		$query = 'DESCRIBE test1';
+		$db->getTableFields('test1');
+		self::assertEquals($query, $log->queries[0]['query'] ?? null);
+	}
+
+	public function testErrorLoggingFromGetTableFields() {
+		$log = (object) ['queries' => []];
+		$db = $this->getDB();
+		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity, PDOException $e) use ($log) {
+			$log->queries[] = ['query' => $query, 'durection' => $duration, 'exception' => $e];
+		}));
+		$query = 'DESCRIBE test1_';
+		try {
+			$db->getTableFields('test1_');
+		} catch (PDOException $e) {}
+		self::assertEquals($query, $log->queries[0]['query'] ?? null);
+		self::assertContains('SQLSTATE[42S02]', ($log->queries[0]['exception'] ?? null)->getMessage());
 	}
 }

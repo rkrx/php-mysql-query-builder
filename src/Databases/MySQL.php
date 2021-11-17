@@ -93,8 +93,10 @@ class MySQL implements Database {
 	 * @return QueryStatement
 	 */
 	public function query(string $query) {
-		return $this->buildQueryStatement($query, function ($query) {
-			return $this->pdo->query($query);
+		return $this->getQueryLoggers()->logRegion($query, function() use ($query) {
+			return $this->buildQueryStatement($query, function ($query) {
+				return $this->pdo->query($query);
+			});
 		});
 	}
 
@@ -114,14 +116,16 @@ class MySQL implements Database {
 	 * @return int
 	 */
 	public function exec(string $query, array $params = []): int {
-		return $this->exceptionHandler(function () use ($query, $params) {
-			$stmt = $this->pdo->prepare($query);
-			$timer = microtime(true);
-			$stmt->execute($params);
-			$this->queryLoggers->log($query, microtime(true) - $timer);
-			$result = $stmt->rowCount();
-			$stmt->closeCursor();
-			return $result;
+		return $this->getQueryLoggers()->logRegion($query, function() use ($query, $params) {
+			return $this->exceptionHandler(function () use ($query, $params) {
+				$stmt = $this->pdo->prepare($query);
+				$timer = microtime(true);
+				$stmt->execute($params);
+				$this->queryLoggers->log($query, microtime(true) - $timer);
+				$result = $stmt->rowCount();
+				$stmt->closeCursor();
+				return $result;
+			});
 		});
 	}
 
@@ -138,18 +142,28 @@ class MySQL implements Database {
 	 * @return array<int, string>
 	 */
 	public function getTableFields(string $table): array {
-		$table = $this->select()->aliasReplacer()->replace($table);
-		if(array_key_exists($table, $this->tableFields)) {
-			return $this->tableFields[$table];
+		$fqTable = $this->select()->aliasReplacer()->replace($table);
+		if(array_key_exists($fqTable, $this->tableFields)) {
+			return $this->tableFields[$fqTable];
 		}
-		$stmt = $this->pdo->query("DESCRIBE {$table}");
-		if($stmt === false) {
-			throw new RuntimeException('Invalid return type');
-		}
-		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-		$this->tableFields[$table] = array_map(static function ($row) { return $row['Field']; }, $rows ?: []);
-		$stmt->closeCursor();
-		return $this->tableFields[$table];
+		$query = "DESCRIBE {$fqTable}";
+		return $this->getQueryLoggers()->logRegion($query, function() use ($query, $fqTable) {
+			return $this->exceptionHandler(function () use ($query, $fqTable) {
+				$stmt = $this->pdo->query($query);
+				try {
+					if($stmt === false) {
+						throw new RuntimeException('Invalid return type');
+					}
+					$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+					$this->tableFields[$fqTable] = array_map(static function ($row) { return $row['Field']; }, $rows ?: []);
+					return $this->tableFields[$fqTable];
+				} finally {
+					try {
+						$stmt->closeCursor();
+					} catch (Throwable $e) {}
+				}
+			});
+		});
 	}
 
 	/**
@@ -351,15 +365,15 @@ class MySQL implements Database {
 	}
 
 	/**
-	 * @param callable $fn
-	 * @return mixed
+	 * @template T
+	 * @param callable(): T $fn
+	 * @return T
 	 */
 	private function exceptionHandler(callable $fn) {
 		try {
 			return $fn();
-		} catch (PDOException $e) {
-			$this->exceptionInterpreter->throwMoreConcreteException($e);
+		} catch (PDOException $exception) {
+			throw $this->exceptionInterpreter->getMoreConcreteException($exception);
 		}
-		return null;
 	}
 }

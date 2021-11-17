@@ -1,23 +1,30 @@
 <?php
 namespace Kir\MySQL\QueryLogger;
 
+use Throwable;
+
 class ClosureQueryLogger implements QueryLogger {
-	/** @var callable */
+	/** @var callable(string, float, string, Throwable|null): void */
 	private $fn;
 
 	/**
-	 * @param callable $fn
+	 * @param callable(string, float, string, Throwable|null): void $fn
 	 */
 	public function __construct(callable $fn) {
 		$this->fn = $fn;
 	}
 
 	/**
-	 * @param string $query
-	 * @param float $duration Duration in seconds
-	 * @return void
+	 * @inheritDoc
 	 */
 	public function log(string $query, float $duration): void {
-		call_user_func($this->fn, $query, $duration);
+		call_user_func($this->fn, $query, $duration, 'INFO', null);
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function logError(string $query, Throwable $exception, float $duration): void {
+		call_user_func($this->fn, $query, $duration, 'ERROR', $exception);
 	}
 }
