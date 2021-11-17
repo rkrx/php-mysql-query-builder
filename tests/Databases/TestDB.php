@@ -45,9 +45,10 @@ class TestDB extends MySQL {
 
 	public function getPDO(): PDO {
 		if($this->pdo === null) {
-			$this->pdo = new PDO('mysql:host=localhost;charset=utf8', 'root', null, [
-				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-			]);
+			$dsn = $_ENV['DB_DNS'] ?? 'mysql:host=localhost;charset=utf8';
+			$user = $_ENV['DB_USER'] ?? 'root';
+			$pass = $_ENV['DB_PASS'] ?? null;
+			$this->pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 		}
 		return $this->pdo;
 	}
