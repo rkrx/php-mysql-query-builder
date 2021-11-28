@@ -12,6 +12,7 @@ use Kir\MySQL\Databases\MySQL;
 use PDO;
 use stdClass;
 use Throwable;
+use Traversable;
 
 /**
  */
@@ -236,9 +237,9 @@ class MySQLRunnableSelect extends MySQLSelect implements RunnableSelect {
 	}
 
 	/**
-	 * @return Generator<int, array<string, mixed>>
+	 * @return Traversable<int, array<string, mixed>>
 	 */
-	public function getIterator() {
+	public function getIterator(): Traversable {
 		yield from $this->fetchRowsLazy();
 	}
 
