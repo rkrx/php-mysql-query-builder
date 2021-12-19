@@ -87,18 +87,4 @@ class DBExprFilter implements OptionalExpression {
 		}
 		return $keyPath;
 	}
-
-	/**
-	 * @param array<string, mixed> $array
-	 * @return bool
-	 */
-	private function isValidArray(array $array): bool {
-		$data = array_filter($array, function ($value) {
-			if(is_array($value)) {
-				return $this->isValidArray($value);
-			}
-			return (string) $value !== '';
-		});
-		return count($data) > 0;
-	}
 }

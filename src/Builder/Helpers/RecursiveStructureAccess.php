@@ -24,7 +24,7 @@ class RecursiveStructureAccess {
 	public static function recursiveGet($structure, $path, $default) {
 		$arrayPath = self::getArrayPath($path);
 		$data = self::ensureArrayIsArray($structure);
-		$count = count($arrayPath ?? []);
+		$count = count($arrayPath);
 		if (!$count) {
 			return $default;
 		}

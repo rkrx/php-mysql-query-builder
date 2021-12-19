@@ -61,6 +61,7 @@ class MySQLTest extends DBTestCase {
 				self::assertEquals(101, $this->getDB()->query('SELECT field1 FROM test1 WHERE id=1')->fetchColumn(0));
 			}
 		});
+		// @phpstan-ignore-next-line - "Unreachable statement - code above always terminates."
 		self::assertEquals(100, $this->getDB()->query('SELECT field1 FROM test1 WHERE id=1')->fetchColumn(0));
 	}
 
@@ -166,7 +167,7 @@ class MySQLTest extends DBTestCase {
 		self::assertEquals('1', $value);
 	}
 
-	public function testInfoLoggingFromQuery() {
+	public function testInfoLoggingFromQuery(): void {
 		$log = (object) ['queries' => []];
 		$db = $this->getDB();
 		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity) use ($log) {
@@ -177,10 +178,10 @@ class MySQLTest extends DBTestCase {
 		self::assertEquals($query, $log->queries[0]['query'] ?? null);
 	}
 
-	public function testErrorLoggingFromQuery() {
+	public function testErrorLoggingFromQuery(): void {
 		$log = (object) ['queries' => []];
 		$db = $this->getDB();
-		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity, PDOException $e) use ($log) {
+		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity, ?PDOException $e) use ($log) {
 			$log->queries[] = ['query' => $query, 'durection' => $duration, 'exception' => $e];
 		}));
 		$query = 'SELECT COUNT(*) FROM test1_';
@@ -188,10 +189,10 @@ class MySQLTest extends DBTestCase {
 			$db->query($query)->fetchColumn(0);
 		} catch (PDOException $e) {}
 		self::assertEquals($query, $log->queries[0]['query'] ?? null);
-		self::assertContains('SQLSTATE[42S02]', ($log->queries[0]['exception'] ?? null)->getMessage());
+		self::assertStringContainsString('SQLSTATE[42S02]', ($log->queries[0]['exception'] ?? null)->getMessage());
 	}
 
-	public function testInfoLoggingFromExec() {
+	public function testInfoLoggingFromExec(): void {
 		$log = (object) ['queries' => []];
 		$db = $this->getDB();
 		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration) use ($log) {
@@ -202,10 +203,10 @@ class MySQLTest extends DBTestCase {
 		self::assertEquals($query, $log->queries[0]['query'] ?? null);
 	}
 
-	public function testErrorLoggingFromExec() {
+	public function testErrorLoggingFromExec(): void {
 		$log = (object) ['queries' => []];
 		$db = $this->getDB();
-		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity, PDOException $e) use ($log) {
+		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity, ?PDOException $e) use ($log) {
 			$log->queries[] = ['query' => $query, 'durection' => $duration, 'exception' => $e];
 		}));
 		$query = 'UPDATE x SET y=1';
@@ -213,10 +214,10 @@ class MySQLTest extends DBTestCase {
 			$db->exec($query);
 		} catch (PDOException $e) {}
 		self::assertEquals($query, $log->queries[0]['query'] ?? null);
-		self::assertContains('SQLSTATE[42S02]', ($log->queries[0]['exception'] ?? null)->getMessage());
+		self::assertStringContainsString('SQLSTATE[42S02]', ($log->queries[0]['exception'] ?? null)->getMessage());
 	}
 
-	public function testInfoLoggingFromGetTableFields() {
+	public function testInfoLoggingFromGetTableFields(): void {
 		$log = (object) ['queries' => []];
 		$db = $this->getDB();
 		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration) use ($log) {
@@ -227,10 +228,10 @@ class MySQLTest extends DBTestCase {
 		self::assertEquals($query, $log->queries[0]['query'] ?? null);
 	}
 
-	public function testErrorLoggingFromGetTableFields() {
+	public function testErrorLoggingFromGetTableFields(): void {
 		$log = (object) ['queries' => []];
 		$db = $this->getDB();
-		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity, PDOException $e) use ($log) {
+		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity, ?PDOException $e) use ($log) {
 			$log->queries[] = ['query' => $query, 'durection' => $duration, 'exception' => $e];
 		}));
 		$query = 'DESCRIBE test1_';
@@ -238,6 +239,6 @@ class MySQLTest extends DBTestCase {
 			$db->getTableFields('test1_');
 		} catch (PDOException $e) {}
 		self::assertEquals($query, $log->queries[0]['query'] ?? null);
-		self::assertContains('SQLSTATE[42S02]', ($log->queries[0]['exception'] ?? null)->getMessage());
+		self::assertStringContainsString('SQLSTATE[42S02]', ($log->queries[0]['exception'] ?? null)->getMessage());
 	}
 }

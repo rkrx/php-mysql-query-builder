@@ -313,6 +313,7 @@ class MySQL implements Database {
 				$this->transactionCommit();
 				return $result;
 			} catch (Throwable $e) {
+				// @phpstan-ignore-next-line; If condition is always false as it is not.
 				if($this->pdo->inTransaction()) {
 					$this->transactionRollback();
 				}
