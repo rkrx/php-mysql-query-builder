@@ -1,17 +1,17 @@
 <?php
 namespace Kir\MySQL\Databases;
 
+use DateTimeZone;
 use Kir\MySQL\Builder;
 use Kir\MySQL\Builder\DBExpr;
 use Kir\MySQL\Builder\QueryStatement;
 use Kir\MySQL\Builder\Select;
 use Kir\MySQL\Database;
 use Kir\MySQL\Databases\MySQL\MySQLExceptionInterpreter;
-use Kir\MySQL\Databases\MySQL\MySQLExpressionQuoter;
 use Kir\MySQL\Databases\MySQL\MySQLFieldQuoter;
 use Kir\MySQL\Databases\MySQL\MySQLRunnableSelect;
 use Kir\MySQL\Databases\MySQL\MySQLUUIDGenerator;
-use Kir\MySQL\Databases\MySQL\MySQLValueQuoter;
+use Kir\MySQL\Databases\MySQL\MySQLQuoter;
 use Kir\MySQL\QueryLogger\QueryLoggers;
 use Kir\MySQL\Tools\AliasRegistry;
 use Kir\MySQL\Tools\VirtualTables;
@@ -42,6 +42,8 @@ class MySQL implements Database {
 	private $exceptionInterpreter;
 	/** @var array<string, mixed> */
 	private $options;
+	/** @var MySQLQuoter */
+	private $quoter;
 
 	/**
 	 * @param PDO $pdo
@@ -62,6 +64,11 @@ class MySQL implements Database {
 			'delete-options' => [],
 		];
 		$this->options = array_merge($defaultOptions, $options);
+		$this->options['timezone'] = $this->options['timezone'] ?? date_default_timezone_get();
+		if(!($this->options['timezone'] instanceof DateTimeZone)) {
+			$this->options['timezone'] = new DateTimeZone((string) $this->options['timezone']);
+		}
+		$this->quoter = new MySQLQuoter($pdo, $this->options['timezone']);
 	}
 
 	/**
@@ -172,7 +179,7 @@ class MySQL implements Database {
 	 * @return string
 	 */
 	public function quoteExpression(string $expression, array $arguments = []): string {
-		return MySQLExpressionQuoter::quoteExpression($this->pdo, $expression, $arguments);
+		return $this->quoter->quoteExpression($expression, $arguments);
 	}
 
 	/**
@@ -180,7 +187,7 @@ class MySQL implements Database {
 	 * @return string
 	 */
 	public function quote($value): string {
-		return MySQLValueQuoter::quote($this->pdo, $value);
+		return $this->quoter->quote($value);
 	}
 
 	/**
