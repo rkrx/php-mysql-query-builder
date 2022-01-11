@@ -230,6 +230,7 @@ class SelectTest extends DBTestCase {
 		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nORDER BY\n\ta DESC\n", $str);
 		self::assertEquals([['a', 'DESC']], $select->getOrderBy());
 		$select->resetOrderBy();
+		$str = $select->asString();
 		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\n", $str);
 		self::assertEquals([], $select->getOrderBy());
 	}
