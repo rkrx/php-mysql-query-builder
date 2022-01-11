@@ -40,6 +40,25 @@ trait OrderByBuilder {
 	}
 
 	/**
+	 * @param string $fieldName
+	 * @param array<int, int|float|string> $values
+	 * @return
+	 */
+	public function getOrderBy() {
+		return $this->orderBy;
+	}
+
+	/**
+	 * Removed all order information from the current layer. This dies not affect sub-selects.
+	 *
+	 * @return $this
+	 */
+	public function resetOrderBy() {
+		$this->orderBy = [];
+		return $this;
+	}
+
+	/**
 	 * @param string $query
 	 * @return string
 	 */

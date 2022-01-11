@@ -222,12 +222,16 @@ class SelectTest extends DBTestCase {
 	}
 
 	public function testOrder(): void {
-		$str = $this->select()
+		$select = $this->select()
 		->field('a')
 		->from('t', 'test')
-		->orderBy('a', 'DESC')
-		->asString();
+		->orderBy('a', 'DESC');
+		$str = $select->asString();
 		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nORDER BY\n\ta DESC\n", $str);
+		self::assertEquals([['a', 'DESC']], $select->getOrderBy());
+		$select->resetOrderBy();
+		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\n", $str);
+		self::assertEquals([], $select->getOrderBy());
 	}
 
 	public function testGroup(): void {
