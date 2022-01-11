@@ -117,9 +117,9 @@ class SelectTest extends DBTestCase {
 		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
-		->where((object) ['field1' => 1, 'field2' => 'aaa', 'field3' => null])
+		->where((object) ['field1' => 1, 't.field2' => 'aaa', '`t`.`field3`' => null])
 		->asString();
-		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(`field1`=1)\n\tAND\n\t(`field2`='aaa')\n\tAND\n\t(ISNULL(`field3`))\n", $str);
+		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(`field1`=1)\n\tAND\n\t(`t`.`field2`='aaa')\n\tAND\n\t(ISNULL(`t`.`field3`))\n", $str);
 	}
 
 	public function testWhereAsEmptyObject(): void {
@@ -135,9 +135,9 @@ class SelectTest extends DBTestCase {
 		$str = $this->select()
 		->field('a')
 		->from('t', 'test')
-		->where(['field1' => 1, 'field2' => 'aaa', 'field3' => null])
+		->where(['field1' => 1, 't.field2' => 'aaa', '`t`.`field3`' => null])
 		->asString();
-		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(`field1`=1)\n\tAND\n\t(`field2`='aaa')\n\tAND\n\t(ISNULL(`field3`))\n", $str);
+		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(`field1`=1)\n\tAND\n\t(`t`.`field2`='aaa')\n\tAND\n\t(ISNULL(`t`.`field3`))\n", $str);
 	}
 
 	public function testWhereAsEmptyArray(): void {

@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Builder\Internal;
 
+use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Database;
 use Kir\MySQL\Builder;
 
@@ -21,10 +22,11 @@ final class ConditionBuilder {
 		foreach($conditions as [$expression, $arguments]) {
 			if(is_array($expression)) {
 				foreach($expression as $key => $value) {
+					$key = self::formatKey($key);
 					if($value === null) {
-						$arr = self::buildCondition($arr, "ISNULL(`{$key}`)", [$value], $db);
+						$arr = self::buildCondition($arr, "ISNULL({$key})", [$value], $db);
 					} else {
-						$arr = self::buildCondition($arr, "`{$key}`=?", [$value], $db);
+						$arr = self::buildCondition($arr, "{$key}=?", [$value], $db);
 					}
 				}
 			} else {
@@ -46,5 +48,21 @@ final class ConditionBuilder {
 		$expr = $db->quoteExpression($expression, $arguments);
 		$conditions[] = "\t({$expr})";
 		return $conditions;
+	}
+
+	/**
+	 * @param string $key
+	 * @return string
+	 */
+	private static function formatKey(string $key): string {
+		if(strpos($key, '`') !== false || strpos($key, '(') !== false) {
+			return $key;
+		}
+		$keyParts = explode('.', $key);
+		$fn = static function (string $part) {
+			return "`{$part}`";
+		};
+		$enclosedKeyParts = array_map($fn, $keyParts);
+		return implode('.', $enclosedKeyParts);
 	}
 }
