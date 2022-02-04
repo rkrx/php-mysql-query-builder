@@ -31,10 +31,5 @@
 	"scripts": {
 		"phpunit": "phpunit -c tests.xml",
 		"phpstan": "phpstan analyse -c phpstan.neon"
-	},
-	"config": {
-		"platform": {
-			"php": "7.1.10"
-		}
 	}
 }

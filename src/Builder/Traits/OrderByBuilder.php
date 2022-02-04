@@ -40,9 +40,7 @@ trait OrderByBuilder {
 	}
 
 	/**
-	 * @param string $fieldName
-	 * @param array<int, int|float|string> $values
-	 * @return
+	 * @return array<int, array{string, string}>
 	 */
 	public function getOrderBy() {
 		return $this->orderBy;
