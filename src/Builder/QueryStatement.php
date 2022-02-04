@@ -82,12 +82,10 @@ class QueryStatement implements DatabaseStatement {
 	 */
 	public function fetchAll($fetchStyle = PDO::FETCH_ASSOC, $fetchArgument = null, array $ctorArgs = []): array {
 		$result = $this->exceptionHandler(function() use ($fetchStyle, $fetchArgument, $ctorArgs) {
-			return $this->queryLoggers->logRegion($this->query, function () use ($fetchStyle, $fetchArgument, $ctorArgs) {
-				if($fetchArgument !== null) {
-					return $this->statement->fetchAll($fetchStyle, $fetchArgument, ...$ctorArgs);
-				}
-				return $this->statement->fetchAll($fetchStyle);
-			});
+			if($fetchArgument !== null) {
+				return $this->statement->fetchAll($fetchStyle, $fetchArgument, ...$ctorArgs);
+			}
+			return $this->statement->fetchAll($fetchStyle);
 		});
 		if(is_bool($result)) {
 			return [];
@@ -103,9 +101,7 @@ class QueryStatement implements DatabaseStatement {
 	 */
 	public function fetch($fetchStyle = PDO::FETCH_ASSOC, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0) {
 		return $this->exceptionHandler(function() use ($fetchStyle, $cursorOrientation, $cursorOffset) {
-			return $this->queryLoggers->logRegion($this->query, function () use ($fetchStyle, $cursorOrientation, $cursorOffset) {
-				return $this->statement->fetch($fetchStyle, $cursorOrientation, $cursorOffset);
-			});
+			return $this->statement->fetch($fetchStyle, $cursorOrientation, $cursorOffset);
 		});
 	}
 
@@ -115,9 +111,7 @@ class QueryStatement implements DatabaseStatement {
 	 */
 	public function fetchColumn($columnNo = 0) {
 		return $this->exceptionHandler(function() use ($columnNo) {
-			return $this->queryLoggers->logRegion($this->query, function () use ($columnNo) {
-				return $this->statement->fetchColumn($columnNo);
-			});
+			return $this->statement->fetchColumn($columnNo);
 		});
 	}
 
