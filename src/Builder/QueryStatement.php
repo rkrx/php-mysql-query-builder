@@ -81,13 +81,14 @@ class QueryStatement implements DatabaseStatement {
 	 * @return array<mixed, mixed>
 	 */
 	public function fetchAll($fetchStyle = PDO::FETCH_ASSOC, $fetchArgument = null, array $ctorArgs = []): array {
-		$result = $this->exceptionHandler(function() use ($fetchStyle, $fetchArgument, $ctorArgs) {
+		$result = $x = $this->exceptionHandler(function() use ($fetchStyle, $fetchArgument, $ctorArgs) {
 			if($fetchArgument !== null) {
 				return $this->statement->fetchAll($fetchStyle, $fetchArgument, ...$ctorArgs);
 			}
 			return $this->statement->fetchAll($fetchStyle);
 		});
-		if(is_bool($result)) {
+		/** @var array<mixed, mixed>|false $x */
+		if($x === false) {
 			return [];
 		}
 		return $result;
