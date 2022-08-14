@@ -16,7 +16,7 @@ use Traversable;
 
 /**
  */
-class MySQLRunnableSelect extends MySQLSelect implements RunnableSelect {
+class MySQLRunnableSelect extends MySQLSelect {
 	/** @var array<string, mixed> */
 	private $values = [];
 	/** @var bool */
@@ -66,6 +66,13 @@ class MySQLRunnableSelect extends MySQLSelect implements RunnableSelect {
 	public function setPreserveTypes(bool $preserveTypes = true) {
 		$this->preserveTypes = $preserveTypes;
 		return $this;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function fetchIndexedRows($callback = null): array {
+		return $this->fetchAll($callback, PDO::FETCH_NUM);
 	}
 
 	/**
@@ -244,10 +251,12 @@ class MySQLRunnableSelect extends MySQLSelect implements RunnableSelect {
 	}
 
 	/**
-	 * @param null|callable(array<string, mixed>): (array<string, mixed>|DBIgnoreRow|null|void) $callback
+	 * @template TFnParamType of array<string, null|scalar>
+	 * @template TFnReturnType of array<string, null|scalar>
+	 * @param null|callable(TFnParamType): (TFnReturnType|DBIgnoreRow|null|void) $callback
 	 * @param int $mode
 	 * @param mixed $arg0
-	 * @return array<string, mixed>[]
+	 * @return ($callback is null ? array<int, ($mode is PDO::FETCH_NUM ? array<int, null|scalar> : array<string, null|scalar>)> : array<int, TFnReturnType|TFnParamType>)
 	 */
 	private function fetchAll($callback = null, int $mode = 0, $arg0 = null) {
 		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0) {
@@ -280,12 +289,12 @@ class MySQLRunnableSelect extends MySQLSelect implements RunnableSelect {
 	/**
 	 * @template T
 	 * @template U
-	 * @param callable(T): U $callback
+	 * @param null|callable(T): U $callback
 	 * @param int $mode
 	 * @param mixed $arg0
-	 * @return Generator<int, T|U>
+	 * @return ($callback is null ? Generator<int, T> : Generator<int, U>)
 	 */
-	private function fetchLazy($callback, int $mode = PDO::FETCH_ASSOC, $arg0 = null): Generator {
+	private function fetchLazy($callback = null, int $mode = PDO::FETCH_ASSOC, $arg0 = null): Generator {
 		$statement = $this->createStatement();
 		$statement->setFetchMode($mode, $arg0);
 		try {

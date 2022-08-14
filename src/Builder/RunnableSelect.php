@@ -41,20 +41,36 @@ interface RunnableSelect extends Select, IteratorAggregate {
 	public function setPreserveTypes(bool $preserveTypes = true);
 
 	/**
-	 * @param null|callable(array<string, mixed>): array<string, mixed>|callable(array<string, mixed>): void|callable(array<string, mixed>): DBIgnoreRow $callback
-	 * @return array<int, array<string, mixed>>
+	 * Fetches all rows using PDO::FETCH_NUM
+	 *
+	 * @template K of int
+	 * @template V
+	 * @param null|callable(array<string, null|scalar>): (void|DBIgnoreRow|array<K, V>) $callback
+	 * @return ($callback is null ? array<int, array<int, null|scalar>> : array<int, array<K, V>>)
+	 */
+	public function fetchIndexedRows($callback = null): array;
+
+	/**
+	 * @template K
+	 * @template V
+	 * @param null|callable(array<string, null|scalar>): (void|DBIgnoreRow|array<K, V>) $callback
+	 * @return ($callback is null ? array<int, array<string, null|scalar>> : array<int, array<K, V>>)
 	 */
 	public function fetchRows($callback = null): array;
 
 	/**
-	 * @param null|callable(array<string, mixed>): (array<mixed, mixed>|null|void) $callback
-	 * @return Generator<int, array<string, mixed>>
+	 * @template K
+	 * @template V
+	 * @param null|callable(array<string, null|scalar>): (void|DBIgnoreRow|array<K, V>) $callback
+	 * @return ($callback is null ? Generator<int, array<string, mixed>> : Generator<int, array<K, V>>)
 	 */
 	public function fetchRowsLazy($callback = null);
 
 	/**
-	 * @param null|callable(array<string, mixed>): array<string, mixed>|callable(array<string, mixed>): void|callable(array<string, mixed>): DBIgnoreRow $callback
-	 * @return array<string, mixed>
+	 * @template K
+	 * @template V
+	 * @param null|callable(array<string, mixed>): (array<K, V>|void|DBIgnoreRow) $callback
+	 * @return ($callback is null ? array<string, null|scalar> : array<K, V>)
 	 */
 	public function fetchRow($callback = null): array;
 
@@ -63,7 +79,7 @@ interface RunnableSelect extends Select, IteratorAggregate {
 	 * @template U
 	 * @param class-string<T> $className
 	 * @param null|callable(T): U $callback
-	 * @return T[]|U[]
+	 * @return ($callback is null ? array<int, T> : array<int, U>)
 	 */
 	public function fetchObjects(string $className = 'stdClass', $callback = null): array;
 
@@ -72,7 +88,7 @@ interface RunnableSelect extends Select, IteratorAggregate {
 	 * @template U
 	 * @param class-string<T> $className
 	 * @param null|callable(T): U $callback
-	 * @return Generator<int, T|U>
+	 * @return ($callback is null ? Generator<int, T> : Generator<int, U>)
 	 */
 	public function fetchObjectsLazy($className = null, $callback = null);
 
@@ -81,7 +97,7 @@ interface RunnableSelect extends Select, IteratorAggregate {
 	 * @template U
 	 * @param class-string<T> $className
 	 * @param null|callable(T): U $callback
-	 * @return T|U
+	 * @return ($callback is null ? T : U)
 	 */
 	public function fetchObject($className = null, $callback = null);
 
@@ -99,8 +115,8 @@ interface RunnableSelect extends Select, IteratorAggregate {
 
 	/**
 	 * @template T
-	 * @param null|callable(null|bool|int|float|string): T $fn
-	 * @return array<int, T|string>
+	 * @param null|callable(null|scalar): T $fn
+	 * @return ($fn is null ? array<int, null|scalar> : array<int, T>)
 	 */
 	public function fetchArray(?callable $fn = null): array;
 
@@ -109,7 +125,7 @@ interface RunnableSelect extends Select, IteratorAggregate {
 	 * @template TCastFn
 	 * @param TDefault $default
 	 * @param null|callable(null|bool|string|int|float): TCastFn $fn
-	 * @return null|bool|string|int|float|TDefault|TCastFn
+	 * @return ($fn is null ? null|scalar|TDefault : TCastFn)
 	 */
 	public function fetchValue($default = null, ?callable $fn = null);
 
