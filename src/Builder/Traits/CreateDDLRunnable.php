@@ -9,7 +9,6 @@ use Kir\MySQL\Database\DatabaseStatement;
  */
 trait CreateDDLRunnable {
 	/**
-	 * @template T
 	 * @param DatabaseStatement $query
 	 * @param callable(scalar=): T $callbackFn
 	 * @return DDLRunnable<T>
