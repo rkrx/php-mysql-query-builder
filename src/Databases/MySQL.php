@@ -2,6 +2,7 @@
 namespace Kir\MySQL\Databases;
 
 use DateTimeZone;
+use JetBrains\PhpStorm\Language;
 use Kir\MySQL\Builder;
 use Kir\MySQL\Builder\DBExpr;
 use Kir\MySQL\Builder\QueryStatement;
@@ -99,7 +100,10 @@ class MySQL implements Database {
 	 * @param string $query
 	 * @return QueryStatement
 	 */
-	public function query(string $query) {
+	public function query(
+		#[Language('MySQL')]
+		string $query
+	) {
 		return $this->getQueryLoggers()->logRegion($query, function() use ($query) {
 			return $this->buildQueryStatement($query, function ($query) {
 				return $this->pdo->query($query);
@@ -111,7 +115,10 @@ class MySQL implements Database {
 	 * @param string $query
 	 * @return QueryStatement
 	 */
-	public function prepare(string $query) {
+	public function prepare(
+		#[Language('MySQL')]
+		string $query
+	) {
 		return $this->buildQueryStatement((string) $query, function ($query) {
 			return $this->pdo->prepare($query);
 		});
@@ -119,10 +126,14 @@ class MySQL implements Database {
 
 	/**
 	 * @param string $query
-	 * @param array<string, mixed> $params
+	 * @param array<string, null|scalar|Stringable|array<null|scalar>> $params
 	 * @return int
 	 */
-	public function exec(string $query, array $params = []): int {
+	public function exec(
+		#[Language('MySQL')]
+		string $query,
+		array $params = []
+	): int {
 		return $this->getQueryLoggers()->logRegion($query, function() use ($query, $params) {
 			return $this->exceptionHandler(function () use ($query, $params) {
 				$stmt = $this->pdo->prepare($query);

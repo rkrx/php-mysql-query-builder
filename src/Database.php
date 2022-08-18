@@ -1,10 +1,12 @@
 <?php
 namespace Kir\MySQL;
 
+use JetBrains\PhpStorm\Language;
 use Kir\MySQL\Builder\QueryStatement;
 use Kir\MySQL\Database\DatabaseStatement;
 use Kir\MySQL\Tools\AliasRegistry;
 use Kir\MySQL\Tools\VirtualTables;
+use Stringable;
 
 interface Database {
 	/**
@@ -21,20 +23,30 @@ interface Database {
 	 * @param string $query
 	 * @return DatabaseStatement
 	 */
-	public function query(string $query);
+	public function query(
+		#[Language('MySQL')]
+		string $query
+	);
 
 	/**
 	 * @param string $query
 	 * @return QueryStatement
 	 */
-	public function prepare(string $query);
+	public function prepare(
+		#[Language('MySQL')]
+		string $query
+	);
 
 	/**
 	 * @param string $query
-	 * @param array<string, mixed> $params
+	 * @param array<string, null|scalar|Stringable|array<null|scalar>> $params
 	 * @return int
 	 */
-	public function exec(string $query, array $params = []): int;
+	public function exec(
+		#[Language('MySQL')]
+		string $query,
+		array $params = []
+	): int;
 
 	/**
 	 * @param string|null $name
