@@ -2,7 +2,7 @@
 
 namespace Kir\MySQL\Builder;
 
-use Kir\MySQL\Builder;
+use DateTimeInterface;
 use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Builder\Expr\OrderBySpecification;
 use Kir\MySQL\Builder\Value\OptionalValue;
@@ -95,14 +95,14 @@ interface Select {
 
 	/**
 	 * @param string|array<string, mixed>|object|OptionalExpression $expression
-	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select ...$args
+	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select|DateTimeInterface ...$args
 	 * @return $this
 	 */
 	public function where($expression, ...$args);
 
 	/**
 	 * @param string|array<string, mixed>|object|OptionalExpression $expression
-	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select ...$args
+	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select|DateTimeInterface ...$args
 	 * @return $this
 	 */
 	public function having($expression, ...$args);

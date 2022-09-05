@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
+use DateTimeInterface;
 use Kir\MySQL\Builder\DBExpr;
 use Kir\MySQL\Builder\Select;
 use Kir\MySQL\Builder\Expr\OptionalExpression;
@@ -15,7 +16,7 @@ trait WhereBuilder {
 
 	/**
 	 * @param string|array<string, mixed>|object|OptionalExpression $expression
-	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select ...$args
+	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select|DateTimeInterface ...$args
 	 * @return $this
 	 */
 	public function where($expression, ...$args) {
