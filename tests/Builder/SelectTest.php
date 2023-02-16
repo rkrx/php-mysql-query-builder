@@ -37,7 +37,7 @@ class SelectTest extends DBTestCase {
 		->from('a', [['a' => 1, 'b' => 3], ['a' => 2, 'b' => 2], ['a' => 3, 'b' => 1]])
 		->joinInner('b', [['a' => 1, 'b' => 3], ['a' => 2, 'b' => 2], ['a' => 3, 'b' => 1]])
 		->asString();
-		self::assertEquals("SELECT\n\ta.a,\n\tb.b\nFROM\n\t(SELECT 1 AS `a`, 3 AS `b`\n\tUNION\n\tSELECT 2 AS `a`, 2 AS `b`\n\tUNION\n\tSELECT 3 AS `a`, 1 AS `b`) a\nINNER JOIN\n\t(SELECT 1 AS `a`, 3 AS `b`\n\tUNION\n\tSELECT 2 AS `a`, 2 AS `b`\n\tUNION\n\tSELECT 3 AS `a`, 1 AS `b`) b\n", $str);
+		self::assertEquals("SELECT\n\ta.a,\n\tb.b\nFROM\n\t(SELECT 1 AS `a`, 3 AS `b`\n\tUNION ALL\n\tSELECT 2 AS `a`, 2 AS `b`\n\tUNION ALL\n\tSELECT 3 AS `a`, 1 AS `b`) a\nINNER JOIN\n\t(SELECT 1 AS `a`, 3 AS `b`\n\tUNION ALL\n\tSELECT 2 AS `a`, 2 AS `b`\n\tUNION ALL\n\tSELECT 3 AS `a`, 1 AS `b`) b\n", $str);
 	}
 
 	public function testMultipleFrom(): void {
@@ -553,6 +553,6 @@ class SelectTest extends DBTestCase {
 		->from('a', range(1, 9))
 		->asString();
 
-		self::assertEquals("SELECT\n\ta.value\nFROM\n\t(SELECT 1 AS `value`\n\tUNION\n\tSELECT 2 AS `value`\n\tUNION\n\tSELECT 3 AS `value`\n\tUNION\n\tSELECT 4 AS `value`\n\tUNION\n\tSELECT 5 AS `value`\n\tUNION\n\tSELECT 6 AS `value`\n\tUNION\n\tSELECT 7 AS `value`\n\tUNION\n\tSELECT 8 AS `value`\n\tUNION\n\tSELECT 9 AS `value`) a\n", $vt1);
+		self::assertEquals("SELECT\n\ta.value\nFROM\n\t(SELECT 1 AS `value`\n\tUNION ALL\n\tSELECT 2 AS `value`\n\tUNION ALL\n\tSELECT 3 AS `value`\n\tUNION ALL\n\tSELECT 4 AS `value`\n\tUNION ALL\n\tSELECT 5 AS `value`\n\tUNION ALL\n\tSELECT 6 AS `value`\n\tUNION ALL\n\tSELECT 7 AS `value`\n\tUNION ALL\n\tSELECT 8 AS `value`\n\tUNION ALL\n\tSELECT 9 AS `value`) a\n", $vt1);
 	}
 }

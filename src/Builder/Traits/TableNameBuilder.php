@@ -34,7 +34,7 @@ trait TableNameBuilder {
 					$parts[] = sprintf("SELECT %s", implode(', ', $values));
 				}
 			}
-			$name = '(' . implode("\n\tUNION\n\t", $parts) . ')';
+			$name = '(' . implode("\n\tUNION ALL\n\t", $parts) . ')';
 		}
 		if((is_string($name) || $name instanceof VirtualTable) && $this->db()->getVirtualTables()->has($name)) {
 			$select = (string) $this->db()->getVirtualTables()->get($name);
