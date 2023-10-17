@@ -175,6 +175,7 @@ class MySQLTest extends DBTestCase {
 		}));
 		$query = 'SELECT COUNT(*) FROM test1';
 		$db->query($query)->fetchColumn(0);
+		// @phpstan-ignore-next-line
 		self::assertEquals($query, $log->queries[0]['query'] ?? null);
 	}
 
@@ -188,7 +189,9 @@ class MySQLTest extends DBTestCase {
 		try {
 			$db->query($query)->fetchColumn(0);
 		} catch (PDOException $e) {}
+		// @phpstan-ignore-next-line
 		self::assertEquals($query, $log->queries[0]['query'] ?? null);
+		// @phpstan-ignore-next-line
 		self::assertStringContainsString('SQLSTATE[42S02]', ($log->queries[0]['exception'] ?? null)->getMessage());
 	}
 
@@ -200,6 +203,7 @@ class MySQLTest extends DBTestCase {
 		}));
 		$query = 'SET @foo = 1';
 		$db->exec($query);
+		// @phpstan-ignore-next-line
 		self::assertEquals($query, $log->queries[0]['query'] ?? null);
 	}
 
@@ -213,7 +217,9 @@ class MySQLTest extends DBTestCase {
 		try {
 			$db->exec($query);
 		} catch (PDOException $e) {}
+		// @phpstan-ignore-next-line
 		self::assertEquals($query, $log->queries[0]['query'] ?? null);
+		// @phpstan-ignore-next-line
 		self::assertStringContainsString('SQLSTATE[42S02]', ($log->queries[0]['exception'] ?? null)->getMessage());
 	}
 
@@ -225,6 +231,7 @@ class MySQLTest extends DBTestCase {
 		}));
 		$query = 'DESCRIBE test1';
 		$db->getTableFields('test1');
+		// @phpstan-ignore-next-line
 		self::assertEquals($query, $log->queries[0]['query'] ?? null);
 	}
 
@@ -238,7 +245,9 @@ class MySQLTest extends DBTestCase {
 		try {
 			$db->getTableFields('test1_');
 		} catch (PDOException $e) {}
+		// @phpstan-ignore-next-line
 		self::assertEquals($query, $log->queries[0]['query'] ?? null);
+		// @phpstan-ignore-next-line
 		self::assertStringContainsString('SQLSTATE[42S02]', ($log->queries[0]['exception'] ?? null)->getMessage());
 	}
 }

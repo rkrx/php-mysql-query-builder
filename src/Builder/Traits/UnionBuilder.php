@@ -2,7 +2,6 @@
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Builder\Select;
-use Kir\MySQL\Databases\MySQL\MySQLSelect;
 
 trait UnionBuilder {
 	use AbstractDB;

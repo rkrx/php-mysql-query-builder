@@ -1,8 +1,8 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
-use Kir\MySQL\Builder\Select;
 use Kir\MySQL\Builder\DBExpr;
+use Kir\MySQL\Builder\Select;
 use Kir\MySQL\Tools\VirtualTable;
 
 trait JoinBuilder {

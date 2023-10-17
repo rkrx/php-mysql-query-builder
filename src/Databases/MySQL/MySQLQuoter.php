@@ -6,7 +6,6 @@ use DateTimeZone;
 use Kir\MySQL\Builder\DBExpr;
 use Kir\MySQL\Builder\Select;
 use PDO;
-use phpDocumentor\Reflection\Types\Scalar;
 
 class MySQLQuoter {
 	/** @var PDO */
@@ -20,7 +19,7 @@ class MySQLQuoter {
 	}
 
 	/**
-	 * @param null|bool|int|float|string|array<int, null|scalar>|DBExpr|Select|DateTimeInterface $value
+	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select|DateTimeInterface $value
 	 * @return string
 	 */
 	public function quote($value): string {

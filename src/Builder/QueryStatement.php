@@ -1,13 +1,13 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Kir\MySQL\Database\DatabaseStatement;
 use Kir\MySQL\Databases\MySQL\MySQLExceptionInterpreter;
 use Kir\MySQL\Exceptions\SqlException;
+use Kir\MySQL\QueryLogger\QueryLoggers;
 use PDO;
 use PDOException;
 use PDOStatement;
-use Kir\MySQL\Database\DatabaseStatement;
-use Kir\MySQL\QueryLogger\QueryLoggers;
 
 class QueryStatement implements DatabaseStatement {
 	/** @var PDOStatement<mixed> */

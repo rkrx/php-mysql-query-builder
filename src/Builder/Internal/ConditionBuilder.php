@@ -1,9 +1,9 @@
 <?php
 namespace Kir\MySQL\Builder\Internal;
 
+use Kir\MySQL\Builder;
 use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Database;
-use Kir\MySQL\Builder;
 
 final class ConditionBuilder {
 	/**

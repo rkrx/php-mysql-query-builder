@@ -9,12 +9,12 @@ use Kir\MySQL\Database\DatabaseStatement;
 class DDLRunnable {
 	/** @var DatabaseStatement */
 	private $query;
-	/** @var null|callable(): T */
+	/** @var null|callable(scalar=): T */
 	private $callbackFn;
 
 	/**
 	 * @param DatabaseStatement $query
-	 * @param null|callable(): T $callbackFn
+	 * @param null|callable(scalar=): T $callbackFn
 	 */
 	public function __construct(DatabaseStatement $query, ?callable $callbackFn = null) {
 		$this->query = $query;

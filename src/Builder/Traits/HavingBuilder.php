@@ -3,10 +3,10 @@ namespace Kir\MySQL\Builder\Traits;
 
 use DateTimeInterface;
 use Kir\MySQL\Builder\DBExpr;
-use Kir\MySQL\Builder\Select;
 use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Builder\Helpers\ConditionAddHelper;
 use Kir\MySQL\Builder\Internal\ConditionBuilder;
+use Kir\MySQL\Builder\Select;
 
 trait HavingBuilder {
 	use AbstractDB;

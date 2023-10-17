@@ -7,7 +7,6 @@ use Kir\MySQL\Builder\Helpers\DBIgnoreRow;
 use Kir\MySQL\Builder\Helpers\FieldTypeProvider;
 use Kir\MySQL\Builder\Helpers\FieldValueConverter;
 use Kir\MySQL\Builder\QueryStatement;
-use Kir\MySQL\Builder\RunnableSelect;
 use Kir\MySQL\Databases\MySQL;
 use PDO;
 use stdClass;

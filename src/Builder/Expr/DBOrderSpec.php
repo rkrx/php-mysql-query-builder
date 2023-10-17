@@ -2,8 +2,6 @@
 
 namespace Kir\MySQL\Builder\Expr;
 
-use RuntimeException;
-
 /**
  * Defines fields that are sortable. Sortable fields have an alias.
  * The alias can be passed as a sort specifier - along with the direction in which to sort.

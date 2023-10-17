@@ -10,17 +10,17 @@ use Kir\MySQL\Builder\Select;
 use Kir\MySQL\Database;
 use Kir\MySQL\Databases\MySQL\MySQLExceptionInterpreter;
 use Kir\MySQL\Databases\MySQL\MySQLFieldQuoter;
+use Kir\MySQL\Databases\MySQL\MySQLQuoter;
 use Kir\MySQL\Databases\MySQL\MySQLRunnableSelect;
 use Kir\MySQL\Databases\MySQL\MySQLUUIDGenerator;
-use Kir\MySQL\Databases\MySQL\MySQLQuoter;
 use Kir\MySQL\QueryLogger\QueryLoggers;
 use Kir\MySQL\Tools\AliasRegistry;
 use Kir\MySQL\Tools\VirtualTables;
 use PDO;
 use PDOException;
 use RuntimeException;
+use Stringable;
 use Throwable;
-use phpDocumentor\Reflection\Types\Scalar;
 
 /**
  */

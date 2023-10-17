@@ -2,12 +2,12 @@
 namespace Kir\MySQL\Databases\MySQL;
 
 use Kir\MySQL\Exceptions\DatabaseHasGoneAwayException;
+use Kir\MySQL\Exceptions\DuplicateUniqueKeyException;
 use Kir\MySQL\Exceptions\IntegrityConstraintViolationException;
+use Kir\MySQL\Exceptions\LockWaitTimeoutExceededException;
+use Kir\MySQL\Exceptions\SqlDeadLockException;
 use Kir\MySQL\Exceptions\SqlException;
 use PDOException;
-use Kir\MySQL\Exceptions\SqlDeadLockException;
-use Kir\MySQL\Exceptions\DuplicateUniqueKeyException;
-use Kir\MySQL\Exceptions\LockWaitTimeoutExceededException;
 
 class MySQLExceptionInterpreter {
 	/**

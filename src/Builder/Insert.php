@@ -1,7 +1,7 @@
 <?php
 namespace Kir\MySQL\Builder;
 
-use Kir\MySQL\Databases\MySQL\MySQLSelect;
+use DateTimeInterface;
 use Kir\MySQL\Tools\AliasReplacer;
 use RuntimeException;
 use Traversable;
@@ -54,7 +54,7 @@ abstract class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $field
-	 * @param null|bool|int|float|string $value
+	 * @param null|bool|int|float|string|DateTimeInterface $value
 	 * @return $this
 	 */
 	public function add(string $field, $value) {
@@ -64,7 +64,7 @@ abstract class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $field
-	 * @param null|bool|int|float|string $value
+	 * @param null|bool|int|float|string|DateTimeInterface $value
 	 * @return $this
 	 */
 	public function update(string $field, $value) {
@@ -74,7 +74,7 @@ abstract class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $field
-	 * @param null|bool|int|float|string $value
+	 * @param null|bool|int|float|string|DateTimeInterface $value
 	 * @return $this
 	 */
 	public function addOrUpdate(string $field, $value) {
@@ -128,7 +128,7 @@ abstract class Insert extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @param array<string, mixed> $data
+	 * @param array<string, null|bool|int|float|string|DateTimeInterface> $data
 	 * @param array<int, string>|null $mask
 	 * @param array<int, string>|null $excludeFields
 	 * @return $this
@@ -141,7 +141,7 @@ abstract class Insert extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @param array<string, mixed> $data
+	 * @param array<string, null|bool|int|float|string|DateTimeInterface> $data
 	 * @param array<int, string>|null $mask
 	 * @param array<int, string>|null $excludeFields
 	 * @return $this
@@ -156,7 +156,7 @@ abstract class Insert extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @param array<string, mixed> $data
+	 * @param array<string, null|bool|int|float|string|DateTimeInterface> $data
 	 * @param array<int, string>|null $mask
 	 * @param array<int, string>|null $excludeFields
 	 * @return $this

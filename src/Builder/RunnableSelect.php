@@ -3,8 +3,8 @@ namespace Kir\MySQL\Builder;
 
 use Generator;
 use IteratorAggregate;
-use Kir\MySQL\Tools\AliasReplacer;
 use Kir\MySQL\Builder\Helpers\DBIgnoreRow;
+use Kir\MySQL\Tools\AliasReplacer;
 use Traversable;
 
 /**
