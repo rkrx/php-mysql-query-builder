@@ -101,9 +101,7 @@ class QueryStatement implements DatabaseStatement {
 	 * @return mixed
 	 */
 	public function fetch($fetchStyle = PDO::FETCH_ASSOC, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0) {
-		return $this->exceptionHandler(function() use ($fetchStyle, $cursorOrientation, $cursorOffset) {
-			return $this->statement->fetch($fetchStyle, $cursorOrientation, $cursorOffset);
-		});
+		return $this->exceptionHandler(fn() => $this->statement->fetch($fetchStyle, $cursorOrientation, $cursorOffset));
 	}
 
 	/**
@@ -111,27 +109,21 @@ class QueryStatement implements DatabaseStatement {
 	 * @return mixed
 	 */
 	public function fetchColumn($columnNo = 0) {
-		return $this->exceptionHandler(function() use ($columnNo) {
-			return $this->statement->fetchColumn($columnNo);
-		});
+		return $this->exceptionHandler(fn() => $this->statement->fetchColumn($columnNo));
 	}
 
 	/**
 	 * @return bool
 	 */
 	public function closeCursor(): bool {
-		return $this->exceptionHandler(function() {
-			return $this->statement->closeCursor();
-		});
+		return $this->exceptionHandler(fn() => $this->statement->closeCursor());
 	}
 
 	/**
 	 * @return int
 	 */
 	public function columnCount(): int {
-		return $this->exceptionHandler(function() {
-			return $this->statement->columnCount();
-		});
+		return $this->exceptionHandler(fn() => $this->statement->columnCount());
 	}
 
 	/**

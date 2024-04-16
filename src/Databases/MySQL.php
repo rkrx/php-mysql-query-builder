@@ -104,11 +104,11 @@ class MySQL implements Database {
 		#[Language('MySQL')]
 		string $query
 	) {
-		return $this->getQueryLoggers()->logRegion($query, function() use ($query) {
-			return $this->buildQueryStatement($query, function ($query) {
-				return $this->pdo->query($query);
-			});
-		});
+		return $this->getQueryLoggers()->logRegion($query, fn() =>
+			$this->buildQueryStatement($query, fn($query) =>
+				$this->pdo->query($query)
+			)
+		);
 	}
 
 	/**
@@ -119,9 +119,9 @@ class MySQL implements Database {
 		#[Language('MySQL')]
 		string $query
 	) {
-		return $this->buildQueryStatement((string) $query, function ($query) {
-			return $this->pdo->prepare($query);
-		});
+		return $this->buildQueryStatement((string) $query, fn($query) =>
+			$this->pdo->prepare($query)
+		);
 	}
 
 	/**
@@ -134,8 +134,8 @@ class MySQL implements Database {
 		string $query,
 		array $params = []
 	): int {
-		return $this->getQueryLoggers()->logRegion($query, function() use ($query, $params) {
-			return $this->exceptionHandler(function () use ($query, $params) {
+		return $this->getQueryLoggers()->logRegion($query, fn() =>
+			$this->exceptionHandler(function () use ($query, $params) {
 				$stmt = $this->pdo->prepare($query);
 				$timer = microtime(true);
 				$stmt->execute($params);
@@ -143,8 +143,8 @@ class MySQL implements Database {
 				$result = $stmt->rowCount();
 				$stmt->closeCursor();
 				return $result;
-			});
-		});
+			})
+		);
 	}
 
 	/**
@@ -165,23 +165,23 @@ class MySQL implements Database {
 			return $this->tableFields[$fqTable];
 		}
 		$query = "DESCRIBE {$fqTable}";
-		return $this->getQueryLoggers()->logRegion($query, function() use ($query, $fqTable) {
-			return $this->exceptionHandler(function () use ($query, $fqTable) {
+		return $this->getQueryLoggers()->logRegion($query, fn() =>
+			$this->exceptionHandler(function () use ($query, $fqTable) {
 				$stmt = $this->pdo->query($query);
 				try {
 					if($stmt === false) {
 						throw new RuntimeException('Invalid return type');
 					}
 					$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-					$this->tableFields[$fqTable] = array_map(static function ($row) { return $row['Field']; }, $rows ?: []);
+					$this->tableFields[$fqTable] = array_map(static fn($row) => $row['Field'], $rows ?: []);
 					return $this->tableFields[$fqTable];
 				} finally {
 					try {
 						$stmt->closeCursor();
 					} catch (Throwable $e) {}
 				}
-			});
-		});
+			})
+		);
 	}
 
 	/**

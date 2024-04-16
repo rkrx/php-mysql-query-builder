@@ -31,9 +31,7 @@ class DBExprFilter implements OptionalExpression {
 		$this->value = RecursiveStructureAccess::recursiveGet($data, $this->keyPath, null);
 		$this->hasValue = is_scalar($this->value) ? trim((string) $this->value) !== '' : !empty($this->value);
 		if($validator === null) {
-			$validator = function() {
-				return true;
-			};
+			$validator = static fn() => true;
 		}
 		$this->validator = $validator;
 		if($validationResultHandler === null) {

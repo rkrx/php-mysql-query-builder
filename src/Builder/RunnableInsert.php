@@ -42,8 +42,9 @@ class RunnableInsert extends Insert implements DDLPreparable {
 	 * @return DDLRunnable<int>
 	 */
 	public function prepare(): DDLRunnable {
-		return $this->createPreparable($this->db()->prepare($this), function() {
-			return (int) $this->db()->getLastInsertId();
-		});
+		return $this->createPreparable(
+			$this->db()->prepare($this),
+			fn() => (int) $this->db()->getLastInsertId()
+		);
 	}
 }

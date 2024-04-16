@@ -20,7 +20,7 @@ trait HavingBuilder {
 	 * @return $this
 	 */
 	public function having($expression, ...$args) {
-		$fn = function ($expression, $args) { $this->having[] = [$expression, $args]; };
+		$fn = fn($expression, $args) => $this->having[] = [$expression, $args];
 		ConditionAddHelper::addCondition($fn, $expression, $args);
 		return $this;
 	}

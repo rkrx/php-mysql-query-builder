@@ -26,13 +26,7 @@ class RunnableDelete extends Delete implements DDLPreparable {
 	public function prepare(): DDLRunnable {
 		return $this->createPreparable(
 			$this->db()->prepare($this),
-			/**
-			 * @param scalar $v
-			 * @return int
-			 */
-			function ($v) {
-				return (int) $v;
-			}
+			fn($v) => (int) $v
 		);
 	}
 }

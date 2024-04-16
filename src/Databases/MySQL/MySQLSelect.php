@@ -61,7 +61,7 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 			$expression = rtrim($expression, ';');
 			$expression = trim($expression);
 			$lines = explode("\n", $expression);
-			$lines = array_map(static function($line) { return "\t\t{$line}"; }, $lines);
+			$lines = array_map(static fn($line) => "\t\t{$line}", $lines);
 			$expression = implode("\n", $lines);
 			$expression = sprintf("(\n%s\n\t)", $expression);
 		}

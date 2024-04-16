@@ -85,7 +85,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 * @inheritDoc
 	 */
 	public function fetchRowsLazy($callback = null) {
-		$callback = $callback ?? (static function ($row) { return $row; });
+		$callback ??= static fn($row) => $row;
 		yield from $this->fetchLazy($callback, PDO::FETCH_ASSOC);
 	}
 
@@ -93,10 +93,11 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 * @inheritDoc
 	 */
 	public function fetchRow($callback = null): array {
-		$callback = $callback ?? (static function ($row) { return $row; });
-		return $this->fetch($callback, PDO::FETCH_ASSOC, null, static function ($row) {
-			return ['valid' => is_array($row), 'default' => []];
-		});
+		$callback ??= static fn($row) => $row;
+		return $this->fetch($callback, PDO::FETCH_ASSOC, null, static fn($row) => [
+			'valid' => is_array($row),
+			'default' => []
+		]);
 	}
 
 	/**
@@ -107,7 +108,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 			$data = $statement->fetchAll(PDO::FETCH_CLASS, $className);
 			if($this->preserveTypes) {
 				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
-				$data = array_map(static function ($row) use ($columnDefinitions) { return FieldValueConverter::convertValues($row, $columnDefinitions); }, $data);
+				$data = array_map(static fn($row) => FieldValueConverter::convertValues($row, $columnDefinitions), $data);
 			}
 			if($callback !== null) {
 				return call_user_func(static function ($resultData = []) use ($data, $callback) {
@@ -130,7 +131,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 * @inheritDoc
 	 */
 	public function fetchObjectsLazy($className = null, $callback = null) {
-		$callback = $callback ?? (static function ($row) { return $row; });
+		$callback ??= static fn($row) => $row;
 		yield from $this->fetchLazy($callback, PDO::FETCH_CLASS, $className ?: $this->defaultClassName);
 	}
 
@@ -138,10 +139,11 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 * @inheritDoc
 	 */
 	public function fetchObject($className = null, $callback = null) {
-		$callback = $callback ?? (static function ($row) { return $row; });
-		return $this->fetch($callback, PDO::FETCH_CLASS, $className ?: $this->defaultClassName, static function ($row) {
-			return ['valid' => is_object($row), 'default' => null];
-		});
+		$callback ??= static fn($row) => $row;
+		return $this->fetch($callback, PDO::FETCH_CLASS, $className ?: $this->defaultClassName, static fn($row) => [
+			'valid' => is_object($row),
+			'default' => null
+		]);
 	}
 
 	/**
@@ -263,7 +265,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 			$data = $statement->fetchAll();
 			if($this->preserveTypes) {
 				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
-				$data = array_map(static function ($row) use ($columnDefinitions) { return FieldValueConverter::convertValues($row, $columnDefinitions); }, $data);
+				$data = array_map(static fn($row) => FieldValueConverter::convertValues($row, $columnDefinitions), $data);
 			}
 			if($callback !== null) {
 				return call_user_func(static function ($resultData = []) use ($data, $callback) {

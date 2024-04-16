@@ -59,9 +59,7 @@ final class ConditionBuilder {
 			return $key;
 		}
 		$keyParts = explode('.', $key);
-		$fn = static function (string $part) {
-			return "`{$part}`";
-		};
+		$fn = static fn(string $part) => "`{$part}`";
 		$enclosedKeyParts = array_map($fn, $keyParts);
 		return implode('.', $enclosedKeyParts);
 	}

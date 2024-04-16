@@ -20,7 +20,7 @@ trait WhereBuilder {
 	 * @return $this
 	 */
 	public function where($expression, ...$args) {
-		$fn = function ($expression, $args) { $this->where[] = [$expression, $args]; };
+		$fn = fn($expression, $args) => $this->where[] = [$expression, $args];
 		ConditionAddHelper::addCondition($fn, $expression, $args);
 		return $this;
 	}

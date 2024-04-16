@@ -17,7 +17,7 @@ trait TableNameBuilder {
 		if(is_object($name) && !($name instanceof VirtualTable) && method_exists($name, '__toString')) {
 			$name = (string) $name;
 			$lines = explode("\n", $name);
-			$lines = array_map(static function (string $line) { return "\t{$line}"; }, $lines);
+			$lines = array_map(static fn(string $line) => "\t{$line}", $lines);
 			$name = implode("\n", $lines);
 			$name = '(' . trim(rtrim(trim($name), ';')) . ')';
 		}
