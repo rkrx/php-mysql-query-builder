@@ -10,7 +10,7 @@ class TestSelect extends MySQLRunnableSelect {
 	 * @param MySQL|null $db
 	 * @return TestSelect
 	 */
-	public static function create(MySQL $db = null): TestSelect {
+	public static function create(?MySQL $db = null): TestSelect {
 		if($db === null) {
 			$db = new TestDB();
 		}

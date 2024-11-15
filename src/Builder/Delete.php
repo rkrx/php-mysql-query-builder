@@ -19,16 +19,16 @@ abstract class Delete extends Statement {
 	use OffsetBuilder;
 
 	/** @var string[] */
-	private $aliases = [];
+	private array $aliases = [];
 
 	/**
 	 * Name der Tabelle
 	 *
 	 * @param string $alias
-	 * @param string|Select $table
+	 * @param null|string|Select $table
 	 * @return $this
 	 */
-	public function from(string $alias, $table = null) {
+	public function from(string $alias, null|string|Select $table = null) {
 		if($table !== null) {
 			$this->aliases[] = $alias;
 		}
@@ -49,7 +49,7 @@ abstract class Delete extends Statement {
 	 * @return string
 	 */
 	public function __toString(): string {
-		$query = "DELETE ";
+		$query = 'DELETE ';
 		$query .= implode(', ', $this->aliases);
 		$query = trim($query) . " FROM\n";
 		$query = $this->buildTables($query);

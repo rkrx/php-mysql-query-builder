@@ -330,7 +330,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 * @param Closure|null $resultValidator
 	 * @return T|U|array<string, mixed>
 	 */
-	private function fetch($callback, int $mode = PDO::FETCH_ASSOC, $arg0 = null, Closure $resultValidator = null) {
+	private function fetch($callback, int $mode = PDO::FETCH_ASSOC, $arg0 = null, ?Closure $resultValidator = null) {
 		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0, $resultValidator) {
 			$statement->setFetchMode($mode, $arg0);
 			$row = $statement->fetch();
