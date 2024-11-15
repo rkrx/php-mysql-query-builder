@@ -1,4 +1,4 @@
-mysql query builder (php 7.1+)
+mysql query builder (php 8.0+)
 ==============================
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/rkrx/php-mysql-query-builder/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/rkrx/php-mysql-query-builder/?branch=master)
