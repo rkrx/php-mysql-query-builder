@@ -1,6 +1,10 @@
-# The SELECT Statement
+# SQL and PHP Query Builder Conversion Guide
 
-## FROM Clause
+This guide is designed to help AI systems translate SQL queries into PHP Query Builder syntax and vice versa, covering essential SQL clauses and concepts.
+
+## The SELECT Statement
+
+### FROM Clause
 
 Consider the following SQL statement:
 
@@ -16,7 +20,7 @@ $db->select()
 	->from('p', 'products');
 ```
 
-### Using an Alias in the FROM Clause:
+#### Using an Alias in the FROM Clause:
 
 There are generally two ways to write this. In the syntax with two parameters, the first parameter is always the alias, and the second parameter is always the table name:
 
@@ -30,7 +34,7 @@ This is equivalent to
 /* ... */ ->from('p', 'products');
 ```
 
-### Using the FROM Clause Without an Alias:
+#### Using the FROM Clause Without an Alias:
 
 If only one parameter is used, it will be interpreted as the table name:
 
@@ -44,7 +48,7 @@ This is equivalent to
 /* ... */ ->from('products');
 ```
 
-## Using Table Fields
+### Using Table Fields
 
 Translate table fields to match the following pattern:
 
@@ -87,9 +91,9 @@ $db->select()
 
 Here’s the enhanced document with additional sections explaining the use of LEFT JOIN, RIGHT JOIN, INNER JOIN, WHERE, HAVING, ORDER BY, LIMIT, OFFSET, and subselects in SQL, along with corresponding examples in PHP Query Builder.
 
-## JOIN Clauses
+### JOIN Clauses
 
-### INNER JOIN
+#### INNER JOIN
 
 `INNER JOIN` returns rows when there is a match in both tables. Example SQL:
 
@@ -103,7 +107,7 @@ PHP Query Builder equivalent:
 /* ... */ ->joinInner('t2', 'test2', 't2.test_id = t1.id AND t2.field1 = ?', 123)
 ```
 
-### LEFT JOIN
+#### LEFT JOIN
 
 `LEFT JOIN` returns all rows from the left table, and matched rows from the right table. If there is no match, NULL values are returned for columns from the right table.
 
@@ -119,7 +123,7 @@ PHP Query Builder equivalent:
 ->joinLeft('t3', 'test3', 't3.test_id = t1.id')
 ```
 
-### RIGHT JOIN
+#### RIGHT JOIN
 
 `RIGHT JOIN` returns all rows from the right table, and matched rows from the left table. If there is no match, NULL values are returned for columns from the left table. Example SQL:
 
@@ -133,7 +137,7 @@ PHP Query Builder equivalent:
 ->joinRight('t4', 'test4', 't4.test_id = t1.id')
 ```
 
-### Using Subselects in JOINs
+#### Using Subselects in JOINs
 
 A subselect can be used as a virtual table in joins. Here’s an example with `RIGHT JOIN`:
 
@@ -154,7 +158,7 @@ $subSelect = function ($id) use ($mysql) {
 $mysql->joinRight('t5', $subSelect(10), 't5.test_id = t1.id');
 ```
 
-## WHERE Clause
+### WHERE Clause
 
 The `WHERE` clause is used to filter records that meet certain conditions. Example SQL:
 
@@ -170,7 +174,7 @@ $mysql->where('t1.field = ?', 'value');
 
 The value can be a scalar value (including `null`) and can also be an array of values. The Query Builder will automatically translate value-arrays into an according `IN`-Clause.
 
-## HAVING Clause
+### HAVING Clause
 
 The `HAVING` clause is used to filter records after aggregation. It typically applies to grouped results. Example SQL:
 
@@ -184,7 +188,7 @@ PHP Query Builder equivalent:
 ->having('customer_count > 10')
 ```
 
-## ORDER BY Clause
+### ORDER BY Clause
 
 The ORDER BY clause is used to sort the result set by one or more columns. Example SQL:
 
@@ -199,7 +203,7 @@ PHP Query Builder equivalent:
 ->orderBy('t1.field2', 'DESC')
 ```
 
-## LIMIT Clause
+### LIMIT Clause
 
 The LIMIT clause specifies the maximum number of records to return. Example SQL:
 
@@ -213,7 +217,7 @@ PHP Query Builder equivalent:
 ->limit(100)
 ```
 
-## OFFSET Clause
+### OFFSET Clause
 
 The OFFSET clause is used in conjunction with LIMIT to skip a certain number of rows before beginning to return rows. Example SQL:
 
@@ -227,7 +231,7 @@ PHP Query Builder equivalent:
 ->offset(50)
 ```
 
-## Using Subselects
+### Using Subselects
 
 Subselects (or subqueries) are queries nested within another query, often used to retrieve data for specific conditions.
 
@@ -254,9 +258,9 @@ $select = $mysql->select()
 	->joinRight('t5', $subSelect(10), 't5.test_id = t1.id');
 ```
 
-# The INSERT Statement
+## The INSERT Statement
 
-## Basic INSERT
+### Basic INSERT
 
 Consider the following SQL statement:
 
@@ -274,7 +278,7 @@ $db->insert()
 	->run();
 ```
 
-### Using Expressions in INSERT
+#### Using Expressions in INSERT
 
 To include SQL expressions directly in the INSERT statement, use `addExpr`:
 
@@ -291,7 +295,7 @@ $db->insert()
 	->run();
 ```
 
-## UPSERT (INSERT ON DUPLICATE KEY UPDATE)
+### UPSERT (INSERT ON DUPLICATE KEY UPDATE)
 
 For scenarios where you want to insert a new row or update an existing row if a duplicate key is found, use `addOrUpdate` and `addOrUpdateExpr`:
 
@@ -311,7 +315,7 @@ $db->insert()
     ->run();
 ```
 
-### Using Expressions with Parameters in UPSERT
+#### Using Expressions with Parameters in UPSERT
 
 To use SQL functions with parameters in UPSERT scenarios, use `addOrUpdateExpr` with placeholders:
 
@@ -329,7 +333,7 @@ $db->insert()
     ->run();
 ```
 
-## UPDATE Part in UPSERT
+### UPDATE Part in UPSERT
 
 To specify assignments only in the `UPDATE` part during an UPSERT scenario, use `update` and `updateExpr`:
 
