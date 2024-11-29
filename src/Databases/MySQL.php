@@ -65,7 +65,7 @@ class MySQL implements Database {
 			'delete-options' => [],
 		];
 		$this->options = array_merge($defaultOptions, $options);
-		$this->options['timezone'] = $this->options['timezone'] ?? date_default_timezone_get();
+		$this->options['timezone'] ??= date_default_timezone_get();
 		if(!($this->options['timezone'] instanceof DateTimeZone)) {
 			$this->options['timezone'] = new DateTimeZone((string) $this->options['timezone']);
 		}

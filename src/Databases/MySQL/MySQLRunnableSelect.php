@@ -17,13 +17,10 @@ use Traversable;
  */
 class MySQLRunnableSelect extends MySQLSelect {
 	/** @var array<string, mixed> */
-	private $values = [];
-	/** @var bool */
-	private $preserveTypes;
-	/** @var string */
-	private $defaultClassName;
-	/** @var int */
-	private $foundRows = 0;
+	private array $values = [];
+	private bool $preserveTypes;
+	private string $defaultClassName;
+	private int $foundRows = 0;
 
 	/**
 	 * @param MySQL $db
@@ -245,19 +242,18 @@ class MySQLRunnableSelect extends MySQLSelect {
 	}
 
 	/**
-	 * @return Traversable<int, array<string, mixed>>
+	 * @return Traversable<int, array<string, bool|float|int|string|null>>
 	 */
 	public function getIterator(): Traversable {
 		yield from $this->fetchRowsLazy();
 	}
 
 	/**
-	 * @template TFnParamType of array<string, null|scalar>
 	 * @template TFnReturnType of array<string, null|scalar>
-	 * @param null|callable(TFnParamType): (TFnReturnType|DBIgnoreRow|null|void) $callback
+	 * @param null|(callable(array<string, null|scalar>): (TFnReturnType|DBIgnoreRow|null|void)) $callback
 	 * @param int $mode
 	 * @param mixed $arg0
-	 * @return ($callback is null ? array<int, ($mode is PDO::FETCH_NUM ? array<int, null|scalar> : array<string, null|scalar>)> : array<int, TFnReturnType|TFnParamType>)
+	 * @return ($callback is null ? array<int, ($mode is PDO::FETCH_NUM ? array<int, null|scalar> : array<string, null|scalar>)> : array<int, TFnReturnType>)
 	 */
 	private function fetchAll($callback = null, int $mode = 0, $arg0 = null) {
 		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0) {
@@ -283,7 +279,6 @@ class MySQLRunnableSelect extends MySQLSelect {
 					return $resultData;
 				});
 			}
-			return $data;
 		});
 	}
 

@@ -8,6 +8,7 @@
 !/.travis.yml
 !/.scrutinizer.yml
 !/composer.json
+!/INSTRUCTIONS.md
 !/phpstan.neon
 !/README.md
 !/rector.php

@@ -5,6 +5,7 @@ use Kir\MySQL\Builder\SelectTest\TestSelect;
 use Kir\MySQL\Common\DBTestCase;
 use Kir\MySQL\QueryLogger\ClosureQueryLogger;
 use PDOException;
+use Throwable;
 use RuntimeException;
 
 class MySQLTest extends DBTestCase {
@@ -182,7 +183,7 @@ class MySQLTest extends DBTestCase {
 	public function testErrorLoggingFromQuery(): void {
 		$log = (object) ['queries' => []];
 		$db = $this->getDB();
-		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity, ?PDOException $e) use ($log) {
+		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity, ?Throwable $e) use ($log) {
 			$log->queries[] = ['query' => $query, 'durection' => $duration, 'exception' => $e];
 		}));
 		$query = 'SELECT COUNT(*) FROM test1_';
@@ -210,7 +211,7 @@ class MySQLTest extends DBTestCase {
 	public function testErrorLoggingFromExec(): void {
 		$log = (object) ['queries' => []];
 		$db = $this->getDB();
-		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity, ?PDOException $e) use ($log) {
+		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity, ?Throwable $e) use ($log) {
 			$log->queries[] = ['query' => $query, 'durection' => $duration, 'exception' => $e];
 		}));
 		$query = 'UPDATE x SET y=1';
@@ -238,7 +239,7 @@ class MySQLTest extends DBTestCase {
 	public function testErrorLoggingFromGetTableFields(): void {
 		$log = (object) ['queries' => []];
 		$db = $this->getDB();
-		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity, ?PDOException $e) use ($log) {
+		$db->getQueryLoggers()->add(new ClosureQueryLogger(function (string $query, float $duration, string $severity, ?Throwable $e) use ($log) {
 			$log->queries[] = ['query' => $query, 'durection' => $duration, 'exception' => $e];
 		}));
 		$query = 'DESCRIBE test1_';

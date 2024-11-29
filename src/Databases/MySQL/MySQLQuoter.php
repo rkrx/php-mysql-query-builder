@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Databases\MySQL;
 
+use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use Kir\MySQL\Builder\DBExpr;
@@ -8,15 +9,10 @@ use Kir\MySQL\Builder\Select;
 use PDO;
 
 class MySQLQuoter {
-	/** @var PDO */
-	private $pdo;
-	/** @var DateTimeZone */
-	private $timeZone;
-
-	public function __construct(PDO $pdo, DateTimeZone $timeZone) {
-		$this->timeZone = $timeZone;
-		$this->pdo = $pdo;
-	}
+	public function __construct(
+		private PDO $pdo,
+		private DateTimeZone $timeZone
+	) {}
 
 	/**
 	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select|DateTimeInterface $value
@@ -48,7 +44,7 @@ class MySQLQuoter {
 		}
 
 		if($value instanceof DateTimeInterface) {
-			$value = date_create_immutable($value->format('c'))->setTimezone($this->timeZone)->format('Y-m-d H:i:s');
+			$value = (new DateTimeImmutable($value->format('c')))->setTimezone($this->timeZone)->format('Y-m-d H:i:s');
 		}
 
 		return $this->pdo->quote($value);

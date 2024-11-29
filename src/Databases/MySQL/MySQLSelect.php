@@ -32,13 +32,10 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 	use UnionBuilder;
 
 	/** @var array<int|string, string> */
-	private $fields = [];
-	/** @var bool */
-	private $calcFoundRows = false;
-	/** @var bool */
-	private $forUpdate = false;
-	/** @var bool */
-	private $distinct = false;
+	private array $fields = [];
+	private bool $calcFoundRows = false;
+	private bool $forUpdate = false;
+	private bool $distinct = false;
 
 	/**
 	 * @param bool $distinct
