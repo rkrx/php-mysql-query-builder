@@ -18,6 +18,7 @@ use Kir\MySQL\Tools\AliasRegistry;
 use Kir\MySQL\Tools\VirtualTables;
 use PDO;
 use PDOException;
+use PDOStatement;
 use RuntimeException;
 use Stringable;
 use Throwable;
@@ -149,10 +150,14 @@ class MySQL implements Database {
 
 	/**
 	 * @param string|null $name
-	 * @return string
+	 * @return string|null
 	 */
-	public function getLastInsertId(?string $name = null): string {
-		return $this->pdo->lastInsertId();
+	public function getLastInsertId(?string $name = null): ?string {
+		$result = $this->pdo->lastInsertId();
+		if($result === false) {
+			return null;
+		}
+		return $result;
 	}
 
 	/**
@@ -177,7 +182,9 @@ class MySQL implements Database {
 					return $this->tableFields[$fqTable];
 				} finally {
 					try {
-						$stmt->closeCursor();
+						if($stmt instanceof PDOStatement) {
+							$stmt->closeCursor();
+						}
 					} catch (Throwable $e) {}
 				}
 			})
@@ -213,7 +220,7 @@ class MySQL implements Database {
 	 * @param array<string|int, string>|null $fields
 	 * @return MySQLRunnableSelect
 	 */
-	public function select(array $fields = null): Builder\RunnableSelect {
+	public function select(?array $fields = null): Builder\RunnableSelect {
 		$select = array_key_exists('select-factory', $this->options)
 			? call_user_func($this->options['select-factory'], $this, $this->options['select-options'])
 			: new MySQL\MySQLRunnableSelect($this, $this->options['select-options']);
@@ -227,7 +234,7 @@ class MySQL implements Database {
 	 * @param null|array<string|int, string> $fields
 	 * @return Builder\RunnableInsert
 	 */
-	public function insert(array $fields = null): Builder\RunnableInsert {
+	public function insert(?array $fields = null): Builder\RunnableInsert {
 		$insert = array_key_exists('insert-factory', $this->options)
 			? call_user_func($this->options['insert-factory'], $this, $this->options['insert-options'])
 			: new Builder\RunnableInsert($this, $this->options['insert-options']);
@@ -241,7 +248,7 @@ class MySQL implements Database {
 	 * @param array<string|int, string>|null $fields
 	 * @return Builder\RunnableUpdate
 	 */
-	public function update(array $fields = null): Builder\RunnableUpdate {
+	public function update(?array $fields = null): Builder\RunnableUpdate {
 		$update = array_key_exists('update-factory', $this->options)
 			? call_user_func($this->options['update-factory'], $this, $this->options['update-options'])
 			: new Builder\RunnableUpdate($this, $this->options['update-options']);
@@ -331,7 +338,6 @@ class MySQL implements Database {
 				$this->transactionCommit();
 				return $result;
 			} catch (Throwable $e) {
-				// @phpstan-ignore-next-line; If condition is always false as it is not.
 				if($this->pdo->inTransaction()) {
 					$this->transactionRollback();
 				}

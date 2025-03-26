@@ -21,7 +21,7 @@ abstract class Update extends InsertUpdateStatement {
 	use OffsetBuilder;
 
 	/** @var mixed[] */
-	private $fields = [];
+	private array $fields = [];
 
 	/**
 	 * @param string $alias
@@ -77,7 +77,7 @@ abstract class Update extends InsertUpdateStatement {
 	 * @param array<int, string>|null $allowedFields
 	 * @return $this
 	 */
-	public function setAll(array $data, array $allowedFields = null): self {
+	public function setAll(array $data, ?array $allowedFields = null): self {
 		if($allowedFields !== null) {
 			foreach($data as $fieldName => $value) {
 				if(in_array($fieldName, $allowedFields)) {

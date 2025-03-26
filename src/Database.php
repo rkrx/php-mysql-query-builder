@@ -50,9 +50,9 @@ interface Database {
 
 	/**
 	 * @param string|null $name
-	 * @return string
+	 * @return string|null
 	 */
-	public function getLastInsertId(?string $name = null): string;
+	public function getLastInsertId(?string $name = null): ?string;
 
 	/**
 	 * @param string $table

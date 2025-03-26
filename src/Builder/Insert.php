@@ -133,7 +133,7 @@ abstract class Insert extends InsertUpdateStatement {
 	 * @param array<int, string>|null $excludeFields
 	 * @return $this
 	 */
-	public function addAll(array $data, array $mask = null, array $excludeFields = null) {
+	public function addAll(array $data, ?array $mask = null, ?array $excludeFields = null) {
 		$this->addAllTo($data, $mask, $excludeFields, function ($field, $value) {
 			$this->add($field, $value);
 		});
@@ -146,7 +146,7 @@ abstract class Insert extends InsertUpdateStatement {
 	 * @param array<int, string>|null $excludeFields
 	 * @return $this
 	 */
-	public function updateAll(array $data, array $mask = null, array $excludeFields = null) {
+	public function updateAll(array $data, ?array $mask = null, ?array $excludeFields = null) {
 		$this->addAllTo($data, $mask, $excludeFields, function ($field, $value) {
 			if($field !== $this->keyField) {
 				$this->update($field, $value);
@@ -161,7 +161,7 @@ abstract class Insert extends InsertUpdateStatement {
 	 * @param array<int, string>|null $excludeFields
 	 * @return $this
 	 */
-	public function addOrUpdateAll(array $data, array $mask = null, array $excludeFields = null) {
+	public function addOrUpdateAll(array $data, ?array $mask = null, ?array $excludeFields = null) {
 		$this->addAll($data, $mask, $excludeFields);
 		$this->updateAll($data, $mask, $excludeFields);
 		return $this;
@@ -177,10 +177,10 @@ abstract class Insert extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @param array<int, array<string, mixed>>|Traversable<int, array<string, mixed>> $rows
+	 * @param iterable<int, array<string, mixed>>|Traversable<int, array<string, mixed>> $rows
 	 * @return int[] Insert IDs
 	 */
-	abstract public function insertRows($rows);
+	abstract public function insertRows(iterable $rows);
 
 	/**
 	 * @param array<string, mixed> $params
@@ -226,7 +226,7 @@ abstract class Insert extends InsertUpdateStatement {
 	/**
 	 * @param array<string|int, mixed> $fields
 	 * @param string $field
-	 * @param null|bool|int|float|string $value
+	 * @param null|bool|int|float|string|DateTimeInterface $value
 	 * @return array<string|int, mixed>
 	 */
 	private function addTo(array $fields, string $field, $value): array {

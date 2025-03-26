@@ -16,7 +16,7 @@ class TestInsert extends Insert {
 	/**
 	 * @inheritDoc
 	 */
-	public function insertRows($rows) {
+	public function insertRows(iterable $rows) {
 		return [];
 	}
 

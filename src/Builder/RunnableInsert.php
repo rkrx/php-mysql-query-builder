@@ -16,7 +16,7 @@ class RunnableInsert extends Insert implements DDLPreparable {
 	/**
 	 * @inheritDoc
 	 */
-	public function insertRows($rows) {
+	public function insertRows(iterable $rows) {
 		if (!is_iterable($rows)) {
 			throw new BadMethodCallException('Expected $rows to by an iterable');
 		}

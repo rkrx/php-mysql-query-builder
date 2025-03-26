@@ -3,7 +3,7 @@ namespace Kir\MySQL\Builder\Expr;
 
 class OptionalDBFilterMap {
 	/** @var array<string, mixed> */
-	private $map;
+	private array $map;
 
 	/**
 	 * @param array<string, mixed> $map
@@ -33,7 +33,7 @@ class OptionalDBFilterMap {
 	 * @param null|callable(mixed): bool $validator
 	 * @return DBExprFilter
 	 */
-	public function __invoke(string $expression, $keyPath, callable $validator = null): DBExprFilter {
+	public function __invoke(string $expression, $keyPath, ?callable $validator = null): DBExprFilter {
 		return new DBExprFilter($expression, $this->map, $keyPath, $validator);
 	}
 }
