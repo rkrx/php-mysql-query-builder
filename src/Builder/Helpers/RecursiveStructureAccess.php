@@ -7,7 +7,7 @@ use ArrayObject;
 class RecursiveStructureAccess {
 	/**
 	 * @param object|array<string, mixed> $structure
-	 * @param string|array<int, string> $path
+	 * @param string|string[] $path
 	 * @return bool
 	 */
 	public static function recursiveHas($structure, $path): bool {
@@ -17,7 +17,7 @@ class RecursiveStructureAccess {
 
 	/**
 	 * @param object|array<string, mixed> $structure
-	 * @param string|array<int, string> $path
+	 * @param string|string[] $path
 	 * @param mixed $default
 	 * @return mixed
 	 */
@@ -40,7 +40,7 @@ class RecursiveStructureAccess {
 
 	/**
 	 * @param mixed $structure
-	 * @param array<int, string> $path
+	 * @param string[] $path
 	 * @return bool
 	 */
 	private static function _recursiveHas($structure, array $path): bool {
@@ -59,8 +59,8 @@ class RecursiveStructureAccess {
 	}
 
 	/**
-	 * @param string|array<int, string> $path
-	 * @return array<int, string>
+	 * @param string|string[] $path
+	 * @return string[]
 	 */
 	private static function getArrayPath($path): array {
 		if(is_array($path)) {

@@ -249,7 +249,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 	}
 
 	/**
-	 * @template TFnReturnType of array<string, null|scalar>
+	 * @template TFnReturnType of array<int|string, mixed>
 	 * @param null|(callable(array<string, null|scalar>): (TFnReturnType|DBIgnoreRow|null|void)) $callback
 	 * @param int $mode
 	 * @param mixed $arg0
@@ -279,6 +279,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 					return $resultData;
 				});
 			}
+			return $data;
 		});
 	}
 

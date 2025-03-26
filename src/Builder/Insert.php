@@ -129,8 +129,8 @@ abstract class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param array<string, null|bool|int|float|string|DateTimeInterface> $data
-	 * @param array<int, string>|null $mask
-	 * @param array<int, string>|null $excludeFields
+	 * @param null|string[] $mask
+	 * @param null|string[] $excludeFields
 	 * @return $this
 	 */
 	public function addAll(array $data, ?array $mask = null, ?array $excludeFields = null) {
@@ -142,8 +142,8 @@ abstract class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param array<string, null|bool|int|float|string|DateTimeInterface> $data
-	 * @param array<int, string>|null $mask
-	 * @param array<int, string>|null $excludeFields
+	 * @param null|string[] $mask
+	 * @param null|string[] $excludeFields
 	 * @return $this
 	 */
 	public function updateAll(array $data, ?array $mask = null, ?array $excludeFields = null) {
@@ -157,7 +157,7 @@ abstract class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param array<string, null|bool|int|float|string|DateTimeInterface> $data
-	 * @param array<int, string>|null $mask
+	 * @param null|string[] $mask
 	 * @param array<int, string>|null $excludeFields
 	 * @return $this
 	 */

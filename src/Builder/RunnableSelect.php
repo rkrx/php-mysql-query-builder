@@ -46,7 +46,7 @@ interface RunnableSelect extends Select, IteratorAggregate {
 	 * @template K of int
 	 * @template V
 	 * @param null|callable(array<string, null|scalar>): (void|DBIgnoreRow|array<K, V>) $callback
-	 * @return ($callback is null ? array<int, array<int, null|scalar>> : array<int, array<K, V>>)
+	 * @return ($callback is null ? list<array<int, null|scalar>> : array<int, array<K, V>>)
 	 */
 	public function fetchIndexedRows($callback = null): array;
 
@@ -62,7 +62,7 @@ interface RunnableSelect extends Select, IteratorAggregate {
 	 * @template K
 	 * @template V
 	 * @param null|callable(array<string, null|scalar>): (void|DBIgnoreRow|array<K, V>) $callback
-	 * @return ($callback is null ? Generator<int, array<string, mixed>> : Generator<int, array<K, V>>)
+	 * @return ($callback is null ? Generator<int, array<string, null|scalar>> : Generator<int, array<K, V>>)
 	 */
 	public function fetchRowsLazy($callback = null);
 

@@ -38,11 +38,11 @@ final class ConditionBuilder {
 	}
 
 	/**
-	 * @param array<int, string> $conditions
+	 * @param string[] $conditions
 	 * @param string $expression
 	 * @param array<int, null|string|array<int, null|scalar>|Builder\DBExpr|Builder\Select> $arguments
 	 * @param Database $db
-	 * @return array<int, string>
+	 * @return string[]
 	 */
 	private static function buildCondition(array $conditions, string $expression, array $arguments, Database $db): array {
 		$expr = $db->quoteExpression($expression, $arguments);

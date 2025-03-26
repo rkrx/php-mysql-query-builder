@@ -6,7 +6,7 @@ use Kir\MySQL\Builder;
 trait GroupByBuilder {
 	use AbstractDB;
 
-	/** @var array<int, string> */
+	/** @var string[] */
 	private $groupBy = [];
 
 	/**
