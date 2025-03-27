@@ -1,22 +1,23 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
-use DateTimeInterface;
-use Kir\MySQL\Builder\DBExpr;
-use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Builder\Helpers\ConditionAddHelper;
 use Kir\MySQL\Builder\Internal\ConditionBuilder;
-use Kir\MySQL\Builder\Select;
+use Kir\MySQL\Builder\Internal\Types;
 
+/**
+ * @phpstan-import-type DBParameterValueType from Types
+ * @phpstan-import-type DBWhereExpressionType from Types
+ */
 trait HavingBuilder {
 	use AbstractDB;
 
-	/** @var array<int, array{string|array<string, mixed>|object|OptionalExpression, array<int, null|string|array<int, null|scalar>|DBExpr|Select>}> */
-	private $having = [];
+	/** @var array<int, array{DBWhereExpressionType, array<DBParameterValueType>}> */
+	private array $having = [];
 
 	/**
-	 * @param string|array<string, mixed>|object|OptionalExpression $expression
-	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select|DateTimeInterface ...$args
+	 * @param DBWhereExpressionType $expression
+	 * @param DBParameterValueType ...$args
 	 * @return $this
 	 */
 	public function having($expression, ...$args) {

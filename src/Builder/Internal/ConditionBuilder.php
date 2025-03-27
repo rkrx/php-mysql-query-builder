@@ -4,6 +4,7 @@ namespace Kir\MySQL\Builder\Internal;
 use Kir\MySQL\Builder;
 use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Database;
+use Stringable;
 
 final class ConditionBuilder {
 	/**
@@ -30,6 +31,7 @@ final class ConditionBuilder {
 					}
 				}
 			} else {
+				/** @var Stringable|string $expression */
 				$arr = self::buildCondition($arr, (string) $expression, $arguments, $db);
 			}
 		}
