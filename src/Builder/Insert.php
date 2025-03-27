@@ -1,25 +1,25 @@
 <?php
+
 namespace Kir\MySQL\Builder;
 
-use DateTimeInterface;
+use Kir\MySQL\Builder\Internal\Types;
 use Kir\MySQL\Tools\AliasReplacer;
 use RuntimeException;
 use Traversable;
 use UnexpectedValueException;
 
+/**
+ * @phpstan-import-type DBParameterValueType from Types
+ */
 abstract class Insert extends InsertUpdateStatement {
-	/** @var array<string|int, mixed> */
-	private $fields = [];
-	/** @var array<string|int, mixed> */
-	private $update = [];
-	/** @var string */
-	private $table;
-	/** @var string */
-	private $keyField;
-	/** @var bool */
-	private $ignore = false;
-	/** @var Select */
-	private $from;
+	/** @var array<string|int, DBParameterValueType> */
+	private array $fields = [];
+	/** @var array<string|int, DBParameterValueType> */
+	private array $update = [];
+	private ?string $table = null;
+	private ?string $keyField = null;
+	private bool $ignore = false;
+	private ?Select $from = null;
 
 	/**
 	 * @param string $table
@@ -54,7 +54,7 @@ abstract class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $field
-	 * @param null|bool|int|float|string|DateTimeInterface $value
+	 * @param DBParameterValueType $value
 	 * @return $this
 	 */
 	public function add(string $field, $value) {
@@ -64,7 +64,7 @@ abstract class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $field
-	 * @param null|bool|int|float|string|DateTimeInterface $value
+	 * @param DBParameterValueType $value
 	 * @return $this
 	 */
 	public function update(string $field, $value) {
@@ -74,7 +74,7 @@ abstract class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $field
-	 * @param null|bool|int|float|string|DateTimeInterface $value
+	 * @param DBParameterValueType $value
 	 * @return $this
 	 */
 	public function addOrUpdate(string $field, $value) {
@@ -85,7 +85,7 @@ abstract class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $str
-	 * @param mixed ...$args
+	 * @param DBParameterValueType ...$args
 	 * @return $this
 	 */
 	public function addExpr(string $str, ...$args) {
@@ -99,7 +99,7 @@ abstract class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $str
-	 * @param mixed ...$args
+	 * @param DBParameterValueType ...$args
 	 * @return $this
 	 */
 	public function updateExpr(string $str, ...$args) {
@@ -113,7 +113,7 @@ abstract class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param string $expr
-	 * @param mixed ...$args
+	 * @param DBParameterValueType ...$args
 	 * @return $this
 	 */
 	public function addOrUpdateExpr(string $expr, ...$args) {
@@ -128,7 +128,7 @@ abstract class Insert extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @param array<string, null|bool|int|float|string|DateTimeInterface> $data
+	 * @param array<string, DBParameterValueType> $data
 	 * @param null|string[] $mask
 	 * @param null|string[] $excludeFields
 	 * @return $this
@@ -141,7 +141,7 @@ abstract class Insert extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @param array<string, null|bool|int|float|string|DateTimeInterface> $data
+	 * @param array<string, DBParameterValueType> $data
 	 * @param null|string[] $mask
 	 * @param null|string[] $excludeFields
 	 * @return $this
@@ -156,7 +156,7 @@ abstract class Insert extends InsertUpdateStatement {
 	}
 
 	/**
-	 * @param array<string, null|bool|int|float|string|DateTimeInterface> $data
+	 * @param array<string, DBParameterValueType> $data
 	 * @param null|string[] $mask
 	 * @param array<int, string>|null $excludeFields
 	 * @return $this
@@ -226,7 +226,7 @@ abstract class Insert extends InsertUpdateStatement {
 	/**
 	 * @param array<string|int, mixed> $fields
 	 * @param string $field
-	 * @param null|bool|int|float|string|DateTimeInterface $value
+	 * @param DBParameterValueType $value
 	 * @return array<string|int, mixed>
 	 */
 	private function addTo(array $fields, string $field, $value): array {
@@ -241,8 +241,8 @@ abstract class Insert extends InsertUpdateStatement {
 
 	/**
 	 * @param array<string, mixed> $data
-	 * @param array<int, string>|null $mask
-	 * @param array<int, string>|null $excludeFields
+	 * @param string[]|null $mask
+	 * @param string[]|null $excludeFields
 	 * @param callable(string, mixed): void $fn
 	 */
 	private function addAllTo(array $data, ?array $mask, ?array $excludeFields, $fn): void {

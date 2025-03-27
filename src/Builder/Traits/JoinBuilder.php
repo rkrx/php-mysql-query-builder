@@ -1,22 +1,26 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
-use Kir\MySQL\Builder\DBExpr;
+use Kir\MySQL\Builder\Internal\Types;
 use Kir\MySQL\Builder\Select;
 use Kir\MySQL\Tools\VirtualTable;
 
+/**
+ * @phpstan-import-type DBParameterValueType from Types
+ * @phpstan-import-type DBTableNameType from Types
+ */
 trait JoinBuilder {
 	use AbstractDB;
 	use AbstractTableNameBuilder;
 
-	/** @var array<int, array{type: string, alias: string, name: string|array<int, array<string, mixed>>|Select|VirtualTable, expression: string|null, arguments: array<int, null|string|array<int, string>|DBExpr|Select>}> */
-	private $joinTables = [];
+	/** @var array<int, array{type: string, alias: string, name: string|array<int, array<string, mixed>>|Select|VirtualTable, expression: string|null, arguments: array<int, DBParameterValueType}> */
+	private array $joinTables = [];
 
 	/**
 	 * @param string $alias
-	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $table
+	 * @param DBTableNameType $table
 	 * @param string|null $expression
-	 * @param null|int|float|string|array<int, string>|DBExpr|Select ...$args
+	 * @param DBParameterValueType ...$args
 	 * @return $this
 	 */
 	public function joinInner(string $alias, $table, ?string $expression = null, ...$args) {
@@ -25,9 +29,9 @@ trait JoinBuilder {
 
 	/**
 	 * @param string $alias
-	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $table
+	 * @param DBTableNameType $table
 	 * @param string $expression
-	 * @param string|int|float|array<int, string>|DBExpr|Select ...$args
+	 * @param DBParameterValueType ...$args
 	 * @return $this
 	 */
 	public function joinLeft(string $alias, $table, string $expression, ...$args) {
@@ -36,9 +40,9 @@ trait JoinBuilder {
 
 	/**
 	 * @param string $alias
-	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $table
+	 * @param DBTableNameType $table
 	 * @param string $expression
-	 * @param string|int|float|array<int, string>|DBExpr|Select ...$args
+	 * @param DBParameterValueType ...$args
 	 * @return $this
 	 */
 	public function joinRight(string $alias, $table, string $expression, ...$args) {
@@ -68,9 +72,9 @@ trait JoinBuilder {
 	/**
 	 * @param string $type
 	 * @param string $alias
-	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $name
+	 * @param DBTableNameType $name
 	 * @param string|null $expression
-	 * @param array<int, mixed> $arguments
+	 * @param array<DBParameterValueType> $arguments
 	 * @return $this
 	 */
 	private function addJoin(string $type, string $alias, $name, ?string $expression = null, array $arguments = []) {

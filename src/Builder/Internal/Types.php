@@ -15,7 +15,7 @@ use Stringable;
  *
  * @phpstan-type DBParameterValueType null|scalar|Stringable|DBExpr|Select|DateTimeInterface|array<null|scalar|Stringable>
  *
- * @phpstan-type DBWhereKeyValueExpressionType string|array<string, DBParameterValueType>|object|OptionalExpression
+ * @phpstan-type DBWhereKeyValueExpressionType array<string, DBParameterValueType>
  * @phpstan-type DBWhereExpressionType string|DBWhereKeyValueExpressionType|object|OptionalExpression
  */
 class Types {

@@ -14,11 +14,11 @@ use Stringable;
 trait WhereBuilder {
 	use AbstractDB;
 
-	/** @var array<int, array{DBWhereExpressionType, array<DBParameterValueType>}> */
+	/** @var array<int, array{DBWhereExpressionType, DBParameterValueType[]}> */
 	private array $where = [];
 
 	/**
-	 * @param string|array<string, mixed>|object|OptionalExpression $expression
+	 * @param DBWhereExpressionType $expression
 	 * @param DBParameterValueType ...$args
 	 * @return $this
 	 */

@@ -12,7 +12,7 @@ use Kir\MySQL\Builder\Internal\Types;
 trait HavingBuilder {
 	use AbstractDB;
 
-	/** @var array<int, array{DBWhereExpressionType, array<DBParameterValueType>}> */
+	/** @var array<int, array{DBWhereExpressionType, DBParameterValueType[]}> */
 	private array $having = [];
 
 	/**
