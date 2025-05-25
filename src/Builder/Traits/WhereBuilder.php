@@ -1,11 +1,10 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
-use Kir\MySQL\Builder\Expr\OptionalExpression;
+use Closure;
 use Kir\MySQL\Builder\Helpers\ConditionAddHelper;
 use Kir\MySQL\Builder\Internal\ConditionBuilder;
 use Kir\MySQL\Builder\Internal\Types;
-use Stringable;
 
 /**
  * @phpstan-import-type DBParameterValueType from Types
@@ -14,7 +13,7 @@ use Stringable;
 trait WhereBuilder {
 	use AbstractDB;
 
-	/** @var array<int, array{DBWhereExpressionType, DBParameterValueType[]}> */
+	/** @var array<int, array{DBWhereExpressionType, list<DBParameterValueType>}> */
 	private array $where = [];
 
 	/**
@@ -23,6 +22,7 @@ trait WhereBuilder {
 	 * @return $this
 	 */
 	public function where($expression, ...$args) {
+		/** @var Closure(DBWhereExpressionType, list<DBParameterValueType>):void $fn */
 		$fn = fn($expression, $args) => $this->where[] = [$expression, $args];
 		ConditionAddHelper::addCondition($fn, $expression, $args);
 		return $this;

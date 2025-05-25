@@ -2,8 +2,6 @@
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Builder\Internal\Types;
-use Kir\MySQL\Builder\Select;
-use Kir\MySQL\Tools\VirtualTable;
 
 /**
  * @phpstan-import-type DBParameterValueType from Types
@@ -13,7 +11,7 @@ trait JoinBuilder {
 	use AbstractDB;
 	use AbstractTableNameBuilder;
 
-	/** @var array<int, array{type: string, alias: string, name: string|array<int, array<string, mixed>>|Select|VirtualTable, expression: string|null, arguments: array<int, DBParameterValueType}> */
+	/** @var array<int, array{type: string, alias: string, name: DBTableNameType, expression: string|null, arguments: list<DBParameterValueType>}> */
 	private array $joinTables = [];
 
 	/**

@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
+use Closure;
 use Kir\MySQL\Builder\Helpers\ConditionAddHelper;
 use Kir\MySQL\Builder\Internal\ConditionBuilder;
 use Kir\MySQL\Builder\Internal\Types;
@@ -21,6 +22,7 @@ trait HavingBuilder {
 	 * @return $this
 	 */
 	public function having($expression, ...$args) {
+		/** @var Closure(DBWhereExpressionType, list<DBParameterValueType>):void $fn */
 		$fn = fn($expression, $args) => $this->having[] = [$expression, $args];
 		ConditionAddHelper::addCondition($fn, $expression, $args);
 		return $this;

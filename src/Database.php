@@ -2,12 +2,16 @@
 namespace Kir\MySQL;
 
 use JetBrains\PhpStorm\Language;
+use Kir\MySQL\Builder\Internal\Types;
 use Kir\MySQL\Builder\QueryStatement;
 use Kir\MySQL\Database\DatabaseStatement;
 use Kir\MySQL\Tools\AliasRegistry;
 use Kir\MySQL\Tools\VirtualTables;
 use Stringable;
 
+/**
+ * @phpstan-import-type DBParameterValueType from Types
+ */
 interface Database {
 	/**
 	 * @return AliasRegistry
@@ -62,7 +66,7 @@ interface Database {
 
 	/**
 	 * @param string $expression
-	 * @param array<int, null|int|float|string|array<int, null|scalar>|Builder\DBExpr|Builder\Select> $arguments
+	 * @param list<DBParameterValueType> $arguments
 	 * @return string
 	 */
 	public function quoteExpression(string $expression, array $arguments = []): string;

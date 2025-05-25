@@ -2,6 +2,7 @@
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\Internal\DefaultValue;
+use Kir\MySQL\Builder\Internal\Types;
 use Kir\MySQL\Builder\Traits\JoinBuilder;
 use Kir\MySQL\Builder\Traits\LimitBuilder;
 use Kir\MySQL\Builder\Traits\OffsetBuilder;
@@ -11,6 +12,9 @@ use Kir\MySQL\Builder\Traits\TableNameBuilder;
 use Kir\MySQL\Builder\Traits\WhereBuilder;
 use RuntimeException;
 
+/**
+ * @phpstan-import-type DBTableNameType from Types
+ */
 abstract class Update extends InsertUpdateStatement {
 	use TableNameBuilder;
 	use TableBuilder;
@@ -24,11 +28,11 @@ abstract class Update extends InsertUpdateStatement {
 	private array $fields = [];
 
 	/**
-	 * @param string $alias
-	 * @param string $table
+	 * @param ($table is null ? DBTableNameType : string) $alias
+	 * @param null|DBTableNameType $table
 	 * @return $this
 	 */
-	public function table(string $alias, $table = null): self {
+	public function table($alias, $table = null): self {
 		if($table === null) {
 			[$alias, $table] = [$table, $alias];
 		}

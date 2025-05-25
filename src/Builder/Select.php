@@ -2,13 +2,14 @@
 
 namespace Kir\MySQL\Builder;
 
-use DateTimeInterface;
-use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Builder\Expr\OrderBySpecification;
+use Kir\MySQL\Builder\Internal\Types;
 use Kir\MySQL\Builder\Value\OptionalValue;
-use Kir\MySQL\Tools\VirtualTable;
 
 /**
+ * @phpstan-import-type DBParameterValueType from Types
+ * @phpstan-import-type DBTableNameType from Types
+ * @phpstan-import-type DBWhereExpressionType from Types
  */
 interface Select {
 	/**
@@ -48,35 +49,35 @@ interface Select {
 	public function fields(array $fields);
 
 	/**
-	 * @param null|string $alias
-	 * @param null|string|Select|VirtualTable|array<int, null|int|float|string|array<string, mixed>> $table
+	 * @param ($table is null ? DBTableNameType : string) $alias
+	 * @param null|DBTableNameType $table
 	 * @return $this
 	 */
-	public function from(?string $alias, $table = null);
+	public function from($alias, $table = null);
 
 	/**
 	 * @param string $alias
-	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $table
+	 * @param DBTableNameType $table
 	 * @param string|null $expression
-	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select ...$args
+	 * @param DBParameterValueType ...$args
 	 * @return $this
 	 */
 	public function joinInner(string $alias, $table, ?string $expression = null, ...$args);
 
 	/**
 	 * @param string $alias
-	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $table
+	 * @param DBTableNameType $table
 	 * @param string $expression
-	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select ...$args
+	 * @param DBParameterValueType ...$args
 	 * @return $this
 	 */
 	public function joinLeft(string $alias, $table, string $expression, ...$args);
 
 	/**
 	 * @param string $alias
-	 * @param string|array<int, array<string, mixed>>|Select|VirtualTable $table
+	 * @param DBTableNameType $table
 	 * @param string $expression
-	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select ...$args
+	 * @param DBParameterValueType ...$args
 	 * @return $this
 	 */
 	public function joinRight(string $alias, $table, string $expression, ...$args);
@@ -94,15 +95,15 @@ interface Select {
 	public function unionAll(...$queries);
 
 	/**
-	 * @param string|array<string, mixed>|object|OptionalExpression $expression
-	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select|DateTimeInterface ...$args
+	 * @param DBWhereExpressionType $expression
+	 * @param DBParameterValueType ...$args
 	 * @return $this
 	 */
 	public function where($expression, ...$args);
 
 	/**
-	 * @param string|array<string, mixed>|object|OptionalExpression $expression
-	 * @param null|scalar|array<int, null|scalar>|DBExpr|Select|DateTimeInterface ...$args
+	 * @param DBWhereExpressionType $expression
+	 * @param DBParameterValueType ...$args
 	 * @return $this
 	 */
 	public function having($expression, ...$args);

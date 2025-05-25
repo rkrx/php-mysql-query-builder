@@ -1,16 +1,18 @@
 <?php
 namespace Kir\MySQL\Builder\Internal;
 
-use Kir\MySQL\Builder;
-use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Database;
 use Stringable;
 
+/**
+ * @phpstan-import-type DBParameterValueType from Types
+ * @phpstan-import-type DBWhereExpressionType from Types
+ */
 final class ConditionBuilder {
 	/**
 	 * @param Database $db
 	 * @param string $query
-	 * @param array<int, array{string|array<string, mixed>|object|OptionalExpression, array<int, null|string|array<int, null|scalar>|Builder\DBExpr|Builder\Select>}> $conditions
+	 * @param array<int, array{DBWhereExpressionType, list<DBParameterValueType>}> $conditions
 	 * @param string $token
 	 * @return string
 	 */
@@ -42,7 +44,7 @@ final class ConditionBuilder {
 	/**
 	 * @param string[] $conditions
 	 * @param string $expression
-	 * @param array<int, null|string|array<int, null|scalar>|Builder\DBExpr|Builder\Select> $arguments
+	 * @param list<DBParameterValueType> $arguments
 	 * @param Database $db
 	 * @return string[]
 	 */

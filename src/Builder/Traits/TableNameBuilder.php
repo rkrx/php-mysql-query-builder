@@ -1,16 +1,19 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
-use Kir\MySQL\Builder\Select;
+use Kir\MySQL\Builder\Internal\Types;
 use Kir\MySQL\Database;
 use Kir\MySQL\Tools\VirtualTable;
 
+/**
+ * @phpstan-import-type DBTableNameType from Types
+ */
 trait TableNameBuilder {
 	use AbstractAliasReplacer;
 
 	/**
 	 * @param string|null $alias
-	 * @param string|array<int, mixed|array<string, mixed>>|object|Select|VirtualTable $name
+	 * @param DBTableNameType $name
 	 * @return string
 	 */
 	protected function buildTableName(?string $alias, $name): string {
@@ -23,8 +26,8 @@ trait TableNameBuilder {
 		}
 		if(is_array($name)) {
 			$parts = [];
-			foreach($name as $index => $bucket) {
-				if(is_scalar($bucket) && ctype_digit((string) $index)) {
+			foreach($name as /*$index => */$bucket) {
+				if(is_scalar($bucket)/* && ctype_digit((string) $index)*/) {
 					$parts[] = "SELECT {$this->db()->quote($bucket)} AS {$this->db()->quoteField('value')}";
 				} else {
 					$values = [];

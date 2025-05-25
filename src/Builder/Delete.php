@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Kir\MySQL\Builder\Internal\Types;
 use Kir\MySQL\Builder\Traits\JoinBuilder;
 use Kir\MySQL\Builder\Traits\LimitBuilder;
 use Kir\MySQL\Builder\Traits\OffsetBuilder;
@@ -9,6 +10,9 @@ use Kir\MySQL\Builder\Traits\TableBuilder;
 use Kir\MySQL\Builder\Traits\TableNameBuilder;
 use Kir\MySQL\Builder\Traits\WhereBuilder;
 
+/**
+ * @phpstan-import-type DBTableNameType from Types
+ */
 abstract class Delete extends Statement {
 	use TableNameBuilder;
 	use TableBuilder;
@@ -24,11 +28,11 @@ abstract class Delete extends Statement {
 	/**
 	 * Name der Tabelle
 	 *
-	 * @param string $alias
-	 * @param null|string|Select $table
+	 * @param ($table is null ? DBTableNameType : string) $alias
+	 * @param null|DBTableNameType $table
 	 * @return $this
 	 */
-	public function from(string $alias, null|string|Select $table = null) {
+	public function from($alias, $table = null) {
 		if($table !== null) {
 			$this->aliases[] = $alias;
 		}

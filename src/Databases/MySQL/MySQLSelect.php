@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Databases\MySQL;
 
+use Kir\MySQL\Builder\Internal\Types;
 use Kir\MySQL\Builder\RunnableSelect;
 use Kir\MySQL\Builder\Select;
 use Kir\MySQL\Builder\Statement;
@@ -14,10 +15,10 @@ use Kir\MySQL\Builder\Traits\TableBuilder;
 use Kir\MySQL\Builder\Traits\TableNameBuilder;
 use Kir\MySQL\Builder\Traits\UnionBuilder;
 use Kir\MySQL\Builder\Traits\WhereBuilder;
-use Kir\MySQL\Tools\VirtualTable;
 use RuntimeException;
 
 /**
+ * @phpstan-import-type DBTableNameType from Types
  */
 abstract class MySQLSelect extends Statement implements RunnableSelect {
 	use TableNameBuilder;
@@ -117,11 +118,11 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 	}
 
 	/**
-	 * @param null|string $alias
-	 * @param null|string|Select|VirtualTable|array<int, null|int|float|string|array<string, mixed>> $table
+	 * @param ($table is null ? DBTableNameType : string) $alias
+	 * @param null|DBTableNameType $table
 	 * @return $this
 	 */
-	public function from(?string $alias, $table = null) {
+	public function from($alias, $table = null) {
 		if($table === null) {
 			[$alias, $table] = [$table, $alias];
 			$this->addTable($alias, (string) $table);

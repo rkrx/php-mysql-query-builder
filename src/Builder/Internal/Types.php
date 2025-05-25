@@ -10,7 +10,7 @@ use Kir\MySQL\Tools\VirtualTable;
 use Stringable;
 
 /**
- * @phpstan-type DBTableNameType string|array<int, array<string, null|scalar>>|Select|VirtualTable
+ * @phpstan-type DBTableNameType string|array<int, null|scalar|array<string, null|scalar>>|Select|VirtualTable
  * @phpstan-type DBFetchRowsCallableReturnType string|array<int, array<string, null|scalar>>|Select|VirtualTable
  *
  * @phpstan-type DBParameterValueType null|scalar|Stringable|DBExpr|Select|DateTimeInterface|array<null|scalar|Stringable>

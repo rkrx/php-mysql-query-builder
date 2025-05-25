@@ -1,18 +1,20 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
-use Kir\MySQL\Builder\Select;
-use Kir\MySQL\Tools\VirtualTable;
+use Kir\MySQL\Builder\Internal\Types;
 
+/**
+ * @phpstan-import-type DBTableNameType from Types
+ */
 trait TableBuilder {
 	use AbstractTableNameBuilder;
 
-	/** @var array<int, array{alias: string|null, name: string|Select|VirtualTable|array<int, null|int|float|string|array<string, mixed>>}> */
+	/** @var array<int, array{alias: string|null, name: DBTableNameType}> */
 	private $tables = [];
 
 	/**
 	 * @param string|null $alias
-	 * @param string|Select|VirtualTable|array<int, null|int|float|string|array<string, mixed>> $table
+	 * @param DBTableNameType $table
 	 * @return $this
 	 */
 	protected function addTable(?string $alias, $table) {
@@ -36,7 +38,7 @@ trait TableBuilder {
 	}
 
 	/**
-	 * @return array<int, array{alias: string|null, name: string|array<int, null|int|float|string|Select|VirtualTable|array<string, mixed>>}>
+	 * @return array<int, array{alias: string|null, name: DBTableNameType}>
 	 */
 	protected function getTables(): array {
 		return $this->tables;
