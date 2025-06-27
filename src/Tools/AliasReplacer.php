@@ -22,6 +22,6 @@ class AliasReplacer {
 			$string = $this->aliasRegistry->get($alias);
 			return $string.$part;
 		};
-		return (string) preg_replace_callback('/^(\\w+)#(\\w+)$/', $fn, $name);
+		return (string) preg_replace_callback('{^(\\w+)#(\\w+.*)$}', $fn, $name);
 	}
 }
