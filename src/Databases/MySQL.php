@@ -27,35 +27,28 @@ use Throwable;
  */
 class MySQL implements Database {
 	/** @var array<string, array<int, string>> */
-	private $tableFields = [];
-	/** @var PDO */
-	private $pdo;
-	/** @var bool */
-	private $outerTransaction = false;
-	/** @var AliasRegistry */
-	private $aliasRegistry;
-	/** @var int */
-	private $transactionLevel = 0;
-	/** @var QueryLoggers */
-	private $queryLoggers;
-	/** @var VirtualTables */
-	private $virtualTables;
-	/** @var MySQLExceptionInterpreter */
-	private $exceptionInterpreter;
+	private array $tableFields = [];
+	private bool $outerTransaction = false;
+	private AliasRegistry $aliasRegistry;
+	private int $transactionLevel = 0;
+	private QueryLoggers $queryLoggers;
+	private ?VirtualTables $virtualTables = null;
+	private MySQLExceptionInterpreter $exceptionInterpreter;
 	/** @var array<string, mixed> */
-	private $options;
-	/** @var MySQLQuoter */
-	private $quoter;
+	private array $options;
+	private MySQLQuoter $quoter;
 
 	/**
 	 * @param PDO $pdo
 	 * @param array<string, mixed> $options
 	 */
-	public function __construct(PDO $pdo, array $options = []) {
+	public function __construct(
+		private PDO $pdo,
+		array $options = []
+	) {
 		if($pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_SILENT) {
 			$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		}
-		$this->pdo = $pdo;
 		$this->aliasRegistry = new AliasRegistry();
 		$this->queryLoggers = new QueryLoggers();
 		$this->exceptionInterpreter = new MySQLExceptionInterpreter();

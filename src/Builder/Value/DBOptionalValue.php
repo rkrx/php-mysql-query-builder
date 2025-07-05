@@ -5,23 +5,16 @@ namespace Kir\MySQL\Builder\Value;
 use Kir\MySQL\Builder\Helpers\RecursiveStructureAccess;
 
 class DBOptionalValue implements OptionalValue {
-	/** @var object|array<string, mixed> */
-	private $data;
-	/** @var string|string[] */
-	private $path;
-	/** @var callable|null */
-	private $validator;
-
 	/**
 	 * @param object|array<string, mixed> $data
 	 * @param string|string[] $path
 	 * @param null|callable(): bool $validator
 	 */
-	public function __construct($data, $path, $validator = null) {
-		$this->data = $data;
-		$this->path = $path;
-		$this->validator = $validator;
-	}
+	public function __construct(
+		private object|array $data,
+		private string|array $path,
+		private $validator = null
+	) {}
 
 	/**
 	 * @return bool

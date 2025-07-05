@@ -5,15 +5,9 @@ use Psr\Log\LoggerInterface;
 use Throwable;
 
 class LoggerInterfaceQueryLogger implements QueryLogger {
-	/** @var LoggerInterface */
-	private $logger;
-
-	/**
-	 * @param LoggerInterface $logger
-	 */
-	public function __construct(LoggerInterface $logger) {
-		$this->logger = $logger;
-	}
+	public function __construct(
+		private LoggerInterface $logger
+	) {}
 
 	/**
 	 * @inheritDoc

@@ -10,33 +10,24 @@ use PDOException;
 use PDOStatement;
 
 class QueryStatement implements DatabaseStatement {
-	/** @var PDOStatement<mixed> */
-	private $statement;
-	/** @var QueryLoggers */
-	private $queryLoggers;
-	/** @var string */
-	private $query;
-	/** @var MySQLExceptionInterpreter */
-	private $exceptionInterpreter;
-
 	/**
 	 * @param PDOStatement<mixed> $stmt
 	 * @param string $query
 	 * @param MySQLExceptionInterpreter $exceptionInterpreter
 	 * @param QueryLoggers $queryLoggers
 	 */
-	public function __construct(PDOStatement $stmt, string $query, MySQLExceptionInterpreter $exceptionInterpreter, QueryLoggers $queryLoggers) {
-		$this->statement = $stmt;
-		$this->queryLoggers = $queryLoggers;
-		$this->query = $query;
-		$this->exceptionInterpreter = $exceptionInterpreter;
-	}
+	public function __construct(
+		private PDOStatement $stmt,
+		private string $query,
+		private MySQLExceptionInterpreter $exceptionInterpreter,
+		private QueryLoggers $queryLoggers
+	) {}
 
 	/**
 	 * @return PDOStatement<mixed>
 	 */
 	public function getStatement(): PDOStatement {
-		return $this->statement;
+		return $this->stmt;
 	}
 
 	/**
@@ -53,7 +44,7 @@ class QueryStatement implements DatabaseStatement {
 		if($arg1 !== null) {
 			$args[] = $arg1;
 		}
-		$this->statement->setFetchMode(...$args);
+		$this->stmt->setFetchMode(...$args);
 		return $this;
 	}
 
@@ -65,7 +56,7 @@ class QueryStatement implements DatabaseStatement {
 	public function execute(array $params = []) {
 		$this->exceptionHandler(function() use ($params) {
 			$this->queryLoggers->logRegion($this->query, function() use ($params) {
-				$response = $this->statement->execute($params);
+				$response = $this->stmt->execute($params);
 				if(!$response) {
 					throw new SqlException('Execution returned with "false".');
 				}
@@ -83,9 +74,9 @@ class QueryStatement implements DatabaseStatement {
 	public function fetchAll($fetchStyle = PDO::FETCH_ASSOC, $fetchArgument = null, array $ctorArgs = []): array {
 		$result = $x = $this->exceptionHandler(function() use ($fetchStyle, $fetchArgument, $ctorArgs) {
 			if($fetchArgument !== null) {
-				return $this->statement->fetchAll($fetchStyle, $fetchArgument, ...$ctorArgs);
+				return $this->stmt->fetchAll($fetchStyle, $fetchArgument, ...$ctorArgs);
 			}
-			return $this->statement->fetchAll($fetchStyle);
+			return $this->stmt->fetchAll($fetchStyle);
 		});
 		/** @var array<mixed, mixed>|false $x */
 		if($x === false) {
@@ -101,7 +92,7 @@ class QueryStatement implements DatabaseStatement {
 	 * @return mixed
 	 */
 	public function fetch($fetchStyle = PDO::FETCH_ASSOC, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0) {
-		return $this->exceptionHandler(fn() => $this->statement->fetch($fetchStyle, $cursorOrientation, $cursorOffset));
+		return $this->exceptionHandler(fn() => $this->stmt->fetch($fetchStyle, $cursorOrientation, $cursorOffset));
 	}
 
 	/**
@@ -109,21 +100,21 @@ class QueryStatement implements DatabaseStatement {
 	 * @return mixed
 	 */
 	public function fetchColumn($columnNo = 0) {
-		return $this->exceptionHandler(fn() => $this->statement->fetchColumn($columnNo));
+		return $this->exceptionHandler(fn() => $this->stmt->fetchColumn($columnNo));
 	}
 
 	/**
 	 * @return bool
 	 */
 	public function closeCursor(): bool {
-		return $this->exceptionHandler(fn() => $this->statement->closeCursor());
+		return $this->exceptionHandler(fn() => $this->stmt->closeCursor());
 	}
 
 	/**
 	 * @return int
 	 */
 	public function columnCount(): int {
-		return $this->exceptionHandler(fn() => $this->statement->columnCount());
+		return $this->exceptionHandler(fn() => $this->stmt->columnCount());
 	}
 
 	/**
@@ -132,7 +123,7 @@ class QueryStatement implements DatabaseStatement {
 	 */
 	public function getColumnMeta(int $columnNo): ?array {
 		return $this->exceptionHandler(function() use ($columnNo) {
-			$columnMeta = $this->statement->getColumnMeta($columnNo);
+			$columnMeta = $this->stmt->getColumnMeta($columnNo);
 			if($columnMeta === false) {
 				return null;
 			}

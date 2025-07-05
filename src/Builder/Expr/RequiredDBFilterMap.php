@@ -4,15 +4,12 @@ namespace Kir\MySQL\Builder\Expr;
 use Kir\MySQL\Builder\Helpers\RecursiveStructureAccess;
 
 class RequiredDBFilterMap {
-	/** @var array<string, mixed> */
-	private $map;
-
 	/**
 	 * @param array<string, mixed> $map
 	 */
-	final public function __construct(array $map) {
-		$this->map = $map;
-	}
+	final public function __construct(
+		private array $map
+	) {}
 
 	/**
 	 * @param array<string, mixed> $map

@@ -16,7 +16,7 @@ interface Select {
 	 * @param bool $preserveTypes
 	 * @return $this
 	 */
-	public function setPreserveTypes(bool $preserveTypes = true);
+	public function setPreserveTypes(bool $preserveTypes = true): self;
 
 	/**
 	 * @param bool $enabled

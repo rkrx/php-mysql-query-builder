@@ -5,18 +5,16 @@ use Kir\MySQL\Builder\Helpers\RecursiveStructureAccess;
 use RuntimeException;
 
 class DBExprFilter implements OptionalExpression {
-	/** @var mixed */
-	private $expression;
 	/** @var bool */
 	private $hasValue;
 	/** @var mixed */
 	private $value;
-	/** @var string[] */
-	private $keyPath;
 	/** @var null|callable(mixed): bool */
 	private $validator;
 	/** @var callable(bool, array{key: mixed, value: string}) */
 	private $validationResultHandler;
+	/** @var string[] */
+	private array $keyPath;
 
 	/**
 	 * @param string $expression
@@ -25,8 +23,13 @@ class DBExprFilter implements OptionalExpression {
 	 * @param callable|null $validator
 	 * @param callable|null $validationResultHandler
 	 */
-	public function __construct(string $expression, array $data, $keyPath, $validator = null, $validationResultHandler = null) {
-		$this->expression = $expression;
+	public function __construct(
+		private string $expression,
+		array $data,
+		string|array $keyPath,
+		$validator = null,
+		$validationResultHandler = null
+	) {
 		$this->keyPath = $this->buildKey($keyPath);
 		$this->value = RecursiveStructureAccess::recursiveGet($data, $this->keyPath, null);
 		$this->hasValue = is_scalar($this->value) ? trim((string) $this->value) !== '' : !empty($this->value);

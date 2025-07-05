@@ -7,7 +7,7 @@ trait UnionBuilder {
 	use AbstractDB;
 
 	/** @var array<int, array{''|'ALL', string|Select}> */
-	private $unions = [];
+	private array $unions = [];
 
 	/**
 	 * @param string|Select ...$queries

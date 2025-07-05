@@ -5,11 +5,8 @@ use Throwable;
 
 class QueryLoggers {
 	/** @var QueryLogger[] */
-	private $queryLoggers = [];
+	private array $queryLoggers = [];
 
-	/**
-	 * @param QueryLogger $queryLogger
-	 */
 	public function add(QueryLogger $queryLogger): void {
 		$this->queryLoggers[] = $queryLogger;
 	}

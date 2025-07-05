@@ -2,15 +2,12 @@
 namespace Kir\MySQL\Builder;
 
 class DBExpr {
-	/** @var string */
-	private $expression;
-
 	/**
 	 * @param string $expression
 	 */
-	public function __construct(string $expression) {
-		$this->expression = $expression;
-	}
+	public function __construct(
+		private string $expression
+	) {}
 
 	/**
 	 * @return string

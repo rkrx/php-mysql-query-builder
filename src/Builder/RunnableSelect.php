@@ -32,13 +32,13 @@ interface RunnableSelect extends Select, IteratorAggregate {
 	/**
 	 * @return $this
 	 */
-	public function clearValues();
+	public function clearValues(): self;
 
 	/**
 	 * @param bool $preserveTypes
 	 * @return $this
 	 */
-	public function setPreserveTypes(bool $preserveTypes = true);
+	public function setPreserveTypes(bool $preserveTypes = true): self;
 
 	/**
 	 * Fetches all rows using PDO::FETCH_NUM

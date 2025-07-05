@@ -2,15 +2,12 @@
 namespace Kir\MySQL\Builder\Expr;
 
 class OptionalDBFilterMap {
-	/** @var array<string, mixed> */
-	private array $map;
-
 	/**
 	 * @param array<string, mixed> $map
 	 */
-	final public function __construct(array $map) {
-		$this->map = $map;
-	}
+	final public function __construct(
+		private array $map
+	) {}
 
 	/**
 	 * @param array<string, mixed> $map

@@ -7,7 +7,7 @@ trait GroupByBuilder {
 	use AbstractDB;
 
 	/** @var string[] */
-	private $groupBy = [];
+	private array $groupBy = [];
 
 	/**
 	 * @param mixed ...$args

@@ -7,8 +7,6 @@ use Kir\MySQL\Database\DatabaseStatement;
  * @template T
  */
 class DDLRunnable {
-	/** @var DatabaseStatement */
-	private $query;
 	/** @var null|callable(scalar=): T */
 	private $callbackFn;
 
@@ -16,8 +14,10 @@ class DDLRunnable {
 	 * @param DatabaseStatement $query
 	 * @param null|callable(scalar=): T $callbackFn
 	 */
-	public function __construct(DatabaseStatement $query, ?callable $callbackFn = null) {
-		$this->query = $query;
+	public function __construct(
+		private DatabaseStatement $query,
+		?callable $callbackFn = null
+	) {
 		$this->callbackFn = $callbackFn;
 	}
 

@@ -2,15 +2,9 @@
 namespace Kir\MySQL\Tools;
 
 class AliasReplacer {
-	/** @var AliasRegistry */
-	private $aliasRegistry;
-
-	/**
-	 * @param AliasRegistry $aliasRegistry
-	 */
-	public function __construct(AliasRegistry $aliasRegistry) {
-		$this->aliasRegistry = $aliasRegistry;
-	}
+	public function __construct(
+		private AliasRegistry $aliasRegistry
+	) {}
 
 	/**
 	 * @param string $name

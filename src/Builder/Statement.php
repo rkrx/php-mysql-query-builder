@@ -7,21 +7,17 @@ use Kir\MySQL\Database;
 use Kir\MySQL\Tools\AliasReplacer;
 
 abstract class Statement implements StatementInterface {
-	/** @var Database */
-	private $db;
-	/** @var AliasReplacer */
-	private $aliasReplacer;
-	/** @var array<string, mixed> */
-	private $options;
+	private AliasReplacer $aliasReplacer;
 
 	/**
 	 * @param Database $db
 	 * @param array<string, mixed> $options
 	 */
-	public function __construct($db, array $options = []) {
-		$this->db = $db;
+	public function __construct(
+		private Database $db,
+		private array $options = []
+	) {
 		$this->aliasReplacer = new AliasReplacer($db->getAliasRegistry());
-		$this->options = $options;
 	}
 
 	/**
@@ -59,7 +55,7 @@ abstract class Statement implements StatementInterface {
 	/**
 	 * @return Database
 	 */
-	protected function db() {
+	protected function db(): Database {
 		return $this->db;
 	}
 

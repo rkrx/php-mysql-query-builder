@@ -6,7 +6,7 @@ use Kir\MySQL\Builder\Select;
 
 class VirtualTables {
 	/** @var array<string, Closure|Select> */
-	private $virtualTables = [];
+	private array $virtualTables = [];
 
 	/**
 	 * @param string $tableName

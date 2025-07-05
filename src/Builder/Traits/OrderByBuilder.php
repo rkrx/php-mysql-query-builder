@@ -7,7 +7,7 @@ trait OrderByBuilder {
 	use AbstractDB;
 
 	/** @var array<int, array{string, string}> */
-	private $orderBy = [];
+	private array $orderBy = [];
 
 	/**
 	 * @param string|OrderBySpecification $expression

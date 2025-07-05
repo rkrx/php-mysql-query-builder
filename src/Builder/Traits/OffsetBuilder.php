@@ -5,8 +5,7 @@ use Kir\MySQL\Builder\InvalidValueException;
 use Kir\MySQL\Builder\Value\OptionalValue;
 
 trait OffsetBuilder {
-	/** @var null|int|OptionalValue */
-	private $offset;
+	private null|int|OptionalValue $offset = null;
 
 	/**
 	 * @return null|int

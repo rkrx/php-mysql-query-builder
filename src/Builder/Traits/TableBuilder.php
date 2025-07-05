@@ -10,7 +10,7 @@ trait TableBuilder {
 	use AbstractTableNameBuilder;
 
 	/** @var array<int, array{alias: string|null, name: DBTableNameType}> */
-	private $tables = [];
+	private array $tables = [];
 
 	/**
 	 * @param string|null $alias

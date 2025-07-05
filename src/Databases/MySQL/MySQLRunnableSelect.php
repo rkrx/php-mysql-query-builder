@@ -51,7 +51,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 	/**
 	 * @inheritDoc
 	 */
-	public function clearValues() {
+	public function clearValues(): self {
 		$this->values = [];
 		return $this;
 	}
@@ -59,7 +59,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 	/**
 	 * @inheritDoc
 	 */
-	public function setPreserveTypes(bool $preserveTypes = true) {
+	public function setPreserveTypes(bool $preserveTypes = true): self {
 		$this->preserveTypes = $preserveTypes;
 		return $this;
 	}

@@ -5,8 +5,7 @@ use Kir\MySQL\Builder\InvalidValueException;
 use Kir\MySQL\Builder\Value\OptionalValue;
 
 trait LimitBuilder {
-	/** @var null|int|OptionalValue */
-	private $limit;
+	private null|int|OptionalValue $limit = null;
 
 	/**
 	 * @return null|int

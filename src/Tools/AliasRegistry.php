@@ -5,14 +5,14 @@ use RuntimeException;
 
 class AliasRegistry {
 	/** @var string[] */
-	private $aliases = [];
+	private array $aliases = [];
 
 	/**
 	 * @param string $alias
 	 * @param string $string
 	 * @return $this
 	 */
-	public function add(string $alias, string $string) {
+	public function add(string $alias, string $string): self {
 		$this->aliases[$alias] = $string;
 		return $this;
 	}
