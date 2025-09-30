@@ -32,6 +32,7 @@
 	},
 	"scripts": {
 		"phpunit": "phpunit -c tests.xml",
-		"phpstan": "phpstan analyse -c phpstan.neon"
+		"phpstan": "phpstan analyse -c phpstan.neon",
+		"test": "phpunit -c tests.xml"
 	}
 }
