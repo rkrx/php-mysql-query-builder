@@ -12,6 +12,7 @@ use Kir\MySQL\Builder\SelectTest\TestSelectMySQL;
 use Kir\MySQL\Builder\Value\DBOptionalValue;
 use Kir\MySQL\Common\DBTestCase;
 use Kir\MySQL\Databases\TestDB;
+use Kir\MySQL\Tools\JsonTable;
 use Kir\MySQL\Tools\VirtualTable;
 
 class SelectTest extends DBTestCase {
@@ -554,5 +555,21 @@ class SelectTest extends DBTestCase {
 		->asString();
 
 		self::assertEquals("SELECT\n\ta.value\nFROM\n\t(SELECT 1 AS `value`\n\tUNION ALL\n\tSELECT 2 AS `value`\n\tUNION ALL\n\tSELECT 3 AS `value`\n\tUNION ALL\n\tSELECT 4 AS `value`\n\tUNION ALL\n\tSELECT 5 AS `value`\n\tUNION ALL\n\tSELECT 6 AS `value`\n\tUNION ALL\n\tSELECT 7 AS `value`\n\tUNION ALL\n\tSELECT 8 AS `value`\n\tUNION ALL\n\tSELECT 9 AS `value`) a\n", $vt1);
+	}
+
+	public function testJsonTable(): void {
+		$vt1 = $this->select()
+		->field('a.id')
+		->field('b.id', 'json_id')
+		->field('b.title', 'json_title')
+		->from('a', 'source_table')
+		->joinInner('b', new JsonTable('a.json_field', '$.key', [[
+			'name' => 'id', 'type' => 'INT', 'jsonPath' => '$.id'
+		], [
+			'name' => 'title', 'type' => 'VARCHAR(255)', 'jsonPath' => '$.title'
+		]]), 'a.id = b.id')
+		->asString();
+
+		self::assertEquals("SELECT\n\ta.id,\n\tb.id AS `json_id`,\n\tb.title AS `json_title`\nFROM\n\tsource_table a\nINNER JOIN\n\tJSON_TABLE(a.json_field, $.key, COLUMNS(id INT PATH '$.id', title VARCHAR(255) PATH '$.title')) b ON a.id = b.id\n", $vt1);
 	}
 }
