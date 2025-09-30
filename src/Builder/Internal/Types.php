@@ -6,11 +6,12 @@ use DateTimeInterface;
 use Kir\MySQL\Builder\DBExpr;
 use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Builder\Select;
+use Kir\MySQL\Common\SpecialTable;
 use Kir\MySQL\Tools\VirtualTable;
 use Stringable;
 
 /**
- * @phpstan-type DBTableNameType string|array<int, null|scalar|array<string, null|scalar>>|Select|VirtualTable
+ * @phpstan-type DBTableNameType string|array<int, null|scalar|array<string, null|scalar>>|Select|VirtualTable|SpecialTable
  * @phpstan-type DBFetchRowsCallableReturnType string|array<int, array<string, null|scalar>>|Select|VirtualTable
  *
  * @phpstan-type DBParameterValueType null|scalar|Stringable|DBExpr|Select|DateTimeInterface|array<null|scalar|Stringable>

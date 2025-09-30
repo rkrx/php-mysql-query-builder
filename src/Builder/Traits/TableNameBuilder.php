@@ -2,6 +2,7 @@
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Builder\Internal\Types;
+use Kir\MySQL\Common\SpecialTable;
 use Kir\MySQL\Database;
 use Kir\MySQL\Tools\VirtualTable;
 
@@ -17,14 +18,15 @@ trait TableNameBuilder {
 	 * @return string
 	 */
 	protected function buildTableName(?string $alias, $name): string {
-		if(is_object($name) && !($name instanceof VirtualTable) && method_exists($name, '__toString')) {
+		if($name instanceof SpecialTable) {
+			$name = $name->asString($this->db());
+		} elseif(is_object($name) && !($name instanceof VirtualTable) && method_exists($name, '__toString')) {
 			$name = (string) $name;
 			$lines = explode("\n", $name);
 			$lines = array_map(static fn(string $line) => "\t{$line}", $lines);
 			$name = implode("\n", $lines);
 			$name = '(' . trim(rtrim(trim($name), ';')) . ')';
-		}
-		if(is_array($name)) {
+		} elseif(is_array($name)) {
 			$parts = [];
 			foreach($name as /*$index => */$bucket) {
 				if(is_scalar($bucket)/* && ctype_digit((string) $index)*/) {
