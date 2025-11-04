@@ -12,7 +12,11 @@ trait LimitBuilder {
 	 */
 	protected function getLimit(): ?int {
 		if($this->limit instanceof OptionalValue) {
-			return $this->limit->getValue();
+			$value = $this->limit->getValue();
+			if(is_numeric($value)) {
+				return (int) $value;
+			}
+			return null;
 		}
 		return $this->limit;
 	}
@@ -39,10 +43,15 @@ trait LimitBuilder {
 		if($this->limit instanceof OptionalValue) {
 			if($this->limit->isValid()) {
 				$value = $this->limit->getValue();
-				if(!preg_match('{\\d+}', $value)) {
-					throw new InvalidValueException('Value for LIMIT has to be a number');
+				if($value === null || is_scalar($value)) {
+					$value = (string) $value;
+				} else {
+					throw new InvalidValueException('Value for OFFSET has to be a number');
 				}
-				$query .= "LIMIT\n\t{$this->limit->getValue()}\n";
+				if(!preg_match('{^\\d+$}', $value)) {
+					throw new InvalidValueException('Value for OFFSET has to be a number');
+				}
+				$query .= "LIMIT\n\t{$value}\n";
 			}
 		} elseif($limit !== null) {
 			$query .= "LIMIT\n\t{$limit}\n";

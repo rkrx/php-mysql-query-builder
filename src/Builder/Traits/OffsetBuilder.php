@@ -12,7 +12,11 @@ trait OffsetBuilder {
 	 */
 	protected function getOffset(): ?int {
 		if($this->offset instanceof OptionalValue) {
-			return $this->offset->getValue();
+			$value = $this->offset->getValue();
+			if(is_numeric($value)) {
+				return (int) $value;
+			}
+			return null;
 		}
 		return $this->offset;
 	}
@@ -35,10 +39,15 @@ trait OffsetBuilder {
 		if($this->offset instanceof OptionalValue) {
 			if($this->offset->isValid()) {
 				$value = $this->offset->getValue();
-				if(!preg_match('{\\d+}', $value)) {
+				if($value === null || is_scalar($value)) {
+					$value = (string) $value;
+				} else {
 					throw new InvalidValueException('Value for OFFSET has to be a number');
 				}
-				$query .= "OFFSET\n\t{$this->offset->getValue()}\n";
+				if(!preg_match('{^\\d+$}', $value)) {
+					throw new InvalidValueException('Value for OFFSET has to be a number');
+				}
+				$query .= "OFFSET\n\t{$value}\n";
 			}
 		} elseif($offset !== null) {
 			$query .= "OFFSET\n\t{$this->offset}\n";
