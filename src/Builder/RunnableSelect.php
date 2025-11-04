@@ -103,7 +103,7 @@ interface RunnableSelect extends Select, IteratorAggregate {
 
 	/**
 	 * @param bool $treatValueAsArray
-	 * @return array<mixed, mixed>
+	 * @return array<array-key, mixed>
 	 */
 	public function fetchKeyValue($treatValueAsArray = false): array;
 
