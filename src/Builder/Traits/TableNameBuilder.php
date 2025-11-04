@@ -1,6 +1,7 @@
 <?php
 namespace Kir\MySQL\Builder\Traits;
 
+use InvalidArgumentException;
 use Kir\MySQL\Builder\Internal\Types;
 use Kir\MySQL\Common\SpecialTable;
 use Kir\MySQL\Database;
@@ -31,12 +32,14 @@ trait TableNameBuilder {
 			foreach($name as /*$index => */$bucket) {
 				if(is_scalar($bucket)/* && ctype_digit((string) $index)*/) {
 					$parts[] = "SELECT {$this->db()->quote($bucket)} AS {$this->db()->quoteField('value')}";
-				} else {
+				} elseif(is_iterable($bucket)) {
 					$values = [];
 					foreach($bucket as $field => $value) {
 						$values[] = sprintf('%s AS %s', $this->db()->quote($value), $this->db()->quoteField($field));
 					}
 					$parts[] = sprintf("SELECT %s", implode(', ', $values));
+				} else {
+					throw new InvalidArgumentException('Only scalar values and iterables are supported as table data');
 				}
 			}
 			$name = '(' . implode("\n\tUNION ALL\n\t", $parts) . ')';
