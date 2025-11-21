@@ -5,11 +5,11 @@
 !/.editorconfig
 !/.gitattributes
 !/.gitignore
-!/.travis.yml
 !/.scrutinizer.yml
-!/composer.json
-!/INSTRUCTIONS.md
-!/phpstan.neon
+!/.travis.yml
+!/AGENTS.md
 !/README.md
+!/composer.json
+!/phpstan.neon
 !/rector.php
 !/tests.xml
