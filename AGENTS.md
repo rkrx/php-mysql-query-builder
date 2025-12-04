@@ -352,3 +352,143 @@ $db->insert()
 ```
 
 This guide provides a structured approach to building INSERT and UPSERT SQL statements using a PHP Query Builder, allowing for clean and maintainable code.
+
+### Table Aliases in INSERT
+
+Tables can use alias expansion like `schema#table`, which resolves via the alias registry. Example: `travis#test1` resolves to `travis_test.test1`.
+
+```php
+$db->insert()
+	->into('travis#test1')
+	->addExpr('last_update=NOW()');
+// Yields:
+// INSERT INTO
+// 	travis_test.test1
+// SET
+// 	last_update=NOW()
+```
+
+### INSERT ... SELECT (Mass Insert)
+
+Populate rows from a subselect. The field list is derived from the select’s field aliases/keys.
+
+```php
+$select = $db->select()
+	->fields(['a' => 'b'])
+	->from('oi', 'travis#test1')
+	->where('1!=2');
+
+$sql = $db->insert()
+	->into('travis#test2')
+	->from($select)
+	->updateExpr('a = VALUES(a)');
+// Yields:
+// INSERT INTO travis_test.test2 (a)
+//     SELECT
+//         b AS `a`
+//     FROM
+//         travis_test.test1 oi
+//     WHERE
+//         (1!=2)
+//     ON DUPLICATE KEY UPDATE
+//         a = VALUES(a)
+```
+
+### Helper Methods for Many Fields
+
+- `addAll(array $data, ?array $mask = null, ?array $exclude = null)`: Adds multiple `SET` assignments at once.
+- `updateAll(array $data, ?array $mask = null, ?array $exclude = null)`: Adds multiple `ON DUPLICATE KEY UPDATE` assignments.
+- `addOrUpdateAll(array $data, ?array $mask = null, ?array $exclude = null)`: Adds to both `SET` and `UPDATE` parts.
+
+Examples:
+
+```php
+// Add a subset of fields
+$db->insert()
+	->into('travis#test1')
+	->addAll(['field1' => 123, 'field2' => 456], ['field1']);
+// SET `field1`=123
+
+// Update a subset on conflict
+$db->insert()
+	->into('travis#test1')
+	->add('field1', 123)
+	->updateAll(['field1' => 123, 'field2' => 456], ['field1']);
+// SET `field1`=123
+// ON DUPLICATE KEY UPDATE `field1`=123
+
+// Add and update all fields (respecting mask/exclude)
+$db->insert()
+	->into('travis#test1')
+	->addOrUpdateAll(['field1' => 123, 'field2' => 456]);
+// SET `field1`=123, `field2`=456
+// ON DUPLICATE KEY UPDATE `field1`=123, `field2`=456
+```
+
+### Field Masking
+
+Use `setMask(array $fieldNames)` to restrict which fields are emitted across `SET` and `ON DUPLICATE KEY UPDATE`.
+
+```php
+$db->insert()
+	->into('test')
+	->addOrUpdate('field1', 1)
+	->addOrUpdate('field2', 2)
+	->setMask(['field1']);
+// Emits only `field1` in both SET and UPDATE
+```
+
+### IGNORE Inserts
+
+Enable `INSERT IGNORE` by calling `setIgnore(true)`.
+
+```php
+$db->insert()
+	->into('table')
+	->setIgnore()
+	->add('field', 1);
+// INSERT IGNORE INTO ...
+```
+
+### Primary Key Handling and LAST_INSERT_ID
+
+When a primary key is included in the insert and you want MySQL to return that key as the last insert id, call `setKey('id_field')`. This adds
+`` `id_field` = LAST_INSERT_ID(id_field) `` to the `ON DUPLICATE KEY UPDATE` part and prevents updating the key via `updateAll`.
+
+```php
+$db->insert()
+	->into('table')
+	->setKey('id')
+	->add('id', 100)
+	->addOrUpdate('name', 'Alice');
+// ON DUPLICATE KEY UPDATE
+// 	`id` = LAST_INSERT_ID(id),
+// 	`name`='Alice'
+```
+
+### Raw Expressions and Parameters
+
+- `addExpr('expr', ...args)`, `updateExpr('expr', ...args)`, `addOrUpdateExpr('expr', ...args)` accept placeholders and values.
+- Use `new DBExpr('NOW()')` (or other SQL) to inject unquoted expressions.
+
+```php
+use Kir\MySQL\Builder\DBExpr;
+
+$db->insert()
+	->into('test')
+	->addExpr('a=?', 'a')            // a='a'
+	->updateExpr('b=?', 'b')         // b='b'
+	->addOrUpdateExpr('c=?', 'c')    // c='c' in both parts
+;
+
+$db->insert()
+	->into('test')
+	->addExpr('a=?', new DBExpr('NOW()'))      // a=NOW()
+	->updateExpr('b=?', new DBExpr('NOW()'))   // b=NOW()
+	->addOrUpdateExpr('c=?', new DBExpr('NOW()'));
+```
+
+### Executing vs. Rendering
+
+- `run()` executes the insert and returns an integer (e.g., affected rows or last insert id depending on driver).
+- `__toString()`/helper like `asString()` in tests returns the SQL for inspection.
