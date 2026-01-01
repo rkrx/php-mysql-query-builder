@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Expr;
 
 /**
@@ -29,7 +30,7 @@ class DBExprOrderBySpec implements OrderBySpecification {
 					}
 					$this->fields[] = [
 						$expressions[$sortFieldSpec[0]],
-						$direction
+						$direction,
 					];
 				}
 			} else { // @phpstan-ignore-line

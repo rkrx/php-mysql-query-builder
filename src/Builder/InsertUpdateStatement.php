@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\Internal\DefaultValue;
@@ -24,6 +25,7 @@ abstract class InsertUpdateStatement extends Statement {
 	 */
 	public function setMask(array $mask) {
 		$this->mask = $mask;
+
 		return $this;
 	}
 
@@ -33,7 +35,7 @@ abstract class InsertUpdateStatement extends Statement {
 	 * @return string[]
 	 */
 	protected function buildFieldList(array $fields, array $query = []): array {
-		foreach ($fields as $fieldName => $fieldValue) {
+		foreach($fields as $fieldName => $fieldValue) {
 			if($fieldValue instanceof DefaultValue) {
 				$fieldValue = 'DEFAULT';
 			}
@@ -41,7 +43,7 @@ abstract class InsertUpdateStatement extends Statement {
 				continue;
 			}
 			if(is_int($fieldName)) {
-				if (is_array($fieldValue)) {
+				if(is_array($fieldValue)) {
 					// @phpstan-ignore-next-line
 					$fieldValue = $this->db()->quoteExpression($fieldValue[0], array_slice($fieldValue, 1));
 				}
@@ -49,7 +51,7 @@ abstract class InsertUpdateStatement extends Statement {
 				$query[] = "\t{$fieldValue}";
 			} else {
 				$fieldName = $this->db()->quoteField($fieldName);
-				if (is_array($fieldValue)) {
+				if(is_array($fieldValue)) {
 					// @phpstan-ignore-next-line
 					$fieldValue = $this->db()->quoteExpression($fieldValue[0], array_slice($fieldValue, 1));
 				}
@@ -57,6 +59,7 @@ abstract class InsertUpdateStatement extends Statement {
 				$query[] = "\t{$fieldName}={$fieldValue}";
 			}
 		}
+
 		return $query;
 	}
 
@@ -66,12 +69,13 @@ abstract class InsertUpdateStatement extends Statement {
 	 * @return bool
 	 */
 	protected function isFieldAccessible(string $fieldName, array $tableFields): bool {
-		if (!in_array($fieldName, $tableFields)) {
+		if(!in_array($fieldName, $tableFields)) {
 			return false;
 		}
-		if (!is_array($this->mask)) {
+		if(!is_array($this->mask)) {
 			return true;
 		}
+
 		return in_array($fieldName, $this->mask, true);
 	}
 }

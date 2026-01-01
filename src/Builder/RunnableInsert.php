@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder;
 
 use BadMethodCallException;
@@ -17,17 +18,18 @@ class RunnableInsert extends Insert implements DDLPreparable {
 	 * @inheritDoc
 	 */
 	public function insertRows(iterable $rows) {
-		if (!is_iterable($rows)) {
+		if(!is_iterable($rows)) {
 			throw new BadMethodCallException('Expected $rows to by an iterable');
 		}
 		$result = [];
 		$query = $this->__toString();
 		$stmt = $this->db()->prepare($query);
-		foreach ($rows as $row) {
+		foreach($rows as $row) {
 			$stmt->execute($row);
 			$result[] = (int) $this->db()->getLastInsertId();
 		}
 		$stmt->closeCursor();
+
 		return $result;
 	}
 

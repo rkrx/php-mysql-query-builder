@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Helpers;
 
 use Kir\MySQL\Builder\QueryStatement;
@@ -17,6 +18,7 @@ abstract class FieldTypeProvider {
 				$fieldTypes[$name] = self::getTypeFromNativeType($nativeType);
 			}
 		}
+
 		return $fieldTypes;
 	}
 
@@ -38,6 +40,7 @@ abstract class FieldTypeProvider {
 			case 'INT24':
 				return 'i';
 		}
+
 		return $type;
 	}
 }

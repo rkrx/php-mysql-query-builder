@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Helpers;
 
 use Kir\MySQL\Builder\Expr\OptionalExpression;

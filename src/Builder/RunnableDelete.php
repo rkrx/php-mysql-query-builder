@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\Internal\DDLPreparable;

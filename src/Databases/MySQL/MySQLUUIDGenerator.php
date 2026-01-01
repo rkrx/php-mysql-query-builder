@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Databases\MySQL;
 
 use RuntimeException;
@@ -21,7 +22,7 @@ class MySQLUUIDGenerator {
 				random_int(0, 0xffff),
 				random_int(0, 0xffff)
 			);
-		} catch (Throwable $e) {
+		} catch(Throwable $e) {
 			// Should not throw an excepion under normal conditions
 			throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
 		}

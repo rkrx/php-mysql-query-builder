@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Tools;
 
 class VirtualTable {
@@ -8,7 +9,7 @@ class VirtualTable {
 	 */
 	public function __construct(
 		private string $tableName,
-		private array $params = []
+		private array $params = [],
 	) {}
 
 	/**

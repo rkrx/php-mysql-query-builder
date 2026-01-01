@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Expr;
 
 interface OrderBySpecification {

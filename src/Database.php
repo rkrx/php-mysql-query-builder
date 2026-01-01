@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL;
 
 use JetBrains\PhpStorm\Language;
@@ -29,7 +30,7 @@ interface Database {
 	 */
 	public function query(
 		#[Language('MySQL')]
-		string $query
+		string $query,
 	);
 
 	/**
@@ -38,7 +39,7 @@ interface Database {
 	 */
 	public function prepare(
 		#[Language('MySQL')]
-		string $query
+		string $query,
 	);
 
 	/**
@@ -49,7 +50,7 @@ interface Database {
 	public function exec(
 		#[Language('MySQL')]
 		string $query,
-		array $params = []
+		array $params = [],
 	): int;
 
 	/**

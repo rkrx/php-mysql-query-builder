@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Internal;
 
 use Kir\MySQL\Database;

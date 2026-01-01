@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Expr;
 
 use Kir\MySQL\Builder\Helpers\RecursiveStructureAccess;
@@ -28,7 +29,7 @@ class DBExprFilter implements OptionalExpression {
 		array $data,
 		string|array $keyPath,
 		$validator = null,
-		$validationResultHandler = null
+		$validationResultHandler = null,
 	) {
 		$this->keyPath = $this->buildKey($keyPath);
 		$this->value = RecursiveStructureAccess::recursiveGet($data, $this->keyPath, null);
@@ -38,7 +39,7 @@ class DBExprFilter implements OptionalExpression {
 		}
 		$this->validator = $validator;
 		if($validationResultHandler === null) {
-			$validationResultHandler = static function () {};
+			$validationResultHandler = static function() {};
 		}
 		$this->validationResultHandler = $validationResultHandler;
 	}
@@ -63,8 +64,10 @@ class DBExprFilter implements OptionalExpression {
 				'value' => $this->value,
 				'key' => implode('.', $this->keyPath),
 			]);
+
 			return $result;
 		}
+
 		return true;
 	}
 
@@ -86,6 +89,7 @@ class DBExprFilter implements OptionalExpression {
 		if(!is_array($keyPath)) {
 			throw new RuntimeException('Invalid key');
 		}
+
 		return $keyPath;
 	}
 }

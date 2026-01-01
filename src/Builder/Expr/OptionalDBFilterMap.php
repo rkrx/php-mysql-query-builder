@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Expr;
 
 class OptionalDBFilterMap {
@@ -6,7 +7,7 @@ class OptionalDBFilterMap {
 	 * @param array<string, mixed> $map
 	 */
 	final public function __construct(
-		private array $map
+		private array $map,
 	) {}
 
 	/**

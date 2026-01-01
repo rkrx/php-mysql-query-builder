@@ -1,9 +1,10 @@
 <?php
+
 namespace Kir\MySQL\Tools;
 
 class AliasReplacer {
 	public function __construct(
-		private AliasRegistry $aliasRegistry
+		private AliasRegistry $aliasRegistry,
 	) {}
 
 	/**
@@ -14,8 +15,10 @@ class AliasReplacer {
 		$fn = function($values) {
 			[, $alias, $part] = $values;
 			$string = $this->aliasRegistry->get($alias);
-			return $string.$part;
+
+			return $string . $part;
 		};
+
 		return (string) preg_replace_callback('{^(\\w+)#(\\w+.*)$}', $fn, $name);
 	}
 }

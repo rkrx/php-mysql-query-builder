@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Databases\MySQL;
 
 use Closure;
@@ -37,6 +38,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 */
 	public function bindValues(array $values) {
 		$this->values = array_merge($this->values, $values);
+
 		return $this;
 	}
 
@@ -45,6 +47,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 */
 	public function bindValue(string $key, $value) {
 		$this->values[$key] = $value;
+
 		return $this;
 	}
 
@@ -53,6 +56,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 */
 	public function clearValues(): self {
 		$this->values = [];
+
 		return $this;
 	}
 
@@ -61,6 +65,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 */
 	public function setPreserveTypes(bool $preserveTypes = true): self {
 		$this->preserveTypes = $preserveTypes;
+
 		return $this;
 	}
 
@@ -91,9 +96,10 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 */
 	public function fetchRow($callback = null): array {
 		$callback ??= static fn($row) => $row;
+
 		return $this->fetch($callback, PDO::FETCH_ASSOC, null, static fn($row) => [
 			'valid' => is_array($row),
-			'default' => []
+			'default' => [],
 		]);
 	}
 
@@ -101,14 +107,14 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 * @inheritDoc
 	 */
 	public function fetchObjects(string $className = 'stdClass', $callback = null): array {
-		return $this->createTempStatement(function (QueryStatement $statement) use ($className, $callback) {
+		return $this->createTempStatement(function(QueryStatement $statement) use ($className, $callback) {
 			$data = $statement->fetchAll(PDO::FETCH_CLASS, $className);
 			if($this->preserveTypes) {
 				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
 				$data = array_map(static fn($row) => FieldValueConverter::convertValues($row, $columnDefinitions), $data);
 			}
 			if($callback !== null) {
-				return call_user_func(static function ($resultData = []) use ($data, $callback) {
+				return call_user_func(static function($resultData = []) use ($data, $callback) {
 					foreach($data as $row) {
 						$result = $callback($row);
 						if($result !== null && !($result instanceof DBIgnoreRow)) {
@@ -117,9 +123,11 @@ class MySQLRunnableSelect extends MySQLSelect {
 							$resultData[] = $row;
 						}
 					}
+
 					return $resultData;
 				});
 			}
+
 			return $data;
 		});
 	}
@@ -137,9 +145,10 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 */
 	public function fetchObject($className = null, $callback = null) {
 		$callback ??= static fn($row) => $row;
+
 		return $this->fetch($callback, PDO::FETCH_CLASS, $className ?: $this->defaultClassName, static fn($row) => [
 			'valid' => is_object($row),
-			'default' => null
+			'default' => null,
 		]);
 	}
 
@@ -147,7 +156,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 * @inheritDoc
 	 */
 	public function fetchKeyValue($treatValueAsArray = false): array {
-		return $this->createTempStatement(static function (QueryStatement $statement) use ($treatValueAsArray) {
+		return $this->createTempStatement(static function(QueryStatement $statement) use ($treatValueAsArray) {
 			if($treatValueAsArray) {
 				$rows = $statement->fetchAll(PDO::FETCH_ASSOC);
 				$result = [];
@@ -155,8 +164,10 @@ class MySQLRunnableSelect extends MySQLSelect {
 					[$key] = array_values($row);
 					$result[$key] = $row;
 				}
+
 				return $result;
 			}
+
 			return $statement->fetchAll(PDO::FETCH_KEY_PAIR);
 		});
 	}
@@ -179,6 +190,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 			}
 			$tmp[] = $row;
 		}
+
 		return $result;
 	}
 
@@ -186,10 +198,11 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 * @inheritDoc
 	 */
 	public function fetchArray(?callable $fn = null): array {
-		return $this->createTempStatement(static function (QueryStatement $stmt) use ($fn) {
+		return $this->createTempStatement(static function(QueryStatement $stmt) use ($fn) {
 			if($fn !== null) {
 				return $stmt->fetchAll(PDO::FETCH_FUNC, $fn);
 			}
+
 			return $stmt->fetchAll(PDO::FETCH_COLUMN);
 		});
 	}
@@ -198,11 +211,12 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 * @inheritDoc
 	 */
 	public function fetchValue($default = null, ?callable $fn = null) {
-		return $this->createTempStatement(static function (QueryStatement $stmt) use ($default, $fn) {
+		return $this->createTempStatement(static function(QueryStatement $stmt) use ($default, $fn) {
 			$result = $stmt->fetchAll(PDO::FETCH_COLUMN);
 			if($result !== false && array_key_exists(0, $result)) {
 				return $fn !== null ? $fn($result[0]) : $result[0];
 			}
+
 			return $default;
 		});
 	}
@@ -238,6 +252,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 		if($this->getCalcFoundRows()) {
 			$this->foundRows = (int) $db->query('SELECT FOUND_ROWS()')->fetchColumn();
 		}
+
 		return $statement;
 	}
 
@@ -256,7 +271,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 * @return ($callback is null ? array<int, ($mode is PDO::FETCH_NUM ? array<int, null|scalar> : array<string, null|scalar>)> : array<int, TFnReturnType>)
 	 */
 	private function fetchAll($callback = null, int $mode = 0, $arg0 = null) {
-		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0) {
+		return $this->createTempStatement(function(QueryStatement $statement) use ($callback, $mode, $arg0) {
 			$statement->setFetchMode($mode, $arg0);
 			$data = $statement->fetchAll();
 			if($this->preserveTypes) {
@@ -264,7 +279,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 				$data = array_map(static fn($row) => FieldValueConverter::convertValues($row, $columnDefinitions), $data);
 			}
 			if($callback !== null) {
-				return call_user_func(static function ($resultData = []) use ($data, $callback) {
+				return call_user_func(static function($resultData = []) use ($data, $callback) {
 					foreach($data as $row) {
 						$result = $callback($row);
 						if($result instanceof DBIgnoreRow) {
@@ -276,9 +291,11 @@ class MySQLRunnableSelect extends MySQLSelect {
 							$resultData[] = $row;
 						}
 					}
+
 					return $resultData;
 				});
 			}
+
 			return $data;
 		});
 	}
@@ -313,7 +330,10 @@ class MySQLRunnableSelect extends MySQLSelect {
 				}
 			}
 		} finally {
-			try { $statement->closeCursor(); } catch (Throwable $e) {}
+			try {
+				$statement->closeCursor();
+			} catch(Throwable) {
+			}
 		}
 	}
 
@@ -327,7 +347,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 	 * @return T|U|array<string, mixed>
 	 */
 	private function fetch($callback, int $mode = PDO::FETCH_ASSOC, $arg0 = null, ?Closure $resultValidator = null) {
-		return $this->createTempStatement(function (QueryStatement $statement) use ($callback, $mode, $arg0, $resultValidator) {
+		return $this->createTempStatement(function(QueryStatement $statement) use ($callback, $mode, $arg0, $resultValidator) {
 			$statement->setFetchMode($mode, $arg0);
 			$row = $statement->fetch();
 			$result = $resultValidator === null ? ['valid' => true] : $resultValidator($row);
@@ -344,6 +364,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 					$row = $result;
 				}
 			}
+
 			return $row;
 		});
 	}

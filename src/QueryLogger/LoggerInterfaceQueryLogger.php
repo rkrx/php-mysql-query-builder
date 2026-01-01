@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\QueryLogger;
 
 use Psr\Log\LoggerInterface;
@@ -6,7 +7,7 @@ use Throwable;
 
 class LoggerInterfaceQueryLogger implements QueryLogger {
 	public function __construct(
-		private LoggerInterface $logger
+		private LoggerInterface $logger,
 	) {}
 
 	/**

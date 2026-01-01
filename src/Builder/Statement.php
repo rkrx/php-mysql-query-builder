@@ -15,7 +15,7 @@ abstract class Statement implements StatementInterface {
 	 */
 	public function __construct(
 		private Database $db,
-		private array $options = []
+		private array $options = [],
 	) {
 		$this->aliasReplacer = new AliasReplacer($db->getAliasRegistry());
 	}
@@ -35,6 +35,7 @@ abstract class Statement implements StatementInterface {
 		if($stop) {
 			exit;
 		}
+
 		return $this;
 	}
 

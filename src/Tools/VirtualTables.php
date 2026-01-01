@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Tools;
 
 use Closure;
@@ -15,6 +16,7 @@ class VirtualTables {
 	 */
 	public function add(string $tableName, $select) {
 		$this->virtualTables[$tableName] = $select;
+
 		return $this;
 	}
 
@@ -36,12 +38,16 @@ class VirtualTables {
 			if($table instanceof Closure) {
 				if($tableName instanceof VirtualTable) {
 					$params = $tableName->getParams();
+
 					return $table($params);
 				}
+
 				return $table();
 			}
+
 			return $table;
 		}
+
 		return null;
 	}
 }

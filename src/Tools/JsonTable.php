@@ -2,10 +2,8 @@
 
 namespace Kir\MySQL\Tools;
 
-use Kir\MySQL\Builder\Internal\Types;
 use Kir\MySQL\Common\SpecialTable;
 use Kir\MySQL\Database;
-use Stringable;
 
 /**
  * @phpstan-type TColumn string|array{name: string, type: string, jsonPath: string}
@@ -21,7 +19,7 @@ class JsonTable implements SpecialTable {
 	public function __construct(
 		private string $dataExpression,
 		private string $jsonPath,
-		private $columns
+		private $columns,
 	) {}
 
 	public function asString(Database $db): string {
@@ -46,6 +44,7 @@ class JsonTable implements SpecialTable {
 			}
 			$result[] = $column;
 		}
+
 		return sprintf('COLUMNS(%s)', implode(', ', $result));
 	}
 }

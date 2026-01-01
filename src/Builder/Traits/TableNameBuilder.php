@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Traits;
 
 use InvalidArgumentException;
@@ -21,6 +22,8 @@ trait TableNameBuilder {
 	protected function buildTableName(?string $alias, $name): string {
 		if($name instanceof SpecialTable) {
 			$name = $name->asString($this->db());
+		} elseif(is_object($name) && method_exists($name, 'isTemporary') && $name->isTemporary()) {
+			$name = $name->getTemporaryName();
 		} elseif(is_object($name) && !($name instanceof VirtualTable) && method_exists($name, '__toString')) {
 			$name = (string) $name;
 			$lines = explode("\n", $name);
@@ -29,7 +32,7 @@ trait TableNameBuilder {
 			$name = '(' . trim(rtrim(trim($name), ';')) . ')';
 		} elseif(is_array($name)) {
 			$parts = [];
-			foreach($name as /*$index => */$bucket) {
+			foreach($name as /*$index => */ $bucket) {
 				if(is_scalar($bucket)/* && ctype_digit((string) $index)*/) {
 					$parts[] = "SELECT {$this->db()->quote($bucket)} AS {$this->db()->quoteField('value')}";
 				} elseif(is_iterable($bucket)) {
@@ -52,6 +55,7 @@ trait TableNameBuilder {
 		if($alias !== null) {
 			return sprintf("%s %s", $name, $alias);
 		}
+
 		return $name;
 	}
 

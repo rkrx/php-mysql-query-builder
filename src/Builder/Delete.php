@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\Internal\Types;
@@ -40,6 +41,7 @@ abstract class Delete extends Statement {
 			[$alias, $table] = [$table, $alias];
 		}
 		$this->addTable($alias, $table);
+
 		return $this;
 	}
 
@@ -62,6 +64,7 @@ abstract class Delete extends Statement {
 		$query = $this->buildOrder($query);
 		$query = $this->buildLimit($query);
 		$query = $this->buildOffset($query);
+
 		return $query;
 	}
 }

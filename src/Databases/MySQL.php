@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Databases;
 
 use DateTimeZone;
@@ -44,7 +45,7 @@ class MySQL implements Database {
 	 */
 	public function __construct(
 		private PDO $pdo,
-		array $options = []
+		array $options = [],
 	) {
 		if($pdo->getAttribute(PDO::ATTR_ERRMODE) === PDO::ERRMODE_SILENT) {
 			$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -87,6 +88,7 @@ class MySQL implements Database {
 		if($this->virtualTables === null) {
 			$this->virtualTables = new VirtualTables();
 		}
+
 		return $this->virtualTables;
 	}
 
@@ -96,7 +98,7 @@ class MySQL implements Database {
 	 */
 	public function query(
 		#[Language('MySQL')]
-		string $query
+		string $query,
 	) {
 		return $this->getQueryLoggers()->logRegion($query, fn() =>
 			$this->buildQueryStatement($query, fn($query) =>
@@ -111,7 +113,7 @@ class MySQL implements Database {
 	 */
 	public function prepare(
 		#[Language('MySQL')]
-		string $query
+		string $query,
 	) {
 		return $this->buildQueryStatement((string) $query, fn($query) =>
 			$this->pdo->prepare($query)
@@ -126,16 +128,17 @@ class MySQL implements Database {
 	public function exec(
 		#[Language('MySQL')]
 		string $query,
-		array $params = []
+		array $params = [],
 	): int {
 		return $this->getQueryLoggers()->logRegion($query, fn() =>
-			$this->exceptionHandler(function () use ($query, $params) {
+			$this->exceptionHandler(function() use ($query, $params) {
 				$stmt = $this->pdo->prepare($query);
 				$timer = microtime(true);
 				$stmt->execute($params);
 				$this->queryLoggers->log($query, microtime(true) - $timer);
 				$result = $stmt->rowCount();
 				$stmt->closeCursor();
+
 				return $result;
 			})
 		);
@@ -150,6 +153,7 @@ class MySQL implements Database {
 		if($result === false) {
 			return null;
 		}
+
 		return $result;
 	}
 
@@ -163,8 +167,9 @@ class MySQL implements Database {
 			return $this->tableFields[$fqTable];
 		}
 		$query = "DESCRIBE {$fqTable}";
+
 		return $this->getQueryLoggers()->logRegion($query, fn() =>
-			$this->exceptionHandler(function () use ($query, $fqTable) {
+			$this->exceptionHandler(function() use ($query, $fqTable) {
 				$stmt = $this->pdo->query($query);
 				try {
 					if($stmt === false) {
@@ -172,13 +177,15 @@ class MySQL implements Database {
 					}
 					$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 					$this->tableFields[$fqTable] = array_map(static fn($row) => $row['Field'], $rows ?: []);
+
 					return $this->tableFields[$fqTable];
 				} finally {
 					try {
 						if($stmt instanceof PDOStatement) {
 							$stmt->closeCursor();
 						}
-					} catch (Throwable $e) {}
+					} catch(Throwable) {
+					}
 				}
 			})
 		);
@@ -220,6 +227,7 @@ class MySQL implements Database {
 		if($fields !== null) {
 			$select->fields($fields);
 		}
+
 		return $select;
 	}
 
@@ -234,6 +242,7 @@ class MySQL implements Database {
 		if($fields !== null) {
 			$insert->addAll($fields);
 		}
+
 		return $insert;
 	}
 
@@ -248,6 +257,7 @@ class MySQL implements Database {
 		if($fields !== null) {
 			$update->setAll($fields);
 		}
+
 		return $update;
 	}
 
@@ -272,6 +282,7 @@ class MySQL implements Database {
 			}
 		}
 		$this->transactionLevel++;
+
 		return $this;
 	}
 
@@ -279,7 +290,7 @@ class MySQL implements Database {
 	 * @return $this
 	 */
 	public function transactionCommit() {
-		return $this->transactionEnd(function () {
+		return $this->transactionEnd(function() {
 			$this->pdo->commit();
 		});
 	}
@@ -288,7 +299,7 @@ class MySQL implements Database {
 	 * @return $this
 	 */
 	public function transactionRollback() {
-		return $this->transactionEnd(function () {
+		return $this->transactionEnd(function() {
 			$this->pdo->rollBack();
 		});
 	}
@@ -329,8 +340,9 @@ class MySQL implements Database {
 			try {
 				$result = $callback($this);
 				$this->transactionCommit();
+
 				return $result;
-			} catch (Throwable $e) {
+			} catch(Throwable $e) {
 				if($this->pdo->inTransaction()) {
 					$this->transactionRollback();
 				}
@@ -342,8 +354,9 @@ class MySQL implements Database {
 		try {
 			$result = $callback($this);
 			$this->exec("RELEASE SAVEPOINT {$uniqueId}");
+
 			return $result;
-		} catch (Throwable $e) {
+		} catch(Throwable $e) {
 			$this->exec("ROLLBACK TO {$uniqueId}");
 			throw $e;
 		}
@@ -365,9 +378,9 @@ class MySQL implements Database {
 				$fn();
 			}
 		}
+
 		return $this;
 	}
-
 
 	/**
 	 * @param string $query
@@ -379,6 +392,7 @@ class MySQL implements Database {
 		if(!$stmt) {
 			throw new RuntimeException("Could not execute statement:\n{$query}");
 		}
+
 		return new QueryStatement($stmt, $query, $this->exceptionInterpreter, $this->queryLoggers);
 	}
 
@@ -390,7 +404,7 @@ class MySQL implements Database {
 	private function exceptionHandler(callable $fn) {
 		try {
 			return $fn();
-		} catch (PDOException $exception) {
+		} catch(PDOException $exception) {
 			throw $this->exceptionInterpreter->getMoreConcreteException($exception);
 		}
 	}

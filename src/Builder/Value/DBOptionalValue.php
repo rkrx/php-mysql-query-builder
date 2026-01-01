@@ -13,7 +13,7 @@ class DBOptionalValue implements OptionalValue {
 	public function __construct(
 		private object|array $data,
 		private string|array $path,
-		private $validator = null
+		private $validator = null,
 	) {}
 
 	/**
@@ -25,8 +25,10 @@ class DBOptionalValue implements OptionalValue {
 		}
 		if($this->validator !== null) {
 			$value = $this->getValue();
+
 			return call_user_func($this->validator, $value);
 		}
+
 		return true;
 	}
 

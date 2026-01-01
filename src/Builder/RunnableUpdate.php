@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\Internal\DDLPreparable;
@@ -17,6 +18,7 @@ class RunnableUpdate extends Update implements DDLPreparable {
 	 */
 	public function run(array $params = []): int {
 		$query = $this->__toString();
+
 		return $this->db()->exec($query, $params);
 	}
 

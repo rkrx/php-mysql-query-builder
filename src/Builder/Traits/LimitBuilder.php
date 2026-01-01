@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Builder\InvalidValueException;
@@ -16,8 +17,10 @@ trait LimitBuilder {
 			if(is_numeric($value)) {
 				return (int) $value;
 			}
+
 			return null;
 		}
+
 		return $this->limit;
 	}
 
@@ -27,6 +30,7 @@ trait LimitBuilder {
 	 */
 	public function limit($limit) {
 		$this->limit = $limit;
+
 		return $this;
 	}
 
@@ -56,6 +60,7 @@ trait LimitBuilder {
 		} elseif($limit !== null) {
 			$query .= "LIMIT\n\t{$limit}\n";
 		}
+
 		return $query;
 	}
 }

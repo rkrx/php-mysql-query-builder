@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Database;
 
 use Kir\MySQL\Exceptions\SqlException;
@@ -13,8 +14,8 @@ interface DatabaseStatement {
 
 	/**
 	 * @param array<string, mixed> $params
-	 * @throws SqlException
 	 * @return $this
+	 * @throws SqlException
 	 */
 	public function execute(array $params = []);
 

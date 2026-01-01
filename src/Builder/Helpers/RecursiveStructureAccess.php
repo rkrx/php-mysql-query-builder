@@ -12,6 +12,7 @@ class RecursiveStructureAccess {
 	 */
 	public static function recursiveHas($structure, $path): bool {
 		$arrayPath = self::getArrayPath($path);
+
 		return self::_recursiveHas($structure, $arrayPath);
 	}
 
@@ -25,7 +26,7 @@ class RecursiveStructureAccess {
 		$arrayPath = self::getArrayPath($path);
 		$data = self::ensureArrayIsArray($structure);
 		$count = count($arrayPath);
-		if (!$count) {
+		if(!$count) {
 			return $default;
 		}
 		foreach($arrayPath as $idxValue) {
@@ -35,6 +36,7 @@ class RecursiveStructureAccess {
 			}
 			$data = $data[$part];
 		}
+
 		return $data;
 	}
 
@@ -55,6 +57,7 @@ class RecursiveStructureAccess {
 		if(count($path)) {
 			return self::_recursiveHas($data[$key] ?? null, $path);
 		}
+
 		return array_key_exists($key, $data);
 	}
 
@@ -70,6 +73,7 @@ class RecursiveStructureAccess {
 		if($parts === false) {
 			return [$path];
 		}
+
 		return $parts;
 	}
 
@@ -87,6 +91,7 @@ class RecursiveStructureAccess {
 		if(is_array($array)) {
 			return $array;
 		}
+
 		return null;
 	}
 }

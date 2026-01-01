@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Builder\Expr\OrderBySpecification;
@@ -19,9 +20,11 @@ trait OrderByBuilder {
 			foreach($expression->getFields() as $field) {
 				$this->addOrder($field[0], $field[1]);
 			}
+
 			return $this;
 		}
 		$this->addOrder($expression, $direction);
+
 		return $this;
 	}
 
@@ -36,6 +39,7 @@ trait OrderByBuilder {
 			$expr[] = $this->db()->quoteExpression("WHEN ? THEN ?", [$value, $idx]);
 		}
 		$this->orderBy[] = [sprintf("CASE %s\n\t\t%s\n\tEND", $this->db()->quoteField($fieldName), implode("\n\t\t", $expr)), 'ASC'];
+
 		return $this;
 	}
 
@@ -53,6 +57,7 @@ trait OrderByBuilder {
 	 */
 	public function resetOrderBy() {
 		$this->orderBy = [];
+
 		return $this;
 	}
 
@@ -69,7 +74,8 @@ trait OrderByBuilder {
 		foreach($this->orderBy as [$expression, $direction]) {
 			$arr[] = sprintf("\t%s %s", $expression, strtoupper($direction));
 		}
-		return $query.implode(",\n", $arr)."\n";
+
+		return $query . implode(",\n", $arr) . "\n";
 	}
 
 	/**

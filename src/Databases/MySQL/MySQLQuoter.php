@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Databases\MySQL;
 
 use DateTimeImmutable;
@@ -11,7 +12,7 @@ use PDO;
 class MySQLQuoter {
 	public function __construct(
 		private PDO $pdo,
-		private DateTimeZone $timeZone
+		private DateTimeZone $timeZone,
 	) {}
 
 	/**
@@ -57,7 +58,7 @@ class MySQLQuoter {
 	 */
 	public function quoteExpression(string $expression, array $arguments = []): string {
 		$index = -1;
-		$func = function () use ($arguments, &$index) {
+		$func = function() use ($arguments, &$index) {
 			$index++;
 			if(array_key_exists($index, $arguments)) {
 				$argument = $arguments[$index];
@@ -69,8 +70,10 @@ class MySQLQuoter {
 			} else {
 				$value = 'NULL';
 			}
+
 			return $value;
 		};
+
 		return (string) preg_replace_callback('{(\\?)}', $func, $expression);
 	}
 }

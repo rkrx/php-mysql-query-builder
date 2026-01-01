@@ -27,6 +27,7 @@ abstract class Insert extends InsertUpdateStatement {
 	 */
 	public function into(string $table) {
 		$this->table = $table;
+
 		return $this;
 	}
 
@@ -36,6 +37,7 @@ abstract class Insert extends InsertUpdateStatement {
 	 */
 	public function setIgnore(bool $value = true) {
 		$this->ignore = $value;
+
 		return $this;
 	}
 
@@ -49,6 +51,7 @@ abstract class Insert extends InsertUpdateStatement {
 	 */
 	public function setKey(string $field) {
 		$this->keyField = $field;
+
 		return $this;
 	}
 
@@ -59,6 +62,7 @@ abstract class Insert extends InsertUpdateStatement {
 	 */
 	public function add(string $field, $value) {
 		$this->fields = $this->addTo($this->fields, $field, $value);
+
 		return $this;
 	}
 
@@ -69,6 +73,7 @@ abstract class Insert extends InsertUpdateStatement {
 	 */
 	public function update(string $field, $value) {
 		$this->update = $this->addTo($this->update, $field, $value);
+
 		return $this;
 	}
 
@@ -80,6 +85,7 @@ abstract class Insert extends InsertUpdateStatement {
 	public function addOrUpdate(string $field, $value) {
 		$this->add($field, $value);
 		$this->update($field, $value);
+
 		return $this;
 	}
 
@@ -94,6 +100,7 @@ abstract class Insert extends InsertUpdateStatement {
 		} else {
 			$this->fields[] = $str;
 		}
+
 		return $this;
 	}
 
@@ -108,6 +115,7 @@ abstract class Insert extends InsertUpdateStatement {
 		} else {
 			$this->update[] = $str;
 		}
+
 		return $this;
 	}
 
@@ -124,6 +132,7 @@ abstract class Insert extends InsertUpdateStatement {
 			$this->fields[] = $expr;
 			$this->update[] = $expr;
 		}
+
 		return $this;
 	}
 
@@ -134,9 +143,10 @@ abstract class Insert extends InsertUpdateStatement {
 	 * @return $this
 	 */
 	public function addAll(array $data, ?array $mask = null, ?array $excludeFields = null) {
-		$this->addAllTo($data, $mask, $excludeFields, function ($field, $value) {
+		$this->addAllTo($data, $mask, $excludeFields, function($field, $value) {
 			$this->add($field, $value);
 		});
+
 		return $this;
 	}
 
@@ -147,11 +157,12 @@ abstract class Insert extends InsertUpdateStatement {
 	 * @return $this
 	 */
 	public function updateAll(array $data, ?array $mask = null, ?array $excludeFields = null) {
-		$this->addAllTo($data, $mask, $excludeFields, function ($field, $value) {
+		$this->addAllTo($data, $mask, $excludeFields, function($field, $value) {
 			if($field !== $this->keyField) {
 				$this->update($field, $value);
 			}
 		});
+
 		return $this;
 	}
 
@@ -164,6 +175,7 @@ abstract class Insert extends InsertUpdateStatement {
 	public function addOrUpdateAll(array $data, ?array $mask = null, ?array $excludeFields = null) {
 		$this->addAll($data, $mask, $excludeFields);
 		$this->updateAll($data, $mask, $excludeFields);
+
 		return $this;
 	}
 
@@ -173,6 +185,7 @@ abstract class Insert extends InsertUpdateStatement {
 	 */
 	public function from(Select $select) {
 		$this->from = $select;
+
 		return $this;
 	}
 
@@ -236,6 +249,7 @@ abstract class Insert extends InsertUpdateStatement {
 		$sqlField = $field;
 		$sqlValue = $this->db()->quote($value);
 		$fields[$sqlField] = $sqlValue;
+
 		return $fields;
 	}
 
@@ -277,6 +291,7 @@ abstract class Insert extends InsertUpdateStatement {
 
 			$queryArr[] = implode(",\n", $updateArr);
 		}
+
 		return implode('', $queryArr);
 	}
 

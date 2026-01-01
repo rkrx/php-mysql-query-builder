@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Builder;
@@ -23,6 +24,7 @@ trait GroupByBuilder {
 			}
 			$this->groupBy[] = $expression;
 		}
+
 		return $this;
 	}
 
@@ -39,7 +41,8 @@ trait GroupByBuilder {
 		foreach($this->groupBy as $expression) {
 			$arr[] = "\t{$expression}";
 		}
-		return $query.implode(",\n", $arr)."\n";
+
+		return $query . implode(",\n", $arr) . "\n";
 	}
 
 	/**

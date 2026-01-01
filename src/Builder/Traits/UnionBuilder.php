@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Builder\Select;
@@ -17,6 +18,7 @@ trait UnionBuilder {
 		foreach($queries as $query) {
 			$this->unions[] = ['', $query];
 		}
+
 		return $this;
 	}
 
@@ -28,6 +30,7 @@ trait UnionBuilder {
 		foreach($queries as $query) {
 			$this->unions[] = ['ALL', $query];
 		}
+
 		return $this;
 	}
 
@@ -36,9 +39,10 @@ trait UnionBuilder {
 	 * @return string
 	 */
 	protected function buildUnions(string $query): string {
-		$wrap = static function ($query) {
+		$wrap = static function($query) {
 			$query = trim($query);
 			$query = implode("\n\t", explode("\n", $query));
+
 			return sprintf("(\n\t%s\n)", $query);
 		};
 		$queries = [$wrap($query)];
@@ -53,6 +57,7 @@ trait UnionBuilder {
 		if(count($queries) > 1) {
 			return implode(' ', $queries);
 		}
+
 		return $query;
 	}
 }

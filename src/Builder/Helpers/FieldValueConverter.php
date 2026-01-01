@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Helpers;
 
 class FieldValueConverter {
@@ -16,6 +17,7 @@ class FieldValueConverter {
 				$result[$key] = $value;
 			}
 		}
+
 		return $result;
 	}
 
@@ -29,6 +31,7 @@ class FieldValueConverter {
 			case 'i': return $value !== null ? (int) $value : null;
 			case 'f': return $value !== null ? (float) $value : null;
 		}
+
 		return $value;
 	}
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Internal;
 
 use Kir\MySQL\Database;
@@ -38,6 +39,7 @@ final class ConditionBuilder {
 			}
 		}
 		$query .= implode("\n\tAND\n", $arr);
+
 		return "{$query}\n";
 	}
 
@@ -51,6 +53,7 @@ final class ConditionBuilder {
 	private static function buildCondition(array $conditions, string $expression, array $arguments, Database $db): array {
 		$expr = $db->quoteExpression($expression, $arguments);
 		$conditions[] = "\t({$expr})";
+
 		return $conditions;
 	}
 
@@ -65,6 +68,7 @@ final class ConditionBuilder {
 		$keyParts = explode('.', $key);
 		$fn = static fn(string $part) => "`{$part}`";
 		$enclosedKeyParts = array_map($fn, $keyParts);
+
 		return implode('.', $enclosedKeyParts);
 	}
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Database\DatabaseStatement;
@@ -8,8 +9,9 @@ use Kir\MySQL\QueryLogger\QueryLoggers;
 use PDO;
 use PDOException;
 use PDOStatement;
+use Stringable;
 
-class QueryStatement implements DatabaseStatement {
+class QueryStatement implements DatabaseStatement, Stringable {
 	/**
 	 * @param PDOStatement<mixed> $stmt
 	 * @param string $query
@@ -20,7 +22,7 @@ class QueryStatement implements DatabaseStatement {
 		private PDOStatement $stmt,
 		private string $query,
 		private MySQLExceptionInterpreter $exceptionInterpreter,
-		private QueryLoggers $queryLoggers
+		private QueryLoggers $queryLoggers,
 	) {}
 
 	/**
@@ -45,13 +47,14 @@ class QueryStatement implements DatabaseStatement {
 			$args[] = $arg1;
 		}
 		$this->stmt->setFetchMode(...$args);
+
 		return $this;
 	}
 
 	/**
 	 * @param array<string, mixed> $params
-	 * @throws SqlException
 	 * @return $this
+	 * @throws SqlException
 	 */
 	public function execute(array $params = []) {
 		$this->exceptionHandler(function() use ($params) {
@@ -62,6 +65,7 @@ class QueryStatement implements DatabaseStatement {
 				}
 			});
 		});
+
 		return $this;
 	}
 
@@ -76,12 +80,14 @@ class QueryStatement implements DatabaseStatement {
 			if($fetchArgument !== null) {
 				return $this->stmt->fetchAll($fetchStyle, $fetchArgument, ...$ctorArgs);
 			}
+
 			return $this->stmt->fetchAll($fetchStyle);
 		});
 		/** @var array<mixed, mixed>|false $x */
 		if($x === false) {
 			return [];
 		}
+
 		return $result;
 	}
 
@@ -127,6 +133,7 @@ class QueryStatement implements DatabaseStatement {
 			if($columnMeta === false) {
 				return null;
 			}
+
 			return $columnMeta;
 		});
 	}
@@ -139,8 +146,12 @@ class QueryStatement implements DatabaseStatement {
 	private function exceptionHandler(callable $fn) {
 		try {
 			return $fn();
-		} catch (PDOException $exception) {
+		} catch(PDOException $exception) {
 			throw $this->exceptionInterpreter->getMoreConcreteException($exception);
 		}
+	}
+
+	public function __toString(): string {
+		return $this->query;
 	}
 }

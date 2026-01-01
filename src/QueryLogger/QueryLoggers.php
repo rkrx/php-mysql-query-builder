@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\QueryLogger;
 
 use Throwable;
@@ -40,10 +41,11 @@ class QueryLoggers {
 	 * @param float $duration
 	 */
 	public function log(string $query, float $duration): void {
-		foreach ($this->queryLoggers as $queryLogger) {
+		foreach($this->queryLoggers as $queryLogger) {
 			try {
 				$queryLogger->log($query, $duration);
-			} catch (Throwable $e) {}
+			} catch(Throwable) {
+			}
 		}
 	}
 
@@ -53,10 +55,11 @@ class QueryLoggers {
 	 * @param float $duration
 	 */
 	public function logError(string $query, Throwable $exception, float $duration): void {
-		foreach ($this->queryLoggers as $queryLogger) {
+		foreach($this->queryLoggers as $queryLogger) {
 			try {
 				$queryLogger->logError($query, $exception, $duration);
-			} catch (Throwable $e) {}
+			} catch(Throwable) {
+			}
 		}
 	}
 }

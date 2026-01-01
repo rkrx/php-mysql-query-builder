@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Builder\InvalidValueException;
@@ -16,8 +17,10 @@ trait OffsetBuilder {
 			if(is_numeric($value)) {
 				return (int) $value;
 			}
+
 			return null;
 		}
+
 		return $this->offset;
 	}
 
@@ -27,6 +30,7 @@ trait OffsetBuilder {
 	 */
 	public function offset($offset = 0) {
 		$this->offset = $offset;
+
 		return $this;
 	}
 
@@ -52,6 +56,7 @@ trait OffsetBuilder {
 		} elseif($offset !== null) {
 			$query .= "OFFSET\n\t{$this->offset}\n";
 		}
+
 		return $query;
 	}
 }

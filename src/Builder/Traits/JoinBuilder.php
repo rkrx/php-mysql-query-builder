@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Builder\Internal\Types;
@@ -54,7 +55,7 @@ trait JoinBuilder {
 	protected function buildJoins(string $query): string {
 		$arr = [];
 		foreach($this->joinTables as $table) {
-			$join = $table['type']." JOIN\n";
+			$join = $table['type'] . " JOIN\n";
 			$join .= "\t" . $this->buildTableName($table['alias'], $table['name']);
 			if($table['expression']) {
 				$join .= " ON " . $this->db()->quoteExpression($table['expression'], $table['arguments']);
@@ -62,8 +63,9 @@ trait JoinBuilder {
 			$arr[] = $join;
 		}
 		if(count($arr)) {
-			$query .= implode("\n", $arr)."\n";
+			$query .= implode("\n", $arr) . "\n";
 		}
+
 		return $query;
 	}
 
@@ -81,8 +83,9 @@ trait JoinBuilder {
 			'alias' => $alias,
 			'name' => $name,
 			'expression' => $expression,
-			'arguments' => $arguments
+			'arguments' => $arguments,
 		];
+
 		return $this;
 	}
 }

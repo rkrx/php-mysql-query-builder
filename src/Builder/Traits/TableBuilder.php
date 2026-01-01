@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Traits;
 
 use Kir\MySQL\Builder\Internal\Types;
@@ -19,6 +20,7 @@ trait TableBuilder {
 	 */
 	protected function addTable(?string $alias, $table) {
 		$this->tables[] = ['alias' => $alias, 'name' => $table];
+
 		return $this;
 	}
 
@@ -29,11 +31,12 @@ trait TableBuilder {
 	protected function buildTables(string $query): string {
 		$arr = [];
 		foreach($this->tables as $table) {
-			$arr[] = "\t".$this->buildTableName($table['alias'], $table['name']);
+			$arr[] = "\t" . $this->buildTableName($table['alias'], $table['name']);
 		}
 		if(count($arr)) {
-			$query .= implode(",\n", $arr)."\n";
+			$query .= implode(",\n", $arr) . "\n";
 		}
+
 		return $query;
 	}
 

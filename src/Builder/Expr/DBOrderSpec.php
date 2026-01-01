@@ -50,6 +50,7 @@ class DBOrderSpec implements DBOrderSpecInterface, OrderBySpecification {
 			}
 			$max--;
 		}
+
 		return $fields;
 	}
 }

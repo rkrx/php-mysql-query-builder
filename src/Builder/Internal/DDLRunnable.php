@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Internal;
 
 use Kir\MySQL\Database\DatabaseStatement;
@@ -16,7 +17,7 @@ class DDLRunnable {
 	 */
 	public function __construct(
 		private DatabaseStatement $query,
-		?callable $callbackFn = null
+		?callable $callbackFn = null,
 	) {
 		$this->callbackFn = $callbackFn;
 	}
@@ -31,6 +32,7 @@ class DDLRunnable {
 		if($this->callbackFn !== null) {
 			$response = call_user_func($this->callbackFn, $response);
 		}
+
 		return $response;
 	}
 }

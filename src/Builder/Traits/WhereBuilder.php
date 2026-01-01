@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder\Traits;
 
 use Closure;
@@ -25,6 +26,7 @@ trait WhereBuilder {
 		/** @var Closure(DBWhereExpressionType, list<DBParameterValueType>):void $fn */
 		$fn = fn($expression, $args) => $this->where[] = [$expression, $args];
 		ConditionAddHelper::addCondition($fn, $expression, $args);
+
 		return $this;
 	}
 

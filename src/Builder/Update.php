@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder;
 
 use Kir\MySQL\Builder\Internal\DefaultValue;
@@ -37,6 +38,7 @@ abstract class Update extends InsertUpdateStatement {
 			[$alias, $table] = [$table, $alias];
 		}
 		$this->addTable($alias, $table);
+
 		return $this;
 	}
 
@@ -49,6 +51,7 @@ abstract class Update extends InsertUpdateStatement {
 		$sqlField = $fieldName;
 		$sqlValue = $this->db()->quote($value);
 		$this->fields[$sqlField] = $sqlValue;
+
 		return $this;
 	}
 
@@ -59,6 +62,7 @@ abstract class Update extends InsertUpdateStatement {
 	public function setDefault(string $fieldName): self {
 		$sqlField = $fieldName;
 		$this->fields[$sqlField] = new DefaultValue();
+
 		return $this;
 	}
 
@@ -73,6 +77,7 @@ abstract class Update extends InsertUpdateStatement {
 		} else {
 			$this->fields[] = $expr;
 		}
+
 		return $this;
 	}
 
@@ -94,6 +99,7 @@ abstract class Update extends InsertUpdateStatement {
 				$this->set($fieldName, $value);
 			}
 		}
+
 		return $this;
 	}
 
@@ -116,6 +122,7 @@ abstract class Update extends InsertUpdateStatement {
 		$query = $this->buildOrder($query);
 		$query = $this->buildLimit($query);
 		$query = $this->buildOffset($query);
+
 		return $query;
 	}
 
@@ -128,6 +135,7 @@ abstract class Update extends InsertUpdateStatement {
 		if(!count($sqlFields)) {
 			throw new RuntimeException('No field-data found');
 		}
+
 		return sprintf("%s%s\n", $query, implode(",\n", $sqlFields));
 	}
 
@@ -160,6 +168,7 @@ abstract class Update extends InsertUpdateStatement {
 				}
 			}
 		}
+
 		return $result;
 	}
 }

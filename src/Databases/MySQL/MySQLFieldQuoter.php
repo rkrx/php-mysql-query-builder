@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Databases\MySQL;
 
 use UnexpectedValueException;
@@ -16,6 +17,7 @@ class MySQLFieldQuoter {
 			return $field;
 		}
 		$parts = explode('.', $field);
-		return '`'.implode('`.`', $parts).'`';
+
+		return '`' . implode('`.`', $parts) . '`';
 	}
 }

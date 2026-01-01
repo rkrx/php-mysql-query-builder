@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Builder;
 
 class DBExpr {
@@ -6,7 +7,7 @@ class DBExpr {
 	 * @param string $expression
 	 */
 	public function __construct(
-		private string $expression
+		private string $expression,
 	) {}
 
 	/**

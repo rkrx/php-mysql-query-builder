@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Databases\MySQL;
 
 use Kir\MySQL\Builder\Internal\Types;
@@ -44,6 +45,7 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 	 */
 	public function distinct(bool $distinct = true) {
 		$this->distinct = $distinct;
+
 		return $this;
 	}
 
@@ -53,7 +55,7 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 	 * @return $this
 	 */
 	public function field($expression, $alias = null) {
-		if (is_object($expression)) {
+		if(is_object($expression)) {
 			$expression = (string) $expression;
 			$expression = trim($expression);
 			$expression = rtrim($expression, ';');
@@ -63,11 +65,12 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 			$expression = implode("\n", $lines);
 			$expression = sprintf("(\n%s\n\t)", $expression);
 		}
-		if ($alias === null) {
+		if($alias === null) {
 			$this->fields[] = $expression;
 		} else {
 			$this->fields[$alias] = $expression;
 		}
+
 		return $this;
 	}
 
@@ -76,9 +79,10 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 	 * @return $this
 	 */
 	public function fields(array $fields) {
-		foreach ($fields as $alias => $expression) {
+		foreach($fields as $alias => $expression) {
 			$this->field($expression, is_int($alias) ? null : $alias);
 		}
+
 		return $this;
 	}
 
@@ -95,6 +99,7 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 	 */
 	public function forUpdate(bool $enabled = true) {
 		$this->forUpdate = $enabled;
+
 		return $this;
 	}
 
@@ -110,10 +115,11 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 	 * @return $this
 	 */
 	public function setCalcFoundRows($calcFoundRows = true) {
-		if (ini_get("mysql.trace_mode")) {
+		if(ini_get("mysql.trace_mode")) {
 			throw new RuntimeException('This function cant operate with mysql.trace_mode is set.');
 		}
 		$this->calcFoundRows = $calcFoundRows;
+
 		return $this;
 	}
 
@@ -129,6 +135,7 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 		} else {
 			$this->addTable($alias, $table);
 		}
+
 		return $this;
 	}
 
@@ -137,15 +144,15 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 	 */
 	public function __toString(): string {
 		$query = "SELECT";
-		if ($this->calcFoundRows) {
+		if($this->calcFoundRows) {
 			$query .= " SQL_CALC_FOUND_ROWS";
 		}
-		if ($this->distinct) {
+		if($this->distinct) {
 			$query .= " DISTINCT";
 		}
 		$query .= "\n";
 		$query = $this->buildFields($query);
-		if (count($this->getTables())) {
+		if(count($this->getTables())) {
 			$query .= "FROM\n";
 		}
 		$query = $this->buildTables($query);
@@ -158,6 +165,7 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 		$query = $this->buildOffset($query);
 		$query = $this->buildUnions($query);
 		$query = $this->buildForUpdate($query);
+
 		return $query;
 	}
 
@@ -167,9 +175,9 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 	 */
 	private function buildFields(string $query): string {
 		$fields = [];
-		if (count($this->fields)) {
-			foreach ($this->fields as $alias => $expression) {
-				if (is_numeric($alias)) {
+		if(count($this->fields)) {
+			foreach($this->fields as $alias => $expression) {
+				if(is_numeric($alias)) {
 					$fields[] = "\t{$expression}";
 				} else {
 					$fields[] = "\t{$expression} AS `{$alias}`";
@@ -178,7 +186,8 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 		} else {
 			$fields[] = "\t*";
 		}
-		return $query.implode(",\n", $fields)."\n";
+
+		return $query . implode(",\n", $fields) . "\n";
 	}
 
 	/**
@@ -186,9 +195,10 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 	 * @return string
 	 */
 	private function buildForUpdate(string $query): string {
-		if ($this->forUpdate) {
+		if($this->forUpdate) {
 			$query .= "FOR UPDATE\n";
 		}
+
 		return $query;
 	}
 }
