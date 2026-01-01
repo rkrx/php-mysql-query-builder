@@ -62,7 +62,6 @@ class MySQLTest extends DBTestCase {
 				self::assertEquals(101, $this->getDB()->query('SELECT field1 FROM test1 WHERE id=1')->fetchColumn(0));
 			}
 		});
-		// @phpstan-ignore-next-line - "Unreachable statement - code above always terminates."
 		self::assertEquals(100, $this->getDB()->query('SELECT field1 FROM test1 WHERE id=1')->fetchColumn(0));
 	}
 
