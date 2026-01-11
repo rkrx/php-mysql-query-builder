@@ -4,6 +4,7 @@ namespace Kir\MySQL\Databases\MySQL;
 
 use Kir\MySQL\Builder\Internal\Types;
 use Kir\MySQL\Builder\RunnableSelect;
+use Kir\MySQL\Builder\RunnableTemporaryTable;
 use Kir\MySQL\Builder\Select;
 use Kir\MySQL\Builder\Statement;
 use Kir\MySQL\Builder\Traits\GroupByBuilder;
@@ -47,6 +48,40 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 		$this->distinct = $distinct;
 
 		return $this;
+	}
+
+	/**
+	 * @param array<int|string, string> $schema
+	 * @param array<string, mixed> $options
+	 * @return RunnableTemporaryTable
+	 */
+	public function temporary(array $schema, array $options = []): RunnableTemporaryTable {
+		$name = 'tmp_' . bin2hex(random_bytes(16));
+
+		$schemaSql = '';
+		if($schema) {
+			$lines = [];
+			foreach($schema as $key => $val) {
+				if(is_int($key)) {
+					$lines[] = $val;
+				} else {
+					$lines[] = "`{$key}` {$val}";
+				}
+			}
+			$schemaSql = '(' . implode(', ', $lines) . ')';
+		}
+
+		$optionsSql = '';
+		if(isset($options['engine'])) {
+			$optionsSql .= " ENGINE={$options['engine']}";
+		}
+
+		$query = (string) $this;
+		$sql = "CREATE TEMPORARY TABLE {$name} {$schemaSql} {$optionsSql} AS {$query}";
+
+		$this->db()->exec($sql);
+
+		return new MySQLTemporaryTable($this->db(), $name);
 	}
 
 	/**

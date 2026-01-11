@@ -152,6 +152,13 @@ interface Select {
 	public function setCalcFoundRows($calcFoundRows = true);
 
 	/**
+	 * @param array<int|string, string> $schema
+	 * @param array<string, mixed> $options
+	 * @return RunnableTemporaryTable
+	 */
+	public function temporary(array $schema, array $options = []): RunnableTemporaryTable;
+
+	/**
 	 * @return string
 	 */
 	public function __toString(): string;

@@ -4,6 +4,7 @@ namespace Kir\MySQL\Builder\Traits;
 
 use InvalidArgumentException;
 use Kir\MySQL\Builder\Internal\Types;
+use Kir\MySQL\Builder\RunnableTemporaryTable;
 use Kir\MySQL\Common\SpecialTable;
 use Kir\MySQL\Database;
 use Kir\MySQL\Tools\VirtualTable;
@@ -22,8 +23,8 @@ trait TableNameBuilder {
 	protected function buildTableName(?string $alias, $name): string {
 		if($name instanceof SpecialTable) {
 			$name = $name->asString($this->db());
-		} elseif(is_object($name) && method_exists($name, 'isTemporary') && $name->isTemporary()) {
-			$name = $name->getTemporaryName();
+		} elseif($name instanceof RunnableTemporaryTable) {
+			$name = $name->getName();
 		} elseif(is_object($name) && !($name instanceof VirtualTable) && method_exists($name, '__toString')) {
 			$name = (string) $name;
 			$lines = explode("\n", $name);
