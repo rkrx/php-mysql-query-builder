@@ -27,20 +27,10 @@ abstract class FieldTypeProvider {
 	 * @return string
 	 */
 	private static function getTypeFromNativeType(string $type): string {
-		switch ($type) {
-			case 'NEWDECIMAL':
-			case 'DECIMAL':
-			case 'FLOAT':
-			case 'DOUBLE':
-				return 'f';
-			case 'TINY':
-			case 'SHORT':
-			case 'LONG':
-			case 'LONGLONG':
-			case 'INT24':
-				return 'i';
-		}
-
-		return $type;
+		return match ($type) {
+			'NEWDECIMAL', 'DECIMAL', 'FLOAT', 'DOUBLE' => 'f',
+			'TINY', 'SHORT', 'LONG', 'LONGLONG', 'INT24' => 'i',
+			default => $type,
+		};
 	}
 }

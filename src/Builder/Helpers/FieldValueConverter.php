@@ -27,11 +27,10 @@ class FieldValueConverter {
 	 * @return mixed
 	 */
 	private static function convertValue($value, string $type) {
-		switch ($type) {
-			case 'i': return $value !== null ? (int) $value : null;
-			case 'f': return $value !== null ? (float) $value : null;
-		}
-
-		return $value;
+		return match ($type) {
+			'i' => $value !== null ? (int) $value : null,
+			'f' => $value !== null ? (float) $value : null,
+			default => $value,
+		};
 	}
 }

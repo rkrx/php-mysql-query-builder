@@ -1,4 +1,5 @@
 <?php
+
 namespace Kir\MySQL\Databases\MySQL;
 
 use Kir\MySQL\Exceptions\DatabaseHasGoneAwayException;
@@ -19,18 +20,14 @@ class MySQLExceptionInterpreter {
 		/** @link http://php.net/manual/en/class.exception.php#Hcom115813 (cHao's comment) */
 		$code = is_array($errorInfo) && isset($errorInfo[1]) ? ((int) $errorInfo[1]) : ((int) $exception->getCode());
 		$message = $exception->getMessage();
-		switch($code) {
-			case 2006: return new DatabaseHasGoneAwayException($message, $code, $exception);
-			case 1213: return new SqlDeadLockException($message, $code, $exception);
-			case 1205: return new LockWaitTimeoutExceededException($message, $code, $exception);
-			case 1022:
-			case 1062:
-			case 1169:
-			case 1586: return new DuplicateUniqueKeyException($message, $code, $exception);
-			case 1216:
-			case 1217:
-			case 1452: return new IntegrityConstraintViolationException($message, $code, $exception);
-		}
-		return new SqlException($message, $code, $exception);
+
+		return match ($code) {
+			2006 => new DatabaseHasGoneAwayException($message, $code, $exception),
+			1213 => new SqlDeadLockException($message, $code, $exception),
+			1205 => new LockWaitTimeoutExceededException($message, $code, $exception),
+			1022, 1062, 1169, 1586 => new DuplicateUniqueKeyException($message, $code, $exception),
+			1216, 1217, 1452 => new IntegrityConstraintViolationException($message, $code, $exception),
+			default => new SqlException($message, $code, $exception),
+		};
 	}
 }
