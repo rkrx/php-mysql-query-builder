@@ -16,7 +16,7 @@ This object implements `Stringable` and returns the name of the temporary table 
 
 ```php
 // 1. Define the complex query
-$result = $db->select()
+$tempTable = $db->select()
     ->from('orders', 'o')
     ->fields([
         'customer_id' => 'o.customer_id',
@@ -34,15 +34,17 @@ $result = $db->select()
 // $result is now a RunnableTemporaryTable instance. 
 // The table 'tmp_...' has been created in the database.
 
-// 2. Use the temporary table in another query
-$rows = $db->select()
-    ->from('customers', 'c')
-    ->joinInner('t', $result, 'c.id = t.customer_id')
-    ->fields(['c.name', 't.total_amount'])
-    ->fetchRows();
-
-// 3. Clean up
-$result->release();
+try {
+	// 2. Use the temporary table in another query
+	$rows = $db->select()
+	    ->from('customers', 'c')
+	    ->joinInner('t', $tempTable, 'c.id = t.customer_id')
+	    ->fields(['c.name', 't.total_amount'])
+	    ->fetchRows();
+} finally {
+	// 3. Clean up
+	$tempTable->release();
+}
 ```
 
 ### Method Signature
