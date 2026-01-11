@@ -25,6 +25,7 @@ Here a few things to keep in mind:
 * [Delete](doc/delete.md)
 * [Nested transactions](doc/nested-transactions.md)
 * [Virtual/alias tables](doc/virtual-tables.md)
+* [Temporary tables](doc/temporary-tables.md)
 
 ## Some extended examples
 
