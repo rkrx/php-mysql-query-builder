@@ -44,34 +44,30 @@ interface RunnableSelect extends Select, IteratorAggregate {
 	/**
 	 * Fetches all rows using PDO::FETCH_NUM
 	 *
-	 * @template K of int
-	 * @template V
-	 * @param null|callable(array<string, null|scalar>): (void|DBIgnoreRow|array<K, V>) $callback
-	 * @return ($callback is null ? list<array<int, null|scalar>> : array<int, array<K, V>>)
+	 * @template T of mixed[]
+	 * @param null|callable(array<string, null|scalar>): (void|DBIgnoreRow|T) $callback
+	 * @return ($callback is null ? list<array<int, null|scalar>> : array<int, T>)
 	 */
 	public function fetchIndexedRows($callback = null): array;
 
 	/**
-	 * @template K
-	 * @template V
-	 * @param null|callable(array<string, null|scalar>): (void|DBIgnoreRow|array<K, V>) $callback
-	 * @return ($callback is null ? array<int, array<string, null|scalar>> : array<int, array<K, V>>)
+	 * @template T
+	 * @param null|callable(array<string, null|scalar>): (void|DBIgnoreRow|T) $callback
+	 * @return ($callback is null ? array<int, array<string, null|scalar>> : list<T>)
 	 */
 	public function fetchRows($callback = null): array;
 
 	/**
-	 * @template K
-	 * @template V
-	 * @param null|callable(array<string, null|scalar>): (void|DBIgnoreRow|array<K, V>) $callback
-	 * @return ($callback is null ? Generator<int, array<string, null|scalar>> : Generator<int, array<K, V>>)
+	 * @template T
+	 * @param null|callable(array<string, null|scalar>): (void|DBIgnoreRow|T) $callback
+	 * @return ($callback is null ? Generator<int, array<string, null|scalar>> : Generator<int, T>)
 	 */
 	public function fetchRowsLazy($callback = null);
 
 	/**
-	 * @template K
-	 * @template V
-	 * @param null|callable(array<string, mixed>): (array<K, V>|void|DBIgnoreRow) $callback
-	 * @return ($callback is null ? array<string, null|scalar> : array<K, V>)
+	 * @template T of array
+	 * @param null|callable(array<string, mixed>): (T|void|DBIgnoreRow) $callback
+	 * @return ($callback is null ? array<string, null|scalar> : T)
 	 */
 	public function fetchRow($callback = null): array;
 
