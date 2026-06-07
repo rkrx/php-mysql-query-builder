@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <phpunit
-        bootstrap="vendor/autoload.php"
+        bootstrap="tests.php"
         backupGlobals="false"
         timeoutForSmallTests="5"
         cacheDirectory=".phpunit.cache"

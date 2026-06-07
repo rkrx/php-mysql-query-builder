@@ -570,6 +570,6 @@ class SelectTest extends DBTestCase {
 		]]), 'a.id = b.id')
 		->asString();
 
-		self::assertEquals("SELECT\n\ta.id,\n\tb.id AS `json_id`,\n\tb.title AS `json_title`\nFROM\n\tsource_table a\nINNER JOIN\n\tJSON_TABLE(a.json_field, $.key, COLUMNS(id INT PATH '$.id', title VARCHAR(255) PATH '$.title')) b ON a.id = b.id\n", $vt1);
+		self::assertEquals("SELECT\n\ta.id,\n\tb.id AS `json_id`,\n\tb.title AS `json_title`\nFROM\n\tsource_table a\nINNER JOIN\n\tJSON_TABLE(a.json_field, '$.key' COLUMNS(id INT PATH '$.id', title VARCHAR(255) PATH '$.title')) b ON a.id = b.id\n", $vt1);
 	}
 }

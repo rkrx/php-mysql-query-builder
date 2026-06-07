@@ -12,4 +12,6 @@
 !/composer.json
 !/phpstan.neon
 !/rector.php
+!/task*.md
+!/tests.php
 !/tests.xml

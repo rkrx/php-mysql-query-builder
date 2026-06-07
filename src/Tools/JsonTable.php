@@ -24,7 +24,7 @@ class JsonTable implements SpecialTable {
 
 	public function asString(Database $db): string {
 		return sprintf(
-			'JSON_TABLE(%s, %s, %s)',
+			"JSON_TABLE(%s, '%s' %s)",
 			$this->dataExpression,
 			$this->jsonPath,
 			$this->translateColumns($db, $this->columns)
