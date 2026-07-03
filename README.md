@@ -16,6 +16,12 @@ Here a few things to keep in mind:
 * You're allowed to nest most queries to build big and powerful queries.
 * The order of method-calls of each statement-builder is irrelevant. The resulting query will always render the right order.
 
+## Optional Rust module
+
+An optional Rust-backed PHP extension is available at
+[rkrx/php-rust-mysql-query-builder-module](https://github.com/rkrx/php-rust-mysql-query-builder-module).
+It provides a native query-builder module that can take over SQL-builder state and rendering while the PHP adapter keeps PDO execution, transactions, logging and fetch helpers compatible with this package.
+
 ## Some simplified examples
 
 * [Initialization](doc/initialization.md)
