@@ -2,6 +2,7 @@
 
 namespace Kir\MySQL\Builder\Helpers;
 
+use Kir\MySQL\Builder\Expr\ConditionExpression;
 use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Builder\Internal\Types;
 use Kir\MySQL\Builder\Traits\WhereBuilder;
@@ -12,7 +13,7 @@ use Kir\MySQL\Builder\Traits\WhereBuilder;
  */
 abstract class ConditionAddHelper {
 	/**
-	 * @param callable(string|array<string, null|scalar>, array<int, DBParameterValueType>): void $addFn
+	 * @param callable(DBWhereExpressionType, array<int, DBParameterValueType>): void $addFn
 	 * @param DBWhereExpressionType $expression
 	 * @param array<DBParameterValueType> $args
 	 */
@@ -21,6 +22,8 @@ abstract class ConditionAddHelper {
 			if($expression->isValid()) {
 				$addFn($expression->getExpression(), [$expression->getValue()]);
 			}
+		} elseif($expression instanceof ConditionExpression) {
+			$addFn($expression, $args);
 		} elseif(is_object($expression)) {
 			self::addAsArray($addFn, (array) $expression, $args);
 		} elseif(is_array($expression)) {

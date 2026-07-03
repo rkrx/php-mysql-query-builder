@@ -4,6 +4,7 @@ namespace Kir\MySQL\Builder\Internal;
 
 use DateTimeInterface;
 use Kir\MySQL\Builder\DBExpr;
+use Kir\MySQL\Builder\Expr\ConditionExpression;
 use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Builder\Select;
 use Kir\MySQL\Common\SpecialTable;
@@ -17,7 +18,7 @@ use Stringable;
  * @phpstan-type DBParameterValueType null|scalar|Stringable|DBExpr|Select|DateTimeInterface|array<null|scalar|Stringable>
  *
  * @phpstan-type DBWhereKeyValueExpressionType array<string, DBParameterValueType>
- * @phpstan-type DBWhereExpressionType string|DBWhereKeyValueExpressionType|object|OptionalExpression
+ * @phpstan-type DBWhereExpressionType string|DBWhereKeyValueExpressionType|ConditionExpression|OptionalExpression|object
  */
 class Types {
 }

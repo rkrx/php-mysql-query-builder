@@ -91,6 +91,70 @@ $query = (new MySQL(new PDO(/* ... */)))
 
 You can also define validation rules to only match certain data in `$filter`.
 
+## Grouped conditions
+
+Multiple calls to `where()` or `having()` are connected with `AND` by default. Use `OrExpr` and `AndExpr` when a condition needs an explicit grouped expression.
+
+```PHP
+use Kir\MySQL\Builder\Expr\DBCondition;
+use Kir\MySQL\Builder\Expr\DBExprFilter;
+use Kir\MySQL\Builder\Expr\OrExpr;
+use Kir\MySQL\Databases\MySQL;
+
+$filter = ['ean' => '4000000000000'];
+
+$rows = (new MySQL(new PDO(/* ... */)))
+->select()
+->field('t.category_id')
+->field('COUNT(*)', 'product_count')
+->field('SUM(t.stock)', 'stock_sum')
+->from('t', 'products')
+->where('t.active=?', true)
+->where(new OrExpr(
+	new DBCondition('t.name LIKE ?', '%desk%'),
+	new DBCondition('t.reference=?', 'ABC-123'),
+	new DBExprFilter('t.ean=?', $filter, 'ean'),
+))
+->groupBy('t.category_id')
+->having(new OrExpr(
+	new DBCondition('COUNT(*) > ?', 10),
+	new DBCondition('SUM(t.stock) IS NULL'),
+))
+->fetchRows();
+```
+
+This produces a condition shape like:
+
+```sql
+WHERE
+	(t.active=1)
+	AND
+	((t.name LIKE '%desk%') OR (t.reference='ABC-123') OR (t.ean='4000000000000'))
+HAVING
+	((COUNT(*) > 10) OR (SUM(t.stock) IS NULL))
+```
+
+Use `DBCondition` inside grouped expressions when the SQL fragment has placeholder arguments. Optional filters can be used in a group as well: if a `DBExprFilter` has no valid value, that part is skipped. If all parts of a group are skipped, the complete grouped condition is omitted.
+
+`AndExpr` can be used directly or nested inside `OrExpr`:
+
+```PHP
+use Kir\MySQL\Builder\Expr\AndExpr;
+use Kir\MySQL\Builder\Expr\DBCondition;
+use Kir\MySQL\Builder\Expr\OrExpr;
+
+$select
+->where(new OrExpr(
+	new AndExpr(
+		new DBCondition('t.type=?', 'product'),
+		new DBCondition('t.active=?', true),
+	),
+	new DBCondition('t.force_visible=?', true),
+));
+```
+
+The same grouped condition objects can be used wherever query conditions are supported, including `where()` on select, update and delete builders, and `having()` on select builders.
+
 ## Sorting from data
 
 ```php
@@ -189,4 +253,3 @@ echo $db->select()
 ```
 
 [Back](../README.md)
-

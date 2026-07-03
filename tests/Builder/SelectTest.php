@@ -1,10 +1,13 @@
 <?php
 namespace Kir\MySQL\Builder;
 
+use Kir\MySQL\Builder\Expr\AndExpr;
+use Kir\MySQL\Builder\Expr\DBCondition;
 use Kir\MySQL\Builder\Expr\DBExprFilter;
-use Kir\MySQL\Builder\Expr\DBSortAliasNotFoundException;
-use Kir\MySQL\Builder\Expr\OptionalDBFilterMap;
 use Kir\MySQL\Builder\Expr\DBOrderSpec;
+use Kir\MySQL\Builder\Expr\DBSortAliasNotFoundException;
+use Kir\MySQL\Builder\Expr\OrExpr;
+use Kir\MySQL\Builder\Expr\OptionalDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredDBFilterMap;
 use Kir\MySQL\Builder\Expr\RequiredValueNotFoundException;
 use Kir\MySQL\Builder\SelectTest\TestSelect;
@@ -220,6 +223,62 @@ class SelectTest extends DBTestCase {
 		->having(new DBExprFilter('a=? AND b=?', ['x' => ['y' => 1]], 'x.y'))
 		->asString();
 		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(a=1 AND b=1)\nHAVING\n\t(a=1 AND b=1)\n", $str);
+	}
+
+	public function testOrExprInWhereAndHaving(): void {
+		$str = $this->select()
+		->field('a')
+		->from('t', 'test')
+		->where(new OrExpr(
+			new DBCondition('a=?', 1),
+			new DBCondition('b IN (?)', [2, 3]),
+			new DBExprFilter('c=?', ['filter' => ['name' => 'aaa']], 'filter.name'),
+		))
+		->where('d=?', 4)
+		->having(new OrExpr(
+			new DBCondition('COUNT(*) > ?', 10),
+			new DBCondition('SUM(t.value) IS NULL'),
+		))
+		->asString();
+
+		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t((a=1) OR (b IN (2, 3)) OR (c='aaa'))\n\tAND\n\t(d=4)\nHAVING\n\t((COUNT(*) > 10) OR (SUM(t.value) IS NULL))\n", $str);
+	}
+
+	public function testGroupedConditionsSkipInvalidOptionalExpressions(): void {
+		$str = $this->select()
+		->field('a')
+		->from('t', 'test')
+		->where(new OrExpr(
+			new DBExprFilter('a=?', ['filter' => []], 'filter.name'),
+			new DBCondition('b=?', 2),
+		))
+		->asString();
+
+		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(b=2)\n", $str);
+
+		$str = $this->select()
+		->field('a')
+		->from('t', 'test')
+		->where(new OrExpr(new DBExprFilter('a=?', ['filter' => []], 'filter.name')))
+		->asString();
+
+		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\n", $str);
+	}
+
+	public function testNestedAndOrExpressions(): void {
+		$str = $this->select()
+		->field('a')
+		->from('t', 'test')
+		->where(new OrExpr(
+			new AndExpr(
+				new DBCondition('a=?', 1),
+				new DBCondition('b=?', 2),
+			),
+			new DBCondition('c=?', 3),
+		))
+		->asString();
+
+		self::assertEquals("SELECT\n\ta\nFROM\n\ttest t\nWHERE\n\t(((a=1) AND (b=2)) OR (c=3))\n", $str);
 	}
 
 	public function testOrder(): void {

@@ -3,9 +3,10 @@
 namespace Kir\MySQL\Builder\Expr;
 
 use Kir\MySQL\Builder\Helpers\RecursiveStructureAccess;
+use Kir\MySQL\Database;
 use RuntimeException;
 
-class DBExprFilter implements OptionalExpression {
+class DBExprFilter implements OptionalExpression, ConditionExpression {
 	/** @var bool */
 	private $hasValue;
 	/** @var mixed */
@@ -76,6 +77,18 @@ class DBExprFilter implements OptionalExpression {
 	 */
 	public function getValue(): array {
 		return [$this->value];
+	}
+
+	/**
+	 * @param Database $db
+	 * @return string|null
+	 */
+	public function buildCondition(Database $db): ?string {
+		if(!$this->isValid()) {
+			return null;
+		}
+
+		return $db->quoteExpression($this->expression, $this->getValue());
 	}
 
 	/**

@@ -2,6 +2,8 @@
 
 namespace Kir\MySQL\Builder\Internal;
 
+use Kir\MySQL\Builder\Expr\ConditionExpression;
+use Kir\MySQL\Builder\Expr\OptionalExpression;
 use Kir\MySQL\Database;
 use Stringable;
 
@@ -21,40 +23,87 @@ final class ConditionBuilder {
 		if(!count($conditions)) {
 			return $query;
 		}
-		$query .= "{$token}\n";
 		$arr = [];
 		foreach($conditions as [$expression, $arguments]) {
-			if(is_array($expression)) {
-				foreach($expression as $key => $value) {
-					$key = self::formatKey($key);
-					if($value === null) {
-						$arr = self::buildCondition($arr, "ISNULL({$key})", [$value], $db);
-					} else {
-						$arr = self::buildCondition($arr, "{$key}=?", [$value], $db);
-					}
-				}
-			} else {
-				/** @var Stringable|string $expression */
-				$arr = self::buildCondition($arr, (string) $expression, $arguments, $db);
+			foreach(self::buildConditionParts($db, $expression, $arguments) as $condition) {
+				$arr[] = "\t({$condition})";
 			}
 		}
+		if(!count($arr)) {
+			return $query;
+		}
+
+		$query .= "{$token}\n";
 		$query .= implode("\n\tAND\n", $arr);
 
 		return "{$query}\n";
 	}
 
 	/**
-	 * @param string[] $conditions
+	 * @param Database $db
+	 * @param DBWhereExpressionType $expression
+	 * @param list<DBParameterValueType> $arguments
+	 * @return string|null
+	 */
+	public static function buildExpression(Database $db, $expression, array $arguments = []): ?string {
+		$parts = self::buildConditionParts($db, $expression, $arguments);
+		if(count($parts) < 1) {
+			return null;
+		}
+		if(count($parts) === 1) {
+			return $parts[0];
+		}
+
+		return implode(' AND ', array_map(static fn(string $condition): string => "({$condition})", $parts));
+	}
+
+	/**
+	 * @param Database $db
+	 * @param DBWhereExpressionType $expression
+	 * @param list<DBParameterValueType> $arguments
+	 * @return string[]
+	 */
+	private static function buildConditionParts(Database $db, $expression, array $arguments): array {
+		if($expression instanceof ConditionExpression) {
+			$condition = $expression->buildCondition($db);
+			return $condition === null ? [] : [$condition];
+		}
+		if($expression instanceof OptionalExpression) {
+			if(!$expression->isValid()) {
+				return [];
+			}
+
+			return self::buildConditionParts($db, $expression->getExpression(), [$expression->getValue()]);
+		}
+		if(is_object($expression) && !$expression instanceof Stringable) {
+			$expression = (array) $expression;
+		}
+		if(is_array($expression)) {
+			$parts = [];
+			foreach($expression as $key => $value) {
+				$key = self::formatKey((string) $key);
+				if($value === null) {
+					$parts[] = self::buildCondition("ISNULL({$key})", [$value], $db);
+				} else {
+					$parts[] = self::buildCondition("{$key}=?", [$value], $db);
+				}
+			}
+
+			return $parts;
+		}
+
+		/** @var Stringable|string $expression */
+		return [self::buildCondition((string) $expression, $arguments, $db)];
+	}
+
+	/**
 	 * @param string $expression
 	 * @param list<DBParameterValueType> $arguments
 	 * @param Database $db
-	 * @return string[]
+	 * @return string
 	 */
-	private static function buildCondition(array $conditions, string $expression, array $arguments, Database $db): array {
-		$expr = $db->quoteExpression($expression, $arguments);
-		$conditions[] = "\t({$expr})";
-
-		return $conditions;
+	private static function buildCondition(string $expression, array $arguments, Database $db): string {
+		return $db->quoteExpression($expression, $arguments);
 	}
 
 	/**
