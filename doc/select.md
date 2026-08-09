@@ -46,6 +46,12 @@ $select = $db->select()
 // Might throw an exception.
 $rows = $select->fetchRows();
 
+// Get multiple rows with numeric column indexes (like PDO::FETCH_NUM).
+$indexedRows = $select->fetchIndexedRows();
+
+// Get the first column of every row.
+$values = $select->fetchValues();
+
 // Get one row as a Key(=Fieldnames)/Value(=Values)-Array (like PDO::FETCH_ASSOC)
 // Result is guaranteed to be an array<string, string> or an empty array.
 // Might throw an exception.
@@ -56,9 +62,34 @@ $row = $select->fetchRow();
 $value = $select->fetchValue();
 ```
 
+`fetchArray()` is deprecated; use `fetchValues()` instead.
+
+### Prepared selects
+
+`prepare()` renders and prepares the select once. The returned `PreparedSelect`
+contains only value-binding and fetch methods and can execute the prepared PDO
+statement more than once. Values already bound to the select are captured when
+`prepare()` is called and can be changed on the prepared select.
+
+```php
+$prepared = $db->select()
+	->field('t.field1')
+	->from('t', 'test')
+	->where('t.id=:id')
+	->prepare();
+
+$firstRow = $prepared->bindValue('id', 1)->fetchRow();
+$secondRow = $prepared->bindValue('id', 2)->fetchRow();
+```
+
 ### Keep the original database types
 
-PDO returns all data as `string` or `null`. However, via the meta data of the last query you can read out the types of the last query. With the method `setPreserveTypes()` one can have the types used in the database largely reconstructed on output. This costs a little performance. On modern systems this should not be too noticeable. But in fact only integers and decimal numbers are translated at the moment. Everything else remains `string` or `null`. If a `null` value is returned from the database, then of course this value is kept.
+Current PDO MySQL versions return integers and floating-point values as native PHP
+types when `PDO::ATTR_STRINGIFY_FETCHES` is disabled. `DECIMAL` values and integers
+outside the PHP integer range remain strings so their value is not truncated.
+`setPreserveTypes()` is retained for legacy configurations; it reconstructs numeric
+types from column metadata, including converting `DECIMAL` to `float`, which can
+lose precision.
 
 ## Optional conditions
 

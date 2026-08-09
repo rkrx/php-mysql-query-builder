@@ -14,6 +14,7 @@ use Kir\MySQL\Databases\MySQL\MySQLFieldQuoter;
 use Kir\MySQL\Databases\MySQL\MySQLQuoter;
 use Kir\MySQL\Databases\MySQL\MySQLRunnableSelect;
 use Kir\MySQL\Databases\MySQL\MySQLUUIDGenerator;
+use Kir\MySQL\Exceptions\StatementPreparationException;
 use Kir\MySQL\QueryLogger\QueryLoggers;
 use Kir\MySQL\Tools\AliasRegistry;
 use Kir\MySQL\Tools\VirtualTables;
@@ -390,7 +391,7 @@ class MySQL implements Database {
 	private function buildQueryStatement(string $query, callable $fn): QueryStatement {
 		$stmt = $fn($query);
 		if(!$stmt) {
-			throw new RuntimeException("Could not execute statement:\n{$query}");
+			throw new StatementPreparationException("Could not prepare statement:\n{$query}");
 		}
 
 		return new QueryStatement($stmt, $query, $this->exceptionInterpreter, $this->queryLoggers);

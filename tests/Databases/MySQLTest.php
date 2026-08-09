@@ -1,8 +1,10 @@
 <?php
 namespace Kir\MySQL\Databases;
 
+use Kir\MySQL\Builder\PreparedSelect;
 use Kir\MySQL\Builder\SelectTest\TestSelect;
 use Kir\MySQL\Common\DBTestCase;
+use Kir\MySQL\Databases\MySQL\MySQLRunnableSelect;
 use Kir\MySQL\QueryLogger\ClosureQueryLogger;
 use PDOException;
 use Throwable;
@@ -165,6 +167,45 @@ class MySQLTest extends DBTestCase {
 		->where('t.id=?', 1)
 		->fetchValue(null, 'strval');
 		self::assertEquals('1', $value);
+	}
+
+	public function testPreparedSelect(): void {
+		$prepared = TestSelect::create()
+		->field('t.id')
+		->from('t', 'test#test1')
+		->where('t.id=:id')
+		->prepare();
+
+		self::assertSame([[1]], $prepared->bindValue('id', 1)->fetchIndexedRows());
+		self::assertSame([2], $prepared->bindValue('id', 2)->fetchValues());
+	}
+
+	public function testPreparedSelectFoundRows(): void {
+		$prepared = TestSelect::create()
+		->field('t.id')
+		->from('t', 'test#test1')
+		->setCalcFoundRows()
+		->limit(1)
+		->prepare();
+
+		self::assertCount(1, $prepared->fetchRows());
+		self::assertSame(100, $prepared->getFoundRows());
+	}
+
+	public function testTraditionalFetchDoesNotUsePreparedSelectPath(): void {
+		$select = new class($this->getDB()) extends MySQLRunnableSelect {
+			public function prepare(): PreparedSelect {
+				throw new RuntimeException('Prepared-select path must not be used');
+			}
+		};
+
+		$values = $select
+		->field('t.id')
+		->from('t', 'test#test1')
+		->where('t.id=?', 1)
+		->fetchValues();
+
+		self::assertSame([1], $values);
 	}
 
 	public function testInfoLoggingFromQuery(): void {

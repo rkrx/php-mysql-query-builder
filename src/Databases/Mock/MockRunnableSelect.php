@@ -3,6 +3,8 @@
 namespace Kir\MySQL\Databases\Mock;
 
 use Kir\MySQL\Builder\Helpers\DBIgnoreRow;
+use Kir\MySQL\Builder\PreparedSelect;
+use Kir\MySQL\Databases\MySQL\MySQLPreparedSelect;
 use Kir\MySQL\Databases\MySQL\MySQLSelect;
 use stdClass;
 use Traversable;
@@ -35,6 +37,17 @@ class MockRunnableSelect extends MySQLSelect {
 		$this->preserveTypes = $preserveTypes;
 
 		return $this;
+	}
+
+	public function prepare(): PreparedSelect {
+		return new MySQLPreparedSelect(
+			$this->db(),
+			$this->db()->prepare($this->__toString()),
+			$this->values,
+			$this->preserveTypes,
+			stdClass::class,
+			$this->getCalcFoundRows(),
+		);
 	}
 
 	public function fetchIndexedRows($callback = null): array {
@@ -183,7 +196,7 @@ class MockRunnableSelect extends MySQLSelect {
 		return $result;
 	}
 
-	public function fetchArray(?callable $fn = null): array {
+	public function fetchValues(?callable $fn = null): array {
 		$values = [];
 		foreach($this->consumeRows() as $row) {
 			$value = array_values($row)[0] ?? null;
@@ -191,6 +204,13 @@ class MockRunnableSelect extends MySQLSelect {
 		}
 
 		return $values;
+	}
+
+	/**
+	 * @deprecated Use fetchValues() instead.
+	 */
+	public function fetchArray(?callable $fn = null): array {
+		return $this->fetchValues($fn);
 	}
 
 	public function fetchValue($default = null, ?callable $fn = null) {

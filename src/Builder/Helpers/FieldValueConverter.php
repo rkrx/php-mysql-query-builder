@@ -5,7 +5,7 @@ namespace Kir\MySQL\Builder\Helpers;
 class FieldValueConverter {
 	/**
 	 * @param array<string, mixed> $row
-	 * @param array<string, string> $columnDefinitions
+	 * @param array<array-key, string> $columnDefinitions
 	 * @return array<string, mixed>
 	 */
 	public static function convertValues(array $row, array $columnDefinitions): array {

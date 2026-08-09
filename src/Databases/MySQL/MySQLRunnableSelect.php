@@ -7,6 +7,7 @@ use Generator;
 use Kir\MySQL\Builder\Helpers\DBIgnoreRow;
 use Kir\MySQL\Builder\Helpers\FieldTypeProvider;
 use Kir\MySQL\Builder\Helpers\FieldValueConverter;
+use Kir\MySQL\Builder\PreparedSelect;
 use Kir\MySQL\Builder\QueryStatement;
 use Kir\MySQL\Databases\MySQL;
 use PDO;
@@ -20,6 +21,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 	/** @var array<string, mixed> */
 	private array $values = [];
 	private bool $preserveTypes;
+	/** @var class-string */
 	private string $defaultClassName;
 	private int $foundRows = 0;
 
@@ -67,6 +69,20 @@ class MySQLRunnableSelect extends MySQLSelect {
 		$this->preserveTypes = $preserveTypes;
 
 		return $this;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function prepare(): PreparedSelect {
+		return new MySQLPreparedSelect(
+			$this->db(),
+			$this->db()->prepare($this->__toString()),
+			$this->values,
+			$this->preserveTypes,
+			$this->defaultClassName,
+			$this->getCalcFoundRows(),
+		);
 	}
 
 	/**
@@ -197,7 +213,7 @@ class MySQLRunnableSelect extends MySQLSelect {
 	/**
 	 * @inheritDoc
 	 */
-	public function fetchArray(?callable $fn = null): array {
+	public function fetchValues(?callable $fn = null): array {
 		return $this->createTempStatement(static function(QueryStatement $stmt) use ($fn) {
 			if($fn !== null) {
 				return $stmt->fetchAll(PDO::FETCH_FUNC, $fn);
@@ -205,6 +221,14 @@ class MySQLRunnableSelect extends MySQLSelect {
 
 			return $stmt->fetchAll(PDO::FETCH_COLUMN);
 		});
+	}
+
+	/**
+	 * @inheritDoc
+	 * @deprecated Use fetchValues() instead.
+	 */
+	public function fetchArray(?callable $fn = null): array {
+		return $this->fetchValues($fn);
 	}
 
 	/**
@@ -264,18 +288,20 @@ class MySQLRunnableSelect extends MySQLSelect {
 	}
 
 	/**
-	 * @template TFnReturnType of array<int|string, mixed>
-	 * @param null|(callable(array<string, null|scalar>): (TFnReturnType|DBIgnoreRow|null|void)) $callback
+	 * @param null|callable $callback
 	 * @param int $mode
 	 * @param mixed $arg0
-	 * @return ($callback is null ? array<int, ($mode is PDO::FETCH_NUM ? array<int, null|scalar> : array<string, null|scalar>)> : array<int, TFnReturnType>)
+	 * @return array<int, mixed>
 	 */
-	private function fetchAll($callback = null, int $mode = 0, $arg0 = null) {
+	private function fetchAll($callback = null, int $mode = 0, $arg0 = null): array {
 		return $this->createTempStatement(function(QueryStatement $statement) use ($callback, $mode, $arg0) {
 			$statement->setFetchMode($mode, $arg0);
-			$data = $statement->fetchAll();
+			$data = $statement->fetchAll(PDO::FETCH_DEFAULT);
 			if($this->preserveTypes) {
 				$columnDefinitions = FieldTypeProvider::getFieldTypes($statement);
+				if($mode === PDO::FETCH_NUM) {
+					$columnDefinitions = array_values($columnDefinitions);
+				}
 				$data = array_map(static fn($row) => FieldValueConverter::convertValues($row, $columnDefinitions), $data);
 			}
 			if($callback !== null) {
