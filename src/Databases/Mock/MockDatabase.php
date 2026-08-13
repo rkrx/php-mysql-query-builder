@@ -7,6 +7,7 @@ use Kir\MySQL\Builder;
 use Kir\MySQL\Builder\DBExpr;
 use Kir\MySQL\Builder\QueryStatement;
 use Kir\MySQL\Database;
+use Kir\MySQL\Tools\AliasReplacer;
 use Kir\MySQL\Tools\AliasRegistry;
 use Kir\MySQL\Tools\VirtualTables;
 use RuntimeException;
@@ -77,6 +78,7 @@ class MockDatabase implements Database {
 		#[Language('MySQL')]
 		string $query,
 	) {
+		$query = $this->replaceQueryAliases($query);
 		$type = $this->detectType($query);
 		$statement = new MockPDOStatement(fn() => $this->popStack($type), $type);
 
@@ -153,6 +155,7 @@ class MockDatabase implements Database {
 		string $query,
 		array $params = [],
 	): int {
+		$query = $this->replaceQueryAliases($query);
 		$type = $this->detectType($query);
 		if($type === 'dql') {
 			return 0;
@@ -161,6 +164,10 @@ class MockDatabase implements Database {
 		$this->lastInsertId = is_scalar($result) ? (string) $result : null;
 
 		return (int) $result;
+	}
+
+	private function replaceQueryAliases(string $query): string {
+		return (new AliasReplacer($this->aliasRegistry))->replaceQuery($query);
 	}
 
 	public function getLastInsertId(?string $name = null): ?string {

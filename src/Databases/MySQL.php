@@ -16,6 +16,7 @@ use Kir\MySQL\Databases\MySQL\MySQLRunnableSelect;
 use Kir\MySQL\Databases\MySQL\MySQLUUIDGenerator;
 use Kir\MySQL\Exceptions\StatementPreparationException;
 use Kir\MySQL\QueryLogger\QueryLoggers;
+use Kir\MySQL\Tools\AliasReplacer;
 use Kir\MySQL\Tools\AliasRegistry;
 use Kir\MySQL\Tools\VirtualTables;
 use PDO;
@@ -32,6 +33,7 @@ class MySQL implements Database {
 	private array $tableFields = [];
 	private bool $outerTransaction = false;
 	private AliasRegistry $aliasRegistry;
+	private ?AliasReplacer $aliasReplacer;
 	private int $transactionLevel = 0;
 	private QueryLoggers $queryLoggers;
 	private ?VirtualTables $virtualTables = null;
@@ -101,6 +103,8 @@ class MySQL implements Database {
 		#[Language('MySQL')]
 		string $query,
 	) {
+		$query = $this->replaceQueryAliases($query);
+
 		return $this->getQueryLoggers()->logRegion($query, fn() =>
 			$this->buildQueryStatement($query, fn($query) =>
 				$this->pdo->query($query)
@@ -116,7 +120,9 @@ class MySQL implements Database {
 		#[Language('MySQL')]
 		string $query,
 	) {
-		return $this->buildQueryStatement((string) $query, fn($query) =>
+		$query = $this->replaceQueryAliases($query);
+
+		return $this->buildQueryStatement($query, fn($query) =>
 			$this->pdo->prepare($query)
 		);
 	}
@@ -131,6 +137,8 @@ class MySQL implements Database {
 		string $query,
 		array $params = [],
 	): int {
+		$query = $this->replaceQueryAliases($query);
+
 		return $this->getQueryLoggers()->logRegion($query, fn() =>
 			$this->exceptionHandler(function() use ($query, $params) {
 				$stmt = $this->pdo->prepare($query);
@@ -395,6 +403,11 @@ class MySQL implements Database {
 		}
 
 		return new QueryStatement($stmt, $query, $this->exceptionInterpreter, $this->queryLoggers);
+	}
+
+	private function replaceQueryAliases(string $query): string {
+		$this->aliasReplacer ??= new AliasReplacer($this->aliasRegistry);
+		return $this->aliasReplacer->replaceQuery($query);
 	}
 
 	/**

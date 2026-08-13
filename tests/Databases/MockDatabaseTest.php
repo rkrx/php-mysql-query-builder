@@ -3,6 +3,7 @@ namespace Kir\MySQL\Databases;
 
 use Kir\MySQL\Builder\PreparedSelect;
 use Kir\MySQL\Databases\Mock\MockDatabase;
+use Kir\MySQL\Databases\Mock\MockQueryStatement;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -161,5 +162,18 @@ class MockDatabaseTest extends TestCase {
 
 		$stmt = $db->query('SELECT * FROM table');
 		$this->assertSame([['id' => 10]], $stmt->fetchAll());
+	}
+
+	public function testRawQueriesReplaceRegisteredAliases(): void {
+		$db = new MockDatabase();
+		$db->getAliasRegistry()->add('shop', 'shop__');
+		$db->addToDQLStack([]);
+
+		$queryStatement = $db->query('SELECT * FROM shop#products');
+		$preparedStatement = $db->prepare('SELECT * FROM shop#orders');
+
+		$this->assertInstanceOf(MockQueryStatement::class, $queryStatement);
+		$this->assertSame('SELECT * FROM shop__products', (string) $queryStatement);
+		$this->assertSame('SELECT * FROM shop__orders', (string) $preparedStatement);
 	}
 }

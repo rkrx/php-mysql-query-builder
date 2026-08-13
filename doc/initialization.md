@@ -16,6 +16,21 @@ $mysql = new MySQL($pdo);
 $mysql->getAliasRegistry()->add('t', 'testdb.test__');
 ```
 
+Registered aliases are also expanded in raw SQL passed to `query()`, `prepare()`,
+and `exec()`:
+
+```PHP
+$mysql->getAliasRegistry()->add('shop', '`dv-shop`.shop__');
+$mysql->query('SELECT * FROM shop#products');
+// SELECT * FROM `dv-shop`.shop__products
+```
+
+Alias expressions inside single-quoted strings, double-quoted strings, and
+backtick-quoted identifiers are left unchanged. SQL comments are not parsed
+separately, so aliases in comments are expanded as well. Consequently, quote
+characters inside comments can affect how the raw SQL is split into quoted and
+unquoted parts.
+
 You can also add options to specify global behavior
 
 ```PHP
