@@ -108,6 +108,24 @@ class MockDatabaseTest extends TestCase {
 		$this->assertSame(10, $prepared->getFoundRows());
 	}
 
+	public function testPreparedSelectWithCommonTableExpressionUsesDqlStack(): void {
+		$db = new MockDatabase();
+		$db->addToDQLStack([
+			['id' => 1],
+		]);
+
+		$cte = $db->select()
+			->field('1', 'id');
+
+		$rows = $db->select()
+			->with('cte', $cte)
+			->from('cte')
+			->prepare()
+			->fetchRows();
+
+		$this->assertSame([['id' => 1]], $rows);
+	}
+
 	public function testFetchObjectsTurnsRowsIntoObjects(): void {
 		$db = new MockDatabase();
 		$db->addToDQLStack([

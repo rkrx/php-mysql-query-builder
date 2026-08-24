@@ -222,6 +222,6 @@ class RustRunnableSelect extends MySQLRunnableSelect {
 	}
 
 	public function __toString(): string {
-		return $this->native->toString();
+		return $this->buildWith($this->native->toString());
 	}
 }

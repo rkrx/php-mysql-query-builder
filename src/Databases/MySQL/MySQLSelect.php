@@ -17,6 +17,7 @@ use Kir\MySQL\Builder\Traits\TableBuilder;
 use Kir\MySQL\Builder\Traits\TableNameBuilder;
 use Kir\MySQL\Builder\Traits\UnionBuilder;
 use Kir\MySQL\Builder\Traits\WhereBuilder;
+use Kir\MySQL\Builder\Traits\WithBuilder;
 use RuntimeException;
 
 /**
@@ -33,6 +34,7 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 	use LimitBuilder;
 	use OffsetBuilder;
 	use UnionBuilder;
+	use WithBuilder;
 
 	/** @var array<int|string, string> */
 	private array $fields = [];
@@ -200,6 +202,7 @@ abstract class MySQLSelect extends Statement implements RunnableSelect {
 		$query = $this->buildOffset($query);
 		$query = $this->buildUnions($query);
 		$query = $this->buildForUpdate($query);
+		$query = $this->buildWith($query);
 
 		return $query;
 	}

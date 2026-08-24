@@ -49,6 +49,22 @@ interface Select {
 	public function fields(array $fields);
 
 	/**
+	 * @param string $name
+	 * @param string|Select $select
+	 * @param array<int, string> $columns
+	 * @return $this
+	 */
+	public function with(string $name, $select, array $columns = []);
+
+	/**
+	 * @param string $name
+	 * @param string|Select $select
+	 * @param array<int, string> $columns
+	 * @return $this
+	 */
+	public function withRecursive(string $name, $select, array $columns = []);
+
+	/**
 	 * @param ($table is null ? DBTableNameType : string) $alias
 	 * @param null|DBTableNameType $table
 	 * @return $this

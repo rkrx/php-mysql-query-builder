@@ -631,4 +631,44 @@ class SelectTest extends DBTestCase {
 
 		self::assertEquals("SELECT\n\ta.id,\n\tb.id AS `json_id`,\n\tb.title AS `json_title`\nFROM\n\tsource_table a\nINNER JOIN\n\tJSON_TABLE(a.json_field, '$.key' COLUMNS(id INT PATH '$.id', title VARCHAR(255) PATH '$.title')) b ON a.id = b.id\n", $vt1);
 	}
+
+	public function testCommonTableExpression(): void {
+		$select = $this->select()
+			->field('(1)', 'num');
+
+		$stmt = (string) $this->select()
+			->field('a.num')
+			->from('a')
+			->with('a', $select);
+
+		self::assertEquals("WITH\n\ta AS (\n\t\tSELECT\n\t\t\t(1) AS `num`\n\t)\nSELECT\n\ta.num\nFROM\n\ta\n", $stmt);
+	}
+
+	public function testRecursiveCommonTableExpression(): void {
+		$select = $this->select()
+			->field('(1)', 'num')
+			->unionAll(
+				$this->select()
+					->field('(n + 1)', 'num')
+					->from('a')
+					->where('n < 5')
+			);
+
+		$stmt = (string) $this->select()
+			->field('a.n')
+			->from('a')
+			->withRecursive('a', $select, ['n']);
+
+		self::assertEquals("WITH RECURSIVE\n\ta (n) AS (\n\t\t(\n\t\t\tSELECT\n\t\t\t\t(1) AS `num`\n\t\t) UNION ALL (\n\t\t\tSELECT\n\t\t\t\t(n + 1) AS `num`\n\t\t\tFROM\n\t\t\t\ta\n\t\t\tWHERE\n\t\t\t\t(n < 5)\n\t\t)\n\t)\nSELECT\n\ta.n\nFROM\n\ta\n", $stmt);
+	}
+
+	public function testMultipleCommonTableExpressions(): void {
+		$stmt = (string) $this->select()
+			->field('b.num')
+			->from('b')
+			->with('a', 'SELECT 1 AS num;')
+			->with('b', $this->select()->field('a.num')->from('a'));
+
+		self::assertEquals("WITH\n\ta AS (\n\t\tSELECT 1 AS num\n\t),\n\tb AS (\n\t\tSELECT\n\t\t\ta.num\n\t\tFROM\n\t\t\ta\n\t)\nSELECT\n\tb.num\nFROM\n\tb\n", $stmt);
+	}
 }

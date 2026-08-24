@@ -89,7 +89,8 @@ class MockDatabase implements Database {
 		$prefix = strtolower((string) preg_replace('/\\s+/', '', substr($query, 0, 6)));
 
 		return match (true) {
-			str_starts_with($prefix, 'select') => 'dql',
+			str_starts_with($prefix, 'select'),
+			str_starts_with($prefix, 'with') => 'dql',
 			str_starts_with($prefix, 'insert'),
 			str_starts_with($prefix, 'update'),
 			str_starts_with($prefix, 'delete') => 'dml',

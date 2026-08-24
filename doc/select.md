@@ -211,6 +211,47 @@ $rows = $db->select()
 
 *⚠ Any aliases specified in the search instructions but for which no DB expression has been defined will result in an exception. It is better that it will bang in such a case instead of just not working.*
 
+## Common table expressions
+
+Use `with()` to add a common table expression to a select. The CTE body can be
+another select or a raw SQL string. Multiple calls are rendered in their call
+order under one `WITH` clause.
+
+```php
+$activeProducts = $db->select()
+	->field('p.id')
+	->field('p.name')
+	->from('p', 'products')
+	->where('p.active=?', true);
+
+$rows = $db->select()
+	->with('active_products', $activeProducts)
+	->field('p.id')
+	->field('p.name')
+	->from('p', 'active_products')
+	->fetchRows();
+```
+
+Recursive CTEs use `withRecursive()`. Its optional third argument declares the
+column names exposed by the CTE.
+
+```php
+$numbers = $db->select()
+	->field('1', 'n')
+	->unionAll(
+		$db->select()
+			->field('n + 1', 'n')
+			->from('numbers')
+			->where('n < 5')
+	);
+
+$values = $db->select()
+	->withRecursive('numbers', $numbers, ['n'])
+	->field('n')
+	->from('numbers')
+	->fetchValues();
+```
+
 ## Some examples
 
 ```PHP
