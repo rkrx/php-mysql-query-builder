@@ -7,19 +7,20 @@ $mysql->delete()->from('test')->run();
 
 $test = function () use ($mysql) {
 	$name = $mysql->select()
-	->field('t.name')
-	->from('t', 'test')
-	->where('t.id=?', 1)
-	->fetchValue();
+		->field('t.name')
+		->from('t', 'test')
+		->where('t.id=?', 1)
+		->fetchValue();
+
 	printf("Current name is %s\n", $name);
 };
 
 $setName = function ($name) use ($mysql) {
 	$mysql->insert()
-	->into('test')
-	->add('id', 1)
-	->addOrUpdate('name', $name)
-	->run();
+		->into('test')
+		->add('id', 1)
+		->addOrUpdate('name', $name)
+		->run();
 };
 
 $setName('Peter');

@@ -109,15 +109,15 @@ $filter = [
 ];
 
 $query = (new MySQL(new PDO(/* ... */)))
-/* ... */
-->from('t', 'test')
-/* ... */
-->where(new DBExprFilter('t.name = ?', $filter, 'name'))
-->where(new DBExprFilter('t.date >= ?', $filter, 'date.start'))    // Key in dot-notation
-->where(new DBExprFilter('t.date <= ?', $filter, ['date', 'end'])) // Key in array-notation
-->limit(new DBOptionalValue($filter, ['count']))
-->offset(new DBOptionalValue($filter, ['offset']))
-->fetchRows();
+	/* ... */
+	->from('t', 'test')
+	/* ... */
+	->where(new DBExprFilter('t.name = ?', $filter, 'name'))
+	->where(new DBExprFilter('t.date >= ?', $filter, 'date.start'))    // Key in dot-notation
+	->where(new DBExprFilter('t.date <= ?', $filter, ['date', 'end'])) // Key in array-notation
+	->limit(new DBOptionalValue($filter, ['count']))
+	->offset(new DBOptionalValue($filter, ['offset']))
+	->fetchRows();
 ```
 
 You can also define validation rules to only match certain data in `$filter`.
@@ -135,23 +135,23 @@ use Kir\MySQL\Databases\MySQL;
 $filter = ['ean' => '4000000000000'];
 
 $rows = (new MySQL(new PDO(/* ... */)))
-->select()
-->field('t.category_id')
-->field('COUNT(*)', 'product_count')
-->field('SUM(t.stock)', 'stock_sum')
-->from('t', 'products')
-->where('t.active=?', true)
-->where(new OrExpr(
-	new DBCondition('t.name LIKE ?', '%desk%'),
-	new DBCondition('t.reference=?', 'ABC-123'),
-	new DBExprFilter('t.ean=?', $filter, 'ean'),
-))
-->groupBy('t.category_id')
-->having(new OrExpr(
-	new DBCondition('COUNT(*) > ?', 10),
-	new DBCondition('SUM(t.stock) IS NULL'),
-))
-->fetchRows();
+	->select()
+	->field('t.category_id')
+	->field('COUNT(*)', 'product_count')
+	->field('SUM(t.stock)', 'stock_sum')
+	->from('t', 'products')
+	->where('t.active=?', true)
+	->where(new OrExpr(
+		new DBCondition('t.name LIKE ?', '%desk%'),
+		new DBCondition('t.reference=?', 'ABC-123'),
+		new DBExprFilter('t.ean=?', $filter, 'ean'),
+	))
+	->groupBy('t.category_id')
+	->having(new OrExpr(
+		new DBCondition('COUNT(*) > ?', 10),
+		new DBCondition('SUM(t.stock) IS NULL'),
+	))
+	->fetchRows();
 ```
 
 This produces a condition shape like:
@@ -175,13 +175,13 @@ use Kir\MySQL\Builder\Expr\DBCondition;
 use Kir\MySQL\Builder\Expr\OrExpr;
 
 $select
-->where(new OrExpr(
-	new AndExpr(
-		new DBCondition('t.type=?', 'product'),
-		new DBCondition('t.active=?', true),
-	),
-	new DBCondition('t.force_visible=?', true),
-));
+	->where(new OrExpr(
+		new AndExpr(
+			new DBCondition('t.type=?', 'product'),
+			new DBCondition('t.active=?', true),
+		),
+		new DBCondition('t.force_visible=?', true),
+	));
 ```
 
 The same grouped condition objects can be used wherever query conditions are supported, including `where()` on select, update and delete builders, and `having()` on select builders.
@@ -198,15 +198,15 @@ $db = new MySQL(new PDO(/* ... */));
 $_GET = ['field3' => 'ASC', 'field1' => 'ASC', 'field2' => 'ASC', 'field4' => 'ASC'];
 
 $rows = $db->select()
-->field('t.field1')
-->field('t.field2')
-->from('t', 'test')
-->orderBy(new DBOrderSpec([
-		'field1' => 't.field1',           // alias => db-expression
-		'field2' => 'REVERSE(t.field2)',  // alias => db-expression
-		'field4' => 't.field2'            // alias => db-expression
-	], $_GET))
-->fetchRows();
+	->field('t.field1')
+	->field('t.field2')
+	->from('t', 'test')
+	->orderBy(new DBOrderSpec([
+			'field1' => 't.field1',           // alias => db-expression
+			'field2' => 'REVERSE(t.field2)',  // alias => db-expression
+			'field4' => 't.field2'            // alias => db-expression
+		], $_GET))
+	->fetchRows();
 ```
 
 *⚠ Any aliases specified in the search instructions but for which no DB expression has been defined will result in an exception. It is better that it will bang in such a case instead of just not working.*
@@ -257,22 +257,22 @@ $values = $db->select()
 ```PHP
 $subSelect = function ($id) use ($mysql) {
     return $mysql->select()
-    ->field('t.id')
-    ->from('t', 'table')
-    ->where('t.foreign_id=?', $id);
+		->field('t.id')
+		->from('t', 'table')
+		->where('t.foreign_id=?', $id);
 };
 
 $select = $mysql->select()
-->field('COUNT(*)', 'customer_count')
-->from('t1', 't#test1')
-->joinInner('t2', 't#test2', 't2.test_id = t1.id AND t2.field1 = ?', 123)
-->joinLeft('t3', 't#test3', 't3.test_id = t1.id')
-->joinRight('t4', 't#test4', 't4.test_id = t1.id')
-->joinRight('t5', $subSelect(10), 't5.test_id = t1.id')
-->orderBy('t1.field1')
-->orderBy('t1.field2', 'DESC')
-->limit(100)
-->offset(50);
+	->field('COUNT(*)', 'customer_count')
+	->from('t1', 't#test1')
+	->joinInner('t2', 't#test2', 't2.test_id = t1.id AND t2.field1 = ?', 123)
+	->joinLeft('t3', 't#test3', 't3.test_id = t1.id')
+	->joinRight('t4', 't#test4', 't4.test_id = t1.id')
+	->joinRight('t5', $subSelect(10), 't5.test_id = t1.id')
+	->orderBy('t1.field1')
+	->orderBy('t1.field2', 'DESC')
+	->limit(100)
+	->offset(50);
 ```
 
 ```PHP
@@ -295,33 +295,33 @@ $dateStart = '2016-05-01';
 $dateEnd = '2016-05-31';
 
 $tableA = $db->select()
-->field('a.field1')
-->field('a.field2')
-->from('a', 'table_a')
-->where('a.date BETWEEN ? AND ?', $dateStart, $dateEnd);
+	->field('a.field1')
+	->field('a.field2')
+	->from('a', 'table_a')
+	->where('a.date BETWEEN ? AND ?', $dateStart, $dateEnd);
 
 $tableB = $db->select()
-->field('b.field1')
-->field('b.field2')
-->from('b', 'table_b')
-->where('b.date BETWEEN ? AND ?', $dateStart, $dateEnd);
+	->field('b.field1')
+	->field('b.field2')
+	->from('b', 'table_b')
+	->where('b.date BETWEEN ? AND ?', $dateStart, $dateEnd);
 
 $tableC = $db->select()
-->field('t.field1')
-->field('t.field2')
-->from('t', 'table_c')
-->where('t.date BETWEEN ? AND ?', $dateStart, $dateEnd);
+	->field('t.field1')
+	->field('t.field2')
+	->from('t', 'table_c')
+	->where('t.date BETWEEN ? AND ?', $dateStart, $dateEnd);
 
 echo $db->select()
-->from('t',
-	$db->select()
-	->field('a.field1')
-	->field('COALESCE(b.field2, a.field2)', 'field2')
-	->from('a', $tableA)
-	->joinLeft('b', $tableB, 'b.id=a.id')
-	->where('NOT ISNULL(a.field1)')
-	->union($tableC)
-);
+	->from('t',
+		$db->select()
+			->field('a.field1')
+			->field('COALESCE(b.field2, a.field2)', 'field2')
+			->from('a', $tableA)
+			->joinLeft('b', $tableB, 'b.id=a.id')
+			->where('NOT ISNULL(a.field1)')
+			->union($tableC)
+	);
 ```
 
 [Back](../README.md)
