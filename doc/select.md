@@ -7,7 +7,8 @@ Feel free to submit a PR and improve something about this site.
 ## Fields
 
 ```php
-use Kir\MySQL\Builder\Expr\DBOrderSpec;use Kir\MySQL\Databases\MySQL;
+use Kir\MySQL\Builder\Expr\DBOrderSpec;
+use Kir\MySQL\Databases\MySQL;
 
 $pdo = new PDO(/* ... */);
 $db = new MySQL($pdo);
@@ -32,7 +33,8 @@ $rows = $db->select()
 ## Receiving data
 
 ```php
-use Kir\MySQL\Builder\Expr\DBOrderSpec;use Kir\MySQL\Databases\MySQL;
+use Kir\MySQL\Builder\Expr\DBOrderSpec;
+use Kir\MySQL\Databases\MySQL;
 
 $db = new MySQL(new PDO(/* ... */));
 
