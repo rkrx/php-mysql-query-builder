@@ -1,0 +1,5 @@
+parameters:
+    level: 0
+    paths:
+        - fixtures/input.php.inc
+        - fixtures/factory.php.inc

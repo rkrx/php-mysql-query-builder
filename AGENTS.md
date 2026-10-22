@@ -2,6 +2,10 @@
 
 This guide is designed to help AI systems translate SQL queries into PHP Query Builder syntax and vice versa, covering essential SQL clauses and concepts.
 
+## Required PHP formatting
+
+Follow the [Query Builder formatting rules](doc/formatting.md) when writing or modifying Query Builder calls and PHP examples. These rules define line breaks, tab indentation, multiline arguments, nested queries, and queries in conditions. They take precedence over inconsistent formatting in older examples below or elsewhere in the documentation.
+
 ## The SELECT Statement
 
 ### FROM Clause

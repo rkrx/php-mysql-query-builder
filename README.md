@@ -32,6 +32,8 @@ It provides a native query-builder module that can take over SQL-builder state a
 * [Nested transactions](doc/nested-transactions.md)
 * [Virtual/alias tables](doc/virtual-tables.md)
 * [Temporary tables](doc/temporary-tables.md)
+* [Query Builder formatting rules](doc/formatting.md)
+* [Includable CS-Fixer configuration](doc/cs-fixer.md)
 
 ## Some extended examples
 

@@ -3,5 +3,10 @@ parameters:
     paths:
         - src
         - tests
+
     excludePaths:
         - src/Databases/Mock/MockRunnableSelect.php
+
+    bootstrapFiles:
+        - tools/fixer-bootstrap.php
+

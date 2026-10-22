@@ -15,3 +15,5 @@
 !/task*.md
 !/tests.php
 !/tests.xml
+!/tools
+!/.php-cs-fixer.dist.php
